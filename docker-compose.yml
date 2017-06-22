@@ -1,0 +1,19 @@
+db:
+  tty: true
+  image: mongo:3.4.4
+  volumes:
+  - /home/app/easyregister/db:/data/db
+  stdin_open: true
+web:
+  environment:
+   # DB_1_PORT_27017_TCP_ADDR: db
+    PORT: '3000'
+  tty: true
+  image: easyregister:4.0
+  ports: 
+  - 80:80
+  volumes:
+    - /home/nfsshare/easyregister/upload:/home/easyRegister/public/upload
+    - /home/nfsshare/easyregister/logs:/home/easyRegister/logs
+  links:
+  - db:db

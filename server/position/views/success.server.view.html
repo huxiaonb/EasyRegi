@@ -1,0 +1,60 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>申请成功</title>
+    <link rel="stylesheet" href="/lib/weui/dist/style/weui.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/base.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/success.css">
+    <!--<link rel="stylesheet" type="text/css" href="/css/position/mediaquery.css">-->
+
+
+</head>
+<body>
+<!--
+<div class="shareTip">
+  <img src="/img/share-info.png">
+</div>
+-->
+
+<div class="container" id="mainContent" style="overflow-x: hidden;position:relative;">
+    <div class="weui_article">
+        <div class="header" align="center">
+                <i class="iconfont icon">&#xe689;</i>
+        </div>
+    </div>
+
+
+    <div class="weui_article middle">
+        <div align="center">
+            {% for successMessage in successMessages %}
+            <p>{{successMessage}}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <div class="weui_article" align="center">
+        <button class="btnStyle blue" onclick="go('/position')">了解更多</button>
+        <!-- <button class="btnStyle white" onclick="shareOnMoments()">分享给小伙伴</button> -->
+    </div>
+</div>
+<script src="/lib/zepto-full/zepto.min.js"></script>
+<script type="text/javascript">
+    function go(path) {
+        console.log(path);
+        path = path || '';
+        var context = location.protocol + "//" + location.host;
+        location.href = context + path;
+    }
+    $(function initAnimation() {
+        var main = $('#mainContent');
+        main.css({bottom: '30rem'});
+        main.animate({bottom: '0'}, 250);
+    })
+</script>
+
+</body>
+</html>

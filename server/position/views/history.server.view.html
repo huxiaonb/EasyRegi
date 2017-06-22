@@ -1,0 +1,46 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+  <link rel="stylesheet" href="/css/position/base.css">
+  <link rel="stylesheet" href="/css/position/iconfont.css">
+  <link rel="stylesheet" href="/css/position/position.css">
+  <title>投递记录</title>
+</head>
+<script src="/lib/zepto-full/zepto.min.js"></script>
+<script type="text/javascript">
+$(function() {
+  var main = $('section'),
+      length = $('section').length,
+      index = 0;
+  var timmer = setInterval(function () {
+        var each = $(main[index ++]);
+        each.animate({left : '0'}, 200);
+        if (index === length) {
+          clearInterval(timmer);
+        }
+      },200);
+})
+</script>
+  <body>
+    {% if applicants.length == 0 %}
+        <h1>您未投递过任何职位</h1>
+    {% endif %}
+    {% for applicant in applicants %}
+    {% for position in applicant.appliedPositions %}
+    <section onclick="javascript:location.href='/position/detail/{{position.positionId}}'" style="position:relative;left:40rem;">
+      <div class="content">
+        <div class="title">
+          {{ position.positionName }}
+        </div>
+        <div class="detail">
+          投递时间: {{position.appliedDate | date('Y年m月d日')}}
+          <br>
+          状态: 正在处理
+        </div>
+      </div>
+
+    </section>
+    {% endfor %}
+
+  </body>
+</html>

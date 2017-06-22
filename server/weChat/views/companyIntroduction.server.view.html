@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{segmentType}}</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no">
+    <link rel="stylesheet" href="/css/company/company.css">
+    <link rel="stylesheet" type="text/css" href="/css/company/animations.css">
+</head>
+<body>
+<div class="wrap">
+    {% for companyInfoSegment in companyInfoSegments %}
+    <div class="oocl {% if !isFlow %} page page-{{loop.index}} {% if loop.first %}page-current{% else %}hide{% endif %} {% endif %}" >
+        <div class="container-con">
+            <div class="container-con-hd">
+                <h2 class="oocl-title">{{companyInfoSegment.title}}</h2>
+               <!-- {% if companyInfoSegment.subTitle %}<p>{{companyInfoSegment.subTitle}}</p>{% endif %}-->
+            </div>
+           <!-- {% if companyInfoSegment.subTitle %}<h3 class="oocl-subTitle" >{{companyInfoSegment.subTitle}}</h3>{% endif %}-->
+            <div class="container-con-bd  {% if !isFlow %} pt-page-rotateCarouselTopIn {% endif %}">
+                {% autoescape %}{{companyInfoSegment.content}}{% endautoescape %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% if !isFlow %}
+<div> <img src="/img/arrow_down.png" alt="" class="arrow-up pt-page-moveIconUp"> </div>
+<div id="page-ft"></div>
+<script type="text/javascript" src="/lib/zepto-full/zepto.min.js"></script>
+<script type="text/javascript" src="/js/company.js"></script>
+{% endif %}
+</body>
+</html>

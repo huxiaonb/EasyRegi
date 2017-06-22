@@ -1,0 +1,100 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <script src="/lib/zepto-full/zepto.min.js"></script>
+  <link rel="stylesheet" href="/lib/weui/dist/style/weui.min.css">
+  <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/position/apply.css">
+    <link rel="stylesheet" href="/customize_lib/zepto-tooltip/css/smooth/zepto-tooltip.min.css">
+  <title>申请职位</title>
+</head>
+<body>
+  <div class="container-fluid main-container" style="position:relative;" id='mainContent'>
+    <div class="content-title">
+      <span>{{data.name}} ({{data.workAddr}})</span>
+    </div>
+      <div class="form-block">
+          <form id="main-apply-form" enctype="multipart/form-data" action="/position/apply/{{data.id}}" method="post">
+              <div class="row">
+                  <div class="col-xs-6 form-group">
+                      <label name="name-label" class="label-apply-form" for="inputName">姓名</label><span style="color:red">*</span>
+                      <abbr rel="tooltip" title="请输入中文英字符,请勿输入非法符号" name="name-tooltip">
+                          <input id="inputName" class="none-box-input form-control" type="text" name="name" placeholder="" data-regex="/^[-'a-z\u4e00-\u9eff\s]{1,120}$/" data-max-length="120" data-min-length="1" data-regex-attr="i" value="{{data.appName}}">
+                      </abbr>
+                  </div>
+                  <div class="col-xs-6 form-group">
+                      <label name="phone-label" class="label-apply-form" for="inputPhoneNumber">联系电话</label><span style="color:red">*</span>
+                      <abbr rel="tooltip" title="请输入正确的11位手机号码,座机以-分隔" name="phone-tooltip">
+                          <input id="inputPhoneNumber" class="none-box-input form-control" type="tel" name="phone" placeholder="" data-regex="/^((1[3|5|7|8|][0-9]{9})|(\d{3,5}-\d{6,8}))$/g" maxlength="14" data-min-length="1" isDigit=true value="{{data.phone}}">
+                      </abbr>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label name="college-label" class="label-apply-form" for="inputCollege">学校</label>
+                  <abbr rel="tooltip" title="请输入中文英字符,请勿输入非法符号" name="college-tooltip">
+                      <input id="inputCollege" class="none-box-input form-control" type="text" name="college" placeholder="" data-regex="/^[-'a-z\u4e00-\u9eff\s]{1,120}$/" data-regex-attr="i" value="{{data.college}}">
+                  </abbr>
+              </div>
+              <div class="row">
+                  <div class="col-xs-6 form-group">
+                      <label name="educationalBackground-label" class="label-apply-form" for="inputEducationalBackground">最高学历</label>
+                      <select name="educationalBackground" class="none-box-input form-control" id="inputEducationalBackground">
+                          <option value="" disabled selected></option>
+                          <option value="博士" {% if data.educationalBackground=="博士" %}selected {% endif %} >博士</option>
+                          <option value="硕士" {% if data.educationalBackground=="硕士" %}selected {% endif %}>硕士</option>
+                          <option value="本科" {% if data.educationalBackground=="本科" %}selected {% endif %}>本科</option>
+                          <option value="专科" {% if data.educationalBackground=="专科" %}selected {% endif %}>专科</option>
+                      </select>
+                  </div>
+                  <div class="col-xs-6 form-group">
+                      <label name="major-label" class="label-apply-form" for="inputMajor">专业</label>
+                      <abbr rel="tooltip" title="请输入中文英字符,请勿输入非法符号" name="major-tooltip">
+                          <input id="inputMajor" class="none-box-input form-control" type="text" name="major" placeholder="" data-regex="/^[-'a-z\u4e00-\u9eff\s]{1,120}$/" data-regex-attr="i" value="{{data.major}}">
+                      </abbr>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label name="graduationDate-label" class="label-apply-form">毕业时间</label>
+                  <div class="row">
+                      <div class="col-xs-12 col-md-12">
+                          <input name="graduationDate" placeholder="" class="none-box-input form-control" type="month" value="{{data.graduationDate}}">
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-xs-6 form-group">
+                      <label name="email-label" class="label-apply-form" for="inputEmail">邮箱</label><span style="color:red">*</span>
+                      <abbr rel="tooltip" title="请输入正确的邮箱格式" name="email-tooltip">
+                          <input id="inputEmail" class="none-box-input form-control" type="email" name="email" placeholder=""
+                                 data-regex="/^[A-Za-z0-9\._%-]+@[A-Za-z0-9\.-]+\.[A-Za-z]{2,6}(?:[;][A-Za-z0-9\._%-]+@[A-Za-z0-9\.-]+\.[A-Za-z]{2,6}?)*$/"
+                                 data-min-length="1" maxLength="50" value="{{data.email}}">
+                      </abbr>
+                  </div>
+                  <div class="col-xs-6 form-group">
+                      <label name="QQ-label" class="label-apply-form" for="inputQQ">QQ</label>
+                      <abbr rel="tooltip" title="请输入正确的QQ号码" name="QQ-tooltip">
+                          <input id="inputQQ" class="none-box-input form-control" type="text" name="QQ" placeholder="" maxlength="20" isDigit=true value="{{data.QQ}}">
+                      </abbr>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <a href="javascript:void(0);" class="btn_addPic">
+                      <abbr rel="tooltip" title="" name="pic-tooltip">
+                          <div  style="max-width: 7rem;">
+                              <span id="filename">添加照片</span>
+                          </div>
+                          <input type="file" tabindex="3"
+                                 title="支持jpg、jpeg、gif、png格式，文件小于5M" size="3"
+                                 name="pic" class="filePrew form-control">
+                      </abbr>
+                  </a>
+              </div>
+          </form>
+      </div>
+      <div class="submit-btn">
+        <button class="btnStyle blue" style="width: 50%;height:4rem;text-align: center; font-weight:bold; font-size: 2rem;" onclick="submit()">发送申请</button>
+      </div>
+  </div>
+  <script src="/js/apply.js" charset="utf-8"></script>
+</body>
+</html>

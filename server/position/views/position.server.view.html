@@ -1,0 +1,60 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+  <link rel="stylesheet" href="/css/position/base.css">
+  <link rel="stylesheet" href="/css/position/iconfont.css">
+  <link rel="stylesheet" href="/css/position/position.css">
+  <title>职位列表</title>
+  {% set map = {
+    Technique : '&#xe676;',
+    Test : '&#xe60b;',
+    Design : '&#xe603;',
+    Service : '&#xe63f;',
+    Support : '&#xe819;'
+  } %}
+</head>
+  <body>
+    {% if positions.length == 0 %}
+      <p>暂无招聘职位<p>
+    {% endif %}
+    {% for position in positions %}
+    <section onclick="javascript:location.href='/position/detail/{{position.id}}'" style="position:relative;left:40rem;">
+      <div class="img">
+          <i class="iconfont icon">
+            {{ map[position.jobType] || 'x' | raw}}
+          </i>
+      </div>
+      <div class="content">
+        <div class="title">
+          {{ position.name }}
+        </div>
+        <div class="detail">
+          {{position.experience}} | {{position.certificate}} | {{position.money}}
+        </div>
+      </div>
+    </section>
+    {% endfor %}
+    <div style="height:4rem;">
+
+    </div>
+    <div align="center" style="position: fixed;bottom: 0.1rem;width: 100%;z-index: 100">
+        <button class="btnStyle blue" onclick="javascript:location.href='/position/history'">投递记录</button>
+    </div>
+    <script src="/lib/zepto-full/zepto.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+      var main = $('section'),
+          length = $('section').length,
+          index = 0;
+      var timmer = setInterval(function () {
+            var each = $(main[index ++]);
+
+            each.animate({left : '0'}, 200);
+            if (index === length) {
+              clearInterval(timmer);
+            }
+          },200);
+    })
+    </script>
+  </body>
+</html>

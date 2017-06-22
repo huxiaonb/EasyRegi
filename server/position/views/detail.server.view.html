@@ -1,0 +1,71 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/lib/weui/dist/style/weui.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/base.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/iconfont.css">
+    <link rel="stylesheet" type="text/css" href="/css/position/detail.css">
+    <title>职位详情</title>
+</head>
+<body>
+<div id="container" style="overflow-x: hidden;position:relative;">
+    <div class="weui_panel head">
+        <div align="center">
+            <div class="weui_article">
+                <p class="head1" style="margin: auto">{{data.name}} <span style="font-size: medium">( {{data.count}}人 )</span></p>
+                <div class="head-text">
+                    <i class="iconfont icon-small">&#xe608;</i>
+                    <span class="head2">{{data.workAddr}}</span>
+                    <i class="iconfont icon-small" style="margin-left: 50px">&#xe629;</i>
+                    <span class="head2">{{data.money}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui_article">
+        {% for welfare in data.welfare %}
+        <button class="btnStyle yellow">{{welfare}}</button>
+        {% endfor %}
+    </div>
+    <div class="weui_article" style="margin-bottom: 2rem">
+        <h1 class="title">岗位职责</h1>
+        <section style="box-shadow: none">
+            {{data.description | raw}}
+        </section>
+        <h1 class="title">任职要求</h1>
+        <section style="box-shadow: none">
+            {{data.descriptionDetail | raw}}
+        </section>
+    </div>
+    <div class="opacity-bg"></div>
+
+    <div id="shadowDiv" class="hidDiv" style="position: fixed"><img id="imgShow" src="/img/share-info.png" style="width: 100%;height: 50%"/></div>
+
+</div>
+<div align="center" style="position:fixed;bottom: 0.1rem;width: 100%;">
+    <button class="btnStyle blue" onclick="javascript:location.href='/position/apply/{{data.id}}'">申请职位</button>
+    <button class="btnStyle white-shadow" onclick="showShares()">分享</button>
+</div>
+<script src="/lib/zepto-full/zepto.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var main = $('#container');
+        main.css({left: '40rem'});
+        main.animate({left: '0'}, 200);
+
+    })
+    function showShares() {
+        if ($("#shadowDiv").attr("class") == "showDiv") {//执行关灯操作
+            $("#shadowDiv").attr("class", "hidDiv");
+        } else $("#shadowDiv").attr("class", "showDiv");
+    }
+    $("#shadowDiv").click(function () {
+        $("#shadowDiv").attr("class", "hidDiv");
+
+    });
+
+</script>
+</body>
+
+</html>
