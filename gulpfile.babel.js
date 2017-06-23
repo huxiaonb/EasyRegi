@@ -11,11 +11,9 @@ import webpackConfig from './webpack.config.babel'
 
 
 gulp.task('webpack-watch', () => {
-    console.log(webpackConfig);
     webpack(webpackConfig).watch({
         aggregateTimeout: 300
     }, (err, stats) => {
-        console.log(err);
         console.log(stats.toString({
             colors: true,
             chunks: false
