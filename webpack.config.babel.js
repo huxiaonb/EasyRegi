@@ -6,7 +6,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin'
 const config = {
     watch: process.env.NODE_ENV !== 'production',
     entry: {
-        'maintain/index' : './maintain/src/main.js',
+        'maintain/index' : './maintain/src/index.js',
         'mobile/index' : './mobile/src/entry.js'
     },
     output: {
