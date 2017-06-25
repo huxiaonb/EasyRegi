@@ -29,10 +29,9 @@ class Index extends React.Component {
     return (
       <div>
         <Layout className='main-container'>
-          <Header style={{ background: '#fff', padding: 0 }}></Header>
-          <Layout style={{position:'relative'}}>
-             <Sider>
-              <Menu theme="dark" mode="inline"  defaultSelectedKeys={['1']}>
+           <Sider>
+              <div style={{fontSize:'24px',color:'white',margin:'20px 0'}}>入职易</div>
+              <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']}>
                 <Menu.Item key="1">
                   <Link to='/comp' className="nav-text">公司信息</Link>
                 </Menu.Item>
@@ -44,13 +43,20 @@ class Index extends React.Component {
                 </Menu.Item>
               </Menu>
             </Sider>
+          <Layout style={{position:'relative'}}>
+            <Menu mode="horizontal">
+              <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />GDGDGD</span>}>
+                <Menu.Item key="setting:1">退出</Menu.Item>
+              </SubMenu>
+            </Menu>
             <Content style={{ margin: '24px 16px 0px', padding: 24, background: '#fff' }}>
               { this.props.children }
             </Content>
+            <Footer style={{ textAlign: 'center',padding:0 }}>
+              M & G PRESENTS ©2017  (づ￣ 3￣)づ 
+            </Footer>
           </Layout>
-          <Footer style={{ textAlign: 'center',padding:0 }}>
-            M & G PRESENTS ©2017  (づ￣ 3￣)づ 
-          </Footer>
+          
         </Layout>
       </div>
       

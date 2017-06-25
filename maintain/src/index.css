@@ -7,3 +7,6 @@
     overflow: auto;
     box-sizing: border-box;
 }
+.user-right{
+    float:right !important;
+}
