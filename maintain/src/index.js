@@ -12,7 +12,7 @@ const SubMenu = Menu.SubMenu
 //引入页面组件
 import CompInfo from './components/compInfo';
 import ApplicantManage from './components/applicantManage';
-import ApplicantPreview from './components/applicantPreview';
+
 import PositionManage from './components/positionManage';
 
 import './index.css'
@@ -49,7 +49,7 @@ class Index extends React.Component {
                 <Menu.Item key="setting:1">退出</Menu.Item>
               </SubMenu>
             </Menu>
-            <Content style={{ margin: '24px 16px 0px', padding: 24, background: '#fff' }}>
+            <Content style={{ margin: '24px 16px 0px', background: '#fff' }}>
               { this.props.children }
             </Content>
             <Footer style={{ textAlign: 'center',padding:0 }}>
@@ -72,7 +72,6 @@ render((
             <IndexRoute component={CompInfo} />
             <Route path="comp" component={CompInfo} />
             <Route path="applicant" component={ApplicantManage} />
-            <Route path="preview" component={ApplicantPreview} />
             <Route path="position" component={PositionManage} />
         </Route>
     </Router>
