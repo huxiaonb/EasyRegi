@@ -1,33 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Layout from 'antd/lib/Layout'
-import Button from 'antd/lib/button'
-import Select from 'antd/lib/select'
-import Checkbox from 'antd/lib/checkbox'
+import {List, InputItem, Picker, Checkbox, Button} from 'antd-mobile'
 
-
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/layout/style/index.less'
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/select/style/index.less';
-import 'antd/lib/checkbox/style/index.less';
-import 'antd/lib/form/style/index.less';
 import lapi from './registerProfile/lapi'
 
-
-
-
-const { Header, Content, Footer, Sider } = Layout;
-const Option = Select.Option;
+const CheckboxItem = Checkbox.CheckboxItem;
 const openId = $('#openId').text();
 
 class Company extends React.Component{
     state={
         bCheck : true,
         mCheck : true,
-        selectCompId: ''
+        selectCompId: '',
+        companies: [{value: 'OOCL', label: 'OOCL'},{value: '金山', label: '金山'}, {value: '西山居', label: '西山居'}]
     }
     async subm(){
         var data = {
@@ -52,29 +38,36 @@ class Company extends React.Component{
             mCheck: e.target.checked,
         });
     }
+    onChange = (val) => {
+        console.log(val);
+    }
     render(){
         let {bCheck, mCheck} = this.state;
         return(
-            <Layout>
-                <Header style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >公司信息</Header>
-                <Content style={{ margin: '24px 16px 0' }}>
+            <div>
+                <div style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >公司信息</div>
+                <div style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'center'}}>
+                        <List renderHeader={()=>'预览'}>
+                            <InputItem
+                            name="name"
+                            placeholder="姓名"
+                            defaultValue="付"
+                            >姓名</InputItem>
                         
-                        <Select  defaultValue="5936c9311bd50e16e864b918" onChange={this.handleChange.bind(this)} className='ant-form-item' style={{minWidth:'120px'}}>
-                            <Option value="5936c9311bd50e16e864b918">OOCL</Option>
-                            <Option value="b">公司B</Option>
-                            <Option value="c">公司C</Option>
-                            <Option value="d">公司D</Option>
-                        </Select>
-                        <Checkbox onChange={this.changeB.bind(this)} checked={bCheck} className='ant-form-item' style={{display:'block'}}>个人保证已填写资料属实并同意体检不合格时不予录用</Checkbox>
-                        <Checkbox onChange={this.changeM.bind(this)} checked={mCheck} className='ant-form-item' style={{display:'block'}}>支付1元支持入职易</Checkbox>                    
-                        <Button type='primary' disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
+                        <Picker data={this.state.companies} cols={1}>
+                            <List.Item arrow="horizontal">公司</List.Item>
+                        </Picker>    
+                        <CheckboxItem key={0} onChange={()=>this.onChange(0)}>个人保证已填写资料属实并同意体检不合格时不予录用</CheckboxItem>
+                        <CheckboxItem key={1} onChange={()=>this.onChange(1)}>支付1元支持入职易</CheckboxItem>
+                        </List>               
+                        <Button type='primary' inline size="small" onClick={this.subm.bind(this)}>提交本人简历</Button>    
                     </div>
-                </Content>
-                <Footer style={{ textAlign: 'center' }}>
+                </div>
+                <div style={{ textAlign: 'center' }}>
                     M & G PRESENTS ©2017  (づ￣ 3￣)づ 
-                </Footer>
-            </Layout>
+                </div>
+            </div>
         )
     }
 }
