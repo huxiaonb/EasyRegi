@@ -151,7 +151,7 @@ class Index extends React.Component {
     //2nd : set data
     if(r.length){
         let info = Object.assign({},r[0]);
-        let wkeys,ekeys=[];
+        let wkeys=[],ekeys=[];
         info.workExperiences.map((wk,idx)=>{
             wkeys.push(idx);
             wk.startedAt = moment(wk.startedAt);
