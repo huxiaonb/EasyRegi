@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {List, InputItem, Picker, Checkbox, Button} from 'antd-mobile'
+import district from 'antd-mobile-demo-data'
 
 import lapi from './registerProfile/lapi'
 
@@ -13,7 +14,8 @@ class Company extends React.Component{
         bCheck : true,
         mCheck : true,
         selectCompId: '',
-        companies: [{value: 'OOCL', label: 'OOCL'},{value: '金山', label: '金山'}, {value: '西山居', label: '西山居'}]
+        companies: [{value: 'OOCL', label: 'OOCL'},{value: '金山', label: '金山'}, {value: '西山居', label: '西山居'}],
+        currentCompany: []
     }
     async subm(){
         var data = {
@@ -41,11 +43,18 @@ class Company extends React.Component{
     onChange = (val) => {
         console.log(val);
     }
-    render(){
+    onPickerChange = (val) => {
+        console.log(val)
+        this.setState({
+            currentCompany: val
+        })
+
+    }
+    render(){ 
         let {bCheck, mCheck} = this.state;
         return(
             <div>
-                <div style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >公司信息</div>
+                <div style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >提交入职资料</div>
                 <div style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'center'}}>
                         <List renderHeader={()=>'预览'}>
@@ -54,8 +63,8 @@ class Company extends React.Component{
                             placeholder="姓名"
                             defaultValue="付"
                             >姓名</InputItem>
-                        
-                        <Picker data={this.state.companies} cols={1}>
+                         
+                        <Picker data={this.state.companies} cols={1} className="all-companies" value={this.state.currentCompany} onPickerChange={this.onPickerChange}>
                             <List.Item arrow="horizontal">公司</List.Item>
                         </Picker>    
                         <CheckboxItem key={0} onChange={()=>this.onChange(0)}>个人保证已填写资料属实并同意体检不合格时不予录用</CheckboxItem>
