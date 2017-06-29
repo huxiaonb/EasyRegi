@@ -44,6 +44,7 @@
     "express-restify-mongoose": "^4.0.2",
     "express-session": "^1.13.0",
     "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.11.2",
     "file-stream-rotator": "^0.0.7",
     "font-awesome": "^4.7.0",
     "generate-password": "^1.1.1",

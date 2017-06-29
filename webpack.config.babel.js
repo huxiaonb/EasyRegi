@@ -11,7 +11,7 @@ const config = {
     },
     output: {
         path: path.resolve(__dirname,  'public/dist'),
-        publicPath : 'public/',
+        publicPath : '../',
         filename: '[name].js',
         libraryTarget: 'umd'
     },
