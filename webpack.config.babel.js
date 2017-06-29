@@ -1,7 +1,7 @@
 import webpack from 'webpack'
 import path from 'path'
 import ExtractTextPlugin from 'extract-text-webpack-plugin'
-
+const pxtorem = require('postcss-pxtorem');
 
 const config = {
     watch: process.env.NODE_ENV !== 'production',
@@ -10,7 +10,7 @@ const config = {
         'mobile/index' : './mobile/src/entry.js'
     },
     output: {
-        path: path.join(__dirname,  'public/dist'),
+        path: path.resolve(__dirname,  'public/dist'),
         publicPath : 'public/',
         filename: '[name].js',
         libraryTarget: 'umd'
@@ -26,7 +26,8 @@ const config = {
             test: /\.js$/,
             exclude: /(node_modules)/,
             loader: 'babel',
-        }, {
+        }, 
+        {
             test: /\.css$/,
             loader: ExtractTextPlugin.extract("style-loader", "css-loader")
         },
@@ -43,7 +44,7 @@ const config = {
         },
         ]
     },
-    
+    postcss: [],
     
     plugins: [
         new webpack.ProvidePlugin({
@@ -69,6 +70,9 @@ if(process.env.NODE_ENV === 'production'){
         }))
 }
 
-
+config.postcss.push(pxtorem({
+    rootValue: 100,
+    propWhiteList: [],
+  }));
 
 export default config

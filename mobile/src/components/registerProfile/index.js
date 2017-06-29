@@ -213,7 +213,7 @@ class Index extends React.Component {
     );
     return(
       <Layout>
-          <Header style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >入职信息录入</Header>
+          <Header style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >编辑个人简历</Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'center'}}>
               {myStep}
