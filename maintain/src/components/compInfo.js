@@ -33,8 +33,10 @@ export default class CompInfo extends React.Component{
                         <div className="entrance-wrap">
                             <Link to="/applicant"><Button size="large" type="ghost">入职员工管理</Button></Link>
                             <Link to="/position"><Button size="large" type="ghost">公司职位管理</Button></Link>
+                            <div>
                             <Link to="#"><Button size="large" type="ghost">更改密码</Button></Link>
                             <Link to="#"><Button size="large" type="ghost">others</Button></Link>
+                            </div>
                         </div>
                         
                 </div>

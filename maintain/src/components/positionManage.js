@@ -1,12 +1,16 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table} from 'antd'
+import {Button, Input, DatePicker, Table, Modal, message,Form} from 'antd'
 import './index.less';
 const {RangePicker } = DatePicker;
-
-export default class PositionManage extends React.Component{
+const FormItem = Form.Item;
+class PositionManage extends React.Component{
     state={
         resultTotal : 0,
+        pFlag : false,
+        rowValue : {
+            positionName : '',
+        }
     }
     onSearch(){
         console.log('search');
@@ -14,26 +18,55 @@ export default class PositionManage extends React.Component{
     clear(){
         console.log('clear');
     }
-    
-    
+    toggleP(){
+        this.setState({
+            pFlag : !this.state.pFlag
+        })
+    }
+    handleOk(){
+        //fetch url edit/create
+        this.toggleP();
+        message.success('操作成功！');
+    }
+    editP(rec){
+        console.log(rec);
+        this.setState({
+            rowValue : rec
+        });
+        this.toggleP();
+    }
+    deleP(rec){
+        Modal.confirm({
+            title: '确认删除此职位吗？',
+            okText: '确认',
+            cancelText: '取消',
+        });
+    }
     componentWillMount(){
         //get table data and set to state,use fetch
     }
     render(){
+        let {pFlag} = this.state;
+        let {getFieldDecorator} = this.props.form;
         const columns = [{
-            title: '姓名',
+            title: '名称',
             dataIndex: 'positionName',
             className: 'log-result-noWrap',
         }, {
             title: '创建日期',
             dataIndex: 'submittedAt',
             className: 'log-result-noWrap',
-        },/*{
-            title: '出生日期',
-            dataIndex: 'birthDate',
-            key: 'birthDate',
+        },{
+            title: '操作',
+            dataIndex: 'action',
+            key: 'action',
             className: 'log-result-noWrap',
-        }, {
+            render: (text, record) => (
+				<span>
+					<a style={{marginRight:'5px'}} href="javascript:;" onClick={this.editP.bind(this,record)}>编辑</a><a className='' href="javascript:;" onClick={this.deleP.bind(this,record)}>删除</a>
+				</span>
+			)
+        }, /*{
             title: '电话',
             dataIndex: 'mobile',
             key: 'mobile',
@@ -47,11 +80,9 @@ export default class PositionManage extends React.Component{
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]
         return(
             <div>
-                
-            
             <div className='search-bar-container'>
                 <div className='search-title'>
-                    招聘职位管理
+                    招聘职位管理<span title='新增职位' style={{marginLeft:'10px'}}><Button shape="circle" type='primary' icon='plus' onClick={this.toggleP.bind(this)} /></span>
                 </div>
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
@@ -87,8 +118,42 @@ export default class PositionManage extends React.Component{
                     }}
                     bordered={true}/>
                 </div>
-            </div>
-            
+                
+                <Modal
+                    title="添加新职位"
+                    visible={pFlag}
+                    onOk={this.handleOk.bind(this)}
+                    onCancel={this.toggleP.bind(this)}
+                    >
+                    <Form>
+                        <FormItem
+                            label='职位名'
+                            name='p_name'>
+                            {getFieldDecorator('p_name',{
+                                rules:[{
+                                    type:'string',required:true
+                                }],
+                                initialValue:this.state.rowValue.positionName
+                            })(
+                                <Input/>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label='其他信息'
+                            name='p_other'>
+                            {getFieldDecorator('p_other',{
+                                rules:[{
+                                    type:'string',required:true
+                                }]
+                            })(
+                                <Input/>
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
+                
+            </div> 
         )
     }
 }
+export default Form.create()(PositionManage)
