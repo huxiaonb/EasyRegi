@@ -1,22 +1,22 @@
 import React from 'react'
 import { render } from 'react-dom'
-//import {Form, Button, Input, Select, Row, Col} from 'antd'
-import Form from 'antd/lib/form'
-import Input from 'antd/lib/input'
-import Button from 'antd/lib/button'
-import Select from 'antd/lib/select'
-import Row from 'antd/lib/row'
-import Col from 'antd/lib/col'
-import DatePicker from 'antd/lib/date-picker'
+import {Form, Button, Input, Select, Row, Col} from 'antd'
+// import Form from 'antd/lib/form'
+// import Input from 'antd/lib/input'
+// import Button from 'antd/lib/button'
+// import Select from 'antd/lib/select'
+// import Row from 'antd/lib/row'
+// import Col from 'antd/lib/col'
+// import DatePicker from 'antd/lib/date-picker'
 
 
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/input/style/index.less';
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/select/style/index.less';
-import 'antd/lib/form/style/index.less';
-import 'antd/lib/date-picker/style/index.less';
+// import 'antd/lib/style/index.less';
+// import 'antd/lib/grid/style/index.less';
+// import 'antd/lib/input/style/index.less';
+// import 'antd/lib/button/style/index.less';
+// import 'antd/lib/select/style/index.less';
+// import 'antd/lib/form/style/index.less';
+// import 'antd/lib/date-picker/style/index.less';
 import './style/login.less'
 
 const FormItem = Form.Item;

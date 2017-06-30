@@ -5,13 +5,13 @@ import { render } from 'react-dom'
 import { Router, Route, Link, hashHistory , IndexRoute, Redirect, IndexLink} from 'react-router'
 
 // 配置导航
-//import { Layout, Menu, Icon } from 'antd';
-import Layout from 'antd/lib/layout'
-import Menu from 'antd/lib/menu'
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/layout/style/index.less';
-import 'antd/lib/menu/style/index.less';
+import { Layout, Menu, Icon } from 'antd';
+// import Layout from 'antd/lib/layout'
+// import Menu from 'antd/lib/menu'
+// import 'antd/lib/style/index.less';
+// import 'antd/lib/grid/style/index.less';
+// import 'antd/lib/layout/style/index.less';
+// import 'antd/lib/menu/style/index.less';
 
 
 const { Header, Sider, Content, Footer } = Layout;

@@ -1,25 +1,25 @@
 import React from 'react'
 import { render } from 'react-dom'
-//import {Button, Input, DatePicker, Table, Modal, message, Form} from 'antd'
+import {Button, Input, DatePicker, Table, Modal, message, Form} from 'antd'
 
-import Form from 'antd/lib/form'
-import Table from 'antd/lib/table'
-import Modal from 'antd/lib/modal'
-import Input from 'antd/lib/input'
-import Button from 'antd/lib/button'
-import DatePicker from 'antd/lib/date-picker'
-import message from 'antd/lib/message'
+// import Form from 'antd/lib/form'
+// import Table from 'antd/lib/table'
+// import Modal from 'antd/lib/modal'
+// import Input from 'antd/lib/input'
+// import Button from 'antd/lib/button'
+// import DatePicker from 'antd/lib/date-picker'
+// import message from 'antd/lib/message'
 
 
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/input/style/index.less';
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/form/style/index.less';
-import 'antd/lib/table/style/index.less';
-import 'antd/lib/modal/style/index.less';
-import 'antd/lib/message/style/index.less';
-import 'antd/lib/date-picker/style/index.less';
+// import 'antd/lib/style/index.less';
+// import 'antd/lib/grid/style/index.less';
+// import 'antd/lib/input/style/index.less';
+// import 'antd/lib/button/style/index.less';
+// import 'antd/lib/form/style/index.less';
+// import 'antd/lib/table/style/index.less';
+// import 'antd/lib/modal/style/index.less';
+// import 'antd/lib/message/style/index.less';
+// import 'antd/lib/date-picker/style/index.less';
 import './style/components.less';
 const {RangePicker } = DatePicker;
 const FormItem = Form.Item;
