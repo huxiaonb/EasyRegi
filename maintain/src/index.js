@@ -5,7 +5,15 @@ import { render } from 'react-dom'
 import { Router, Route, Link, hashHistory , IndexRoute, Redirect, IndexLink} from 'react-router'
 
 // 配置导航
-import { Layout, Menu, Icon } from 'antd';
+//import { Layout, Menu, Icon } from 'antd';
+import Layout from 'antd/lib/layout'
+import Menu from 'antd/lib/menu'
+import 'antd/lib/style/index.less';
+import 'antd/lib/grid/style/index.less';
+import 'antd/lib/layout/style/index.less';
+import 'antd/lib/menu/style/index.less';
+
+
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu
 
@@ -15,7 +23,7 @@ import CompInfo from './components/compInfo';
 import ApplicantManage from './components/applicantManage';
 import PositionManage from './components/positionManage';
 
-import './index.css'
+import './index.less'
 class Index extends React.Component {
   state = {
     collapsed: false,

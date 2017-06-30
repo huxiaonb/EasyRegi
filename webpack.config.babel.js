@@ -7,13 +7,11 @@ const config = {
     watch: process.env.NODE_ENV !== 'production',
     entry: {
         'maintain/index' : './maintain/src/index.js',
-        'mobile/index' : './mobile/src/entry.js'
     },
     output: {
         path: path.resolve(__dirname,  'public/dist'),
         publicPath : '../',
         filename: '[name].js',
-        libraryTarget: 'umd'
     },
     resolve: {
         modulesDirectories: ['node_modules', path.join(__dirname, './node_modules')],
@@ -70,9 +68,5 @@ if(process.env.NODE_ENV === 'production'){
         }))
 }
 
-config.postcss.push(pxtorem({
-    rootValue: 100,
-    propWhiteList: [],
-  }));
 
 export default config

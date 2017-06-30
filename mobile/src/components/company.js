@@ -5,6 +5,7 @@ import {List, InputItem, Picker, Checkbox, Button} from 'antd-mobile'
 import district from 'antd-mobile-demo-data'
 
 import lapi from './registerProfile/lapi'
+import './less/index.less'
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const openId = $('#openId').text();
@@ -67,8 +68,8 @@ class Company extends React.Component{
                         <Picker data={this.state.companies} cols={1} className="all-companies" value={this.state.currentCompany} onPickerChange={this.onPickerChange}>
                             <List.Item arrow="horizontal">公司</List.Item>
                         </Picker>    
-                        <CheckboxItem key={0} onChange={()=>this.onChange(0)}>个人保证已填写资料属实并同意体检不合格时不予录用</CheckboxItem>
-                        <CheckboxItem key={1} onChange={()=>this.onChange(1)}>支付1元支持入职易</CheckboxItem>
+                        <CheckboxItem  key={0} onChange={()=>this.onChange(0)}>个人保证已填写资料属实并同意体检不合格时不予录用</CheckboxItem>
+                        <CheckboxItem  key={1} onChange={()=>this.onChange(1)}>支付1元支持入职易</CheckboxItem>
                         </List>               
                         <Button type='primary' inline size="small" onClick={this.subm.bind(this)}>提交本人简历</Button>    
                     </div>

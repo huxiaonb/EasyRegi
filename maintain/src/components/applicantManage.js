@@ -1,7 +1,19 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table} from 'antd'
-import './index.less';
+//import {Button, Input, DatePicker, Table} from 'antd'
+import Table from 'antd/lib/table'
+import Input from 'antd/lib/input'
+import Button from 'antd/lib/button'
+import DatePicker from 'antd/lib/date-picker'
+
+import 'antd/lib/style/index.less';
+import 'antd/lib/grid/style/index.less';
+import 'antd/lib/input/style/index.less';
+import 'antd/lib/button/style/index.less';
+import 'antd/lib/table/style/index.less';
+import 'antd/lib/date-picker/style/index.less';
+import './style/components.less';
+
 const {RangePicker } = DatePicker;
 
 export default class ApplicantManage extends React.Component{

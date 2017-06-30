@@ -20,7 +20,7 @@ import 'antd/lib/select/style/index.less';
 import 'antd/lib/card/style/index.less';
 import 'antd/lib/badge/style/index.less';
 import 'antd/lib/date-picker/style/index.less';
-import '../../less/ranger-picker.less'
+//import '../../less/ranger-picker.less'
 
 
 const FormItem = Form.Item;
