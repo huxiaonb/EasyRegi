@@ -7,11 +7,12 @@ import webpack from 'webpack'
 import nodemon from 'gulp-nodemon'
 import config  from './config/config'
 import webpackConfig from './webpack.config.babel'
+import webpackMobileConfig from './mobile/webpack.config'
 
 
 
 gulp.task('webpack-watch', () => {
-    webpack(webpackConfig).watch({
+    webpack([webpackConfig,webpackMobileConfig]).watch({
         aggregateTimeout: 300
     }, (err, stats) => {
         console.log(stats.toString({
