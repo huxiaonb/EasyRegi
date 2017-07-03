@@ -399,12 +399,12 @@ function getAllCompanyNames(req, res, next){
         var companyNames = [];
         if(!_.isEmpty(companies)){
           _.forEach(companies, function(company){
-            var loginId = _.get(company, ['loginId'], ''),
+            var _id = _.get(company, ['_id'], ''),
                 alias = _.get(company, ['alias'], '');
-            if(!_.isEmpty(loginId) && !_.isEmpty(alias)){
+            if(!_.isEmpty(_id) && !_.isEmpty(alias)){
               var nameObj = {
                 label: alias,
-                value: loginId
+                value: _id
               }
               companyNames.push(nameObj);
             }

@@ -7,7 +7,7 @@
 export default{
     login(acc,pwd){
         //需要返回当前公司信息
-        let url = '';
+        let url = '../api/company/login';
         return fetch(url,{
              method:"post",
              //headers:{},
@@ -16,23 +16,25 @@ export default{
     },
     createOrUpdateComp(data){
         /*注册公司或更新公司数据
-            data{
-                name：全名
-                alias：简称
-                prop：类型
-                size：规模，
-                contact_person:联系人,
-                contact_phone:联系电话,
-                email:邮箱 用作 登录 id,
-                addr: 公司地址,
-                desc：简介
+            var company = {
+                companyName: '大贵金属附属2',
+                password: '111111', //必须的
+                alias: 'DGMF',
+                companyAddress: '深圳南山区南山医院附近',
+                companyType: '国企',
+                companyScale: '3000人以上',
+                phoneNumber: '1111111',
+                contactPersonName: '李先生',
+                email: '3215@qq.com', //必须的
+                description: '超级金属附属厂',
+                positions: []
             }
         */
-        let url='';
+        let url='../api/company/update';
         return fetch(url,{
              method:"post",
              //headers:{},
-             body:data
+             body:company
         }).then(data => data).catch(e => console.log(e));
     },
     getBasicInfo(){

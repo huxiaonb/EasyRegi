@@ -9,7 +9,7 @@ describe('company api unit test', function(){
     describe('insert', function(){
         it('insert company by POST method', function(done){
             var company = {
-                loginId: 'oocluser',
+                email: 'oocluser',
                 password: '123456',
                 companyName: 'OOCL ZHA',
                 alias: 'OOCL',

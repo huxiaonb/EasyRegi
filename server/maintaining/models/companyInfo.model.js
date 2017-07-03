@@ -17,11 +17,6 @@ var PositionSchema = new Schema({
 })
 
 var CompanySchema = new Schema({
-    loginId: {
-        type: String,
-        required: true,
-        unique: true
-    },
     password: {
         type: String,
         required: true
@@ -38,7 +33,11 @@ var CompanySchema = new Schema({
     companyScale: String,
     phoneNumber: String,
     contactPersonName: String,
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
     description: {
         type: String,
         default: '',
