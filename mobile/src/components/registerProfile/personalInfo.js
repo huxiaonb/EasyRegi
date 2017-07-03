@@ -2,33 +2,35 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import Form from 'antd/lib/form'
-import Input from 'antd/lib/input'
-import Button from 'antd/lib/button'
-import Select from 'antd/lib/select'
-import DatePicker from 'antd/lib/date-picker'
-import Card from 'antd/lib/card'
+import { List, InputItem, Button,Picker,DatePicker,Card, Icon} from 'antd-mobile'
+import { createForm } from 'rc-form';
+import moment from 'moment';
+// import Form from 'antd/lib/form'
+// import Input from 'antd/lib/input'
+// import Button from 'antd/lib/button'
+// import Select from 'antd/lib/select'
+// import DatePicker from 'antd/lib/date-picker'
+// import Card from 'antd/lib/card'
 import Upload from 'antd/lib/upload';
-import Icon from 'antd/lib/icon';
-import Modal from 'antd/lib/modal';
+// import Icon from 'antd/lib/icon';
+// import Modal from 'antd/lib/modal';
  
 
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/input/style/index.less';
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/form/style/index.less';
-import 'antd/lib/select/style/index.less';
-import 'antd/lib/date-picker/style/index.less';
-import 'antd/lib/card/style/index.less';
-import 'antd/lib/upload/style/index.less';
-
-import 'antd/lib/modal/style/index.less';
+// import 'antd/lib/style/index.less';
+// import 'antd/lib/grid/style/index.less';
+// import 'antd/lib/input/style/index.less';
+// import 'antd/lib/button/style/index.less';
+// import 'antd/lib/form/style/index.less';
+// import 'antd/lib/select/style/index.less';
+// import 'antd/lib/date-picker/style/index.less';
+// import 'antd/lib/card/style/index.less';
+// import 'antd/lib/upload/style/index.less';
+// import 'antd/lib/modal/style/index.less';
 
 
 const openId = $('#openId').text();
-const FormItem = Form.Item;
-const Option = Select.Option;
+const FormItem = List.Item;
+//const Option = Select.Option;
 const nations = ["汉族","蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族",  
                "哈尼族","哈萨克族","傣族","黎族","傈僳族","佤族","畲族","高山族","拉祜族","水族","东乡族","纳西族","景颇族","柯尔克孜族",  
                "土族","达斡尔族","仫佬族","羌族","布朗族","撒拉族","毛南族","仡佬族","锡伯族","阿昌族","普米族","塔吉克族","怒族", "乌孜别克族",  
@@ -135,60 +137,56 @@ class PersonalInfo extends React.Component {
         const uploadButton = ( <Button>
                             <Icon type="upload" /> Click to Upload
                         </Button>);
-        const { getFieldDecorator } = this.props.form;
+        const { getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let nationOptions = [],
             {healthFlag,fileList} = this.state;
         for (let key in nations) {
-            nationOptions.push(<Option key={key} value={nations[key]}>{nations[key]}</Option>)
+            nationOptions.push({label:nations[key],value:nations[key]})
         }
         let {personal} = this.props;
         return(
-        <div key='per-info' style={{textAlign:'center'}}>
-        <Form layout='vertical'>
-            <FormItem
-                label="姓名"
+        <form key='per-info' style={{textAlign:'center'}}>
+        <List >
+            <InputItem
                 name="name"
-                hasFeedback>
+                value={personal.name}
+                >
                 {getFieldDecorator('name', {
                     rules:[{
                         type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                     },{
                         required:true,message:'请输入有效的姓名！'
-                    }],
-                    initialValue:personal.name
-                })(
-                    <Input placeholder='请输入姓名！'/>
-                )}
-            </FormItem>
+                    }]
+                })}姓名
+            </InputItem>
             <FormItem
                 label="性别"
                 name="gender"
-                hasFeedback>
+                >
                 {getFieldDecorator('gender', {
                     rules:[{
                         required:true, message:'请选择性别！'
                     }],
                     initialValue:personal.gender || '男'
                 })(
-                    <Select>
-                        <Option value="male">男</Option>
-                        <Option value="female">女</Option>
-                    </Select>
+                    <Picker cols={1} data={[{label:'男',value:'男'},{label:'女',value:'女'}]}>
+                    <List.Item arrow="horizontal">性别</List.Item>
+                    </Picker>
                 )}
             </FormItem>
             <FormItem
                 label="民族"
                 name="folk"
-                hasFeedback>
+                >
                 {getFieldDecorator('folk', {
                     rules:[{
                         type:'string', required:true, message:'请选择民族！'
                     }],
                     initialValue : personal.folk || '汉族'
                 })(
-                    <Select>
-                        {nationOptions}
-                    </Select>
+                    <Picker data={nationOptions}>
+                    <List.Item arrow="horizontal">民族</List.Item>
+                    </Picker>
                 )}
             </FormItem>
             
@@ -200,7 +198,7 @@ class PersonalInfo extends React.Component {
                     rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                     initialValue : personal.date
                 })(
-                    <DatePicker/>
+                    <DatePicker><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
                 )}
             </FormItem>
             <FormItem
@@ -210,19 +208,16 @@ class PersonalInfo extends React.Component {
                     rules: [{ type:'string', required: true, message: '请选择健康状况!' }],
                     initialValue : personal.healthState || '良好'
                 })(
-                    <Select
-                        onChange={this.handleHealthChange.bind(this)}>
-                        <Option value="良好">良好</Option>
-                        <Option value="一般">一般</Option>
-                        <Option value="其他">其他</Option>
-                    </Select>
-                    /*{healthFlag && <Input name='healthState' placeholder='请说明健康状况！'/>}*/
+                    <Picker
+                        data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
+                        <List.Item arrow="horizontal">健康状况</List.Item>
+                    </Picker>
                 )}
             </FormItem>
-            <FormItem
+            <InputItem
                 label="身份证号码"
                 name="idCardNumber"
-                hasFeedback>
+                >
                 {getFieldDecorator('idCardNumber', {
                     rules:[{
                         type:'string', pattern:/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/, message:'请输入有效的身份证号码！'
@@ -230,38 +225,34 @@ class PersonalInfo extends React.Component {
                         required:true, message:'请输入有效的身份证号码！'
                     }],
                     initialValue : personal.idCardNumber
-                })(
-                    <Input placeholder='请输入身份证号码！'/>
-                )}
-            </FormItem>
-            <FormItem
-                label="家庭住址"
+                })}身份证号码
+            </InputItem>
+             
+            <InputItem
                 name="homeAddress"
-                hasFeedback>
+                >
                 {getFieldDecorator('homeAddress', {
                     rules:[{
-                        type:'string', pattern:/^[A-Za-z0-9_\u4e00-\u9fa5]{1,50}$/, message:'请输入有效的家庭住址！'
+                        type:'string'
                     },{
                         required:true,message:'请输入有效的家庭住址！'
                     }],
                     initialValue : personal.homeAddress
-                })(
-                    <Input placeholder='请输入家庭住址！'/>
-                )}
-            </FormItem>
-            <FormItem
-                label="现住址"
+                })}家庭住址
+            </InputItem>
+           <InputItem
                 name="currentAddress">
-                {getFieldDecorator('currentAddress',{
-                     initialValue : personal.currentAddress
-                })(
-                    <Input placeholder='请输入现住址' />
-                )}
-            </FormItem>
-            <FormItem
-               label="联系手机"
+                {getFieldDecorator('currentAddress', {
+                    rules:[{type:'string'},{
+                        required:true,message:'请输入有效的家庭住址！'
+                    }],
+                    initialValue : personal.currentAddress
+                })}现住址
+            </InputItem>
+            
+            <InputItem
                name="mobile"
-               hasFeedback>
+               >
                {getFieldDecorator('mobile', {
                     rules: [{
                         type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
@@ -269,14 +260,11 @@ class PersonalInfo extends React.Component {
                         whitespace: true, required: true, message: '请输入有效的联系手机！'
                     }],
                     initialValue : personal.mobile
-                })(
-                    <Input placeholder='请输入联系手机！'/>
-                )}               
-             </FormItem>
-             <FormItem
-                label="邮箱"
+                })}联系手机          
+             </InputItem>
+             <InputItem
                 name='email'
-                hasFeedback>
+                >
                 {getFieldDecorator('email', {
                     rules: [{
                         type: 'email', message: '请输入有效的邮箱!',
@@ -284,36 +272,28 @@ class PersonalInfo extends React.Component {
                         required: true, message: '请输入有效的邮箱!',
                     }],
                     initialValue : personal.email
-                })(
-                    <Input placeholder='请输入邮箱!'/>
-                )}
-            </FormItem>
-            <FormItem
-                label="联系座机"
+                })}邮箱
+            </InputItem>
+            <InputItem
                 name="tele"
-                hasFeedback>
+                >
                 {getFieldDecorator('tele', {
                     rules: [{
                         type: 'string', pattern: /^([0-9]{3,4}\-)?[0-9]{6,10}(\-[0-9]{1,4})?$/, message: '请输入有效的联系座机！'
                     }],
                     initialValue : personal.tele
-                })(
-                    <Input placeholder='请输入联系座机！'/>
-                )}
-            </FormItem>
-            <FormItem
-               label="QQ"
+                })}联系座机
+            </InputItem>
+            <InputItem
                name="qqNumber"
-               hasFeedback>
+               >
                {getFieldDecorator('qqNumber', {
                     rules: [{
                         type: 'string', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
                     }],
                     initialValue : personal.qqNumber
-                })(
-                    <Input placeholder='请输入QQ！'/>
-                )}               
-             </FormItem>
+                })}QQ             
+             </InputItem>
              <FormItem
                 label='上传图片'
                 name='upload'>
@@ -332,10 +312,10 @@ class PersonalInfo extends React.Component {
                     </Upload>
                 )}
              </FormItem>
-        </Form>
-         <Button type="primary" onClick={this.nextStep.bind(this)}>下一步</Button>
-        </div>
+        </List>
+         <Button type="primary" inline onClick={this.nextStep.bind(this)}>下一步</Button>
+        </form>
         )}
 }
 
-export default Form.create()(PersonalInfo)
+export default createForm()(PersonalInfo)

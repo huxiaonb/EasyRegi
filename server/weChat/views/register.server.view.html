@@ -14,7 +14,10 @@
     <!-- Bootstrap core CSS 
     <link href="./css/framework7.material.colors.min.css" rel="stylesheet">
     <link href="./css/framework7.material.min.css" rel="stylesheet">-->
-    <link href="./dist/mobile/index.css" rel="stylesheet">
+    <script src="../dist/mobile/antm-viewport.min.js">
+    </script>
+    <link href="../dist/mobile/index.css" rel="stylesheet">
+    <script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"></script>
 </head>
 
 
@@ -22,17 +25,27 @@
     <div> 
         <span id='openId' hidden>{{openId}}</span>
     </div>
-    <div id='testForm'>
+    <div id='infoForm'>
         
     </div>
+
+    
+    
+</body>
 
     </script>
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="./js/lib/underscore-min.js"></script>
     <script src="./js/lib/jquery.min.js"></script>
-    <script src="./dist/mobile/index.js"></script>
-    <script src="./js/test.js"></script>
-</body>
-
+    <script src="../dist/mobile/index.js"></script>
+    <script type="text/javascript">
+        if(!window.Promise) {
+            console.log('no promise')
+            document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
+        }
+        $(_.once(function(){
+            Lego('#infoForm').registerForm();
+        }))
+    </script>
 </html>
 
