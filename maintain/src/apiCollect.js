@@ -4,6 +4,7 @@
                 .then(data => console.log(data))
                 .catch(e => console.log("Oops, error", e))
 */
+import fetch from 'isomorphic-fetch';
 export default{
     login(acc,pwd){
         //需要返回当前公司信息

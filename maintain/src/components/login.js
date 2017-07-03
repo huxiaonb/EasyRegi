@@ -125,13 +125,13 @@ class Login extends React.Component{
                             {getFieldDecorator('comp_prop',{
                                 rules:[{
                                     type:'string',required:true,message:'请选择公司类型'
-                                }],initialValue : '0'
+                                }],initialValue : '国营' 
                             })(
                                 <Select>
-                                    <Option value="0">国营</Option>
-                                    <Option value="1">私营</Option>
-                                    <Option value="3">合资</Option>
-                                    <Option value="4">外资</Option>
+                                    <Option value="国营">国营</Option>
+                                    <Option value="私营">私营</Option>
+                                    <Option value="合资">合资</Option>
+                                    <Option value="外资">外资</Option>
                                 </Select>
                             )}
                         </FormItem>
@@ -147,10 +147,10 @@ class Login extends React.Component{
                                 }],initialValue : '0'
                             })(
                                 <Select>
-                                    <Option value="0">国营</Option>
-                                    <Option value="1">私营</Option>
-                                    <Option value="3">合资</Option>
-                                    <Option value="4">外资</Option>
+                                    <Option value="1000 人以下">1000 人以下</Option>
+                                    <Option value="1000~3000 人">1000~3000 人</Option>
+                                    <Option value="3000~5000 人">3000~5000 人</Option>
+                                    <Option value="5000 以上">5000 以上</Option>
                                 </Select>
                             )}
                         </FormItem>

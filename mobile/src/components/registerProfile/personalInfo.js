@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon} from 'antd-mobile'
 import { createForm } from 'rc-form';
 import moment from 'moment';
+
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -27,7 +28,8 @@ import Upload from 'antd/lib/upload';
 // import 'antd/lib/upload/style/index.less';
 // import 'antd/lib/modal/style/index.less';
 
-
+const maxDate = moment('2017-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const minDate = moment('1950-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const openId = $('#openId').text();
 const FormItem = List.Item;
 //const Option = Select.Option;
@@ -198,7 +200,7 @@ class PersonalInfo extends React.Component {
                     rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                     initialValue : personal.date
                 })(
-                    <DatePicker><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
+                    <DatePicker mode="date" maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
                 )}
             </FormItem>
             <FormItem
