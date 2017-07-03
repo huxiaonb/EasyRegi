@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
+
 // 引入React-Router模块
 import { Router, Route, Link, hashHistory , IndexRoute, Redirect, IndexLink} from 'react-router'
 
@@ -34,6 +35,9 @@ class Index extends React.Component {
     this.setState({
       login:false
     })
+  }
+  login(acc,pwd){
+    //get current login company info and set to state as props to children
   }
   render() {
     return (
