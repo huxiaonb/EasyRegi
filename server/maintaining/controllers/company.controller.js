@@ -1,18 +1,19 @@
-let _ = require('lodash'),
+var _ = require('lodash'),
     async = require('async');
 var mongoose = require('mongoose');
-let Company = mongoose.model('Company');
-let Applicant = mongoose.model('Applicant');
+var Company = mongoose.model('Company');
+var Applicant = mongoose.model('Applicant');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
 exports.getPositionsAndApplicantsNum = getPositionsAndApplicantsNum;
 exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
 exports.getPositionsByCompanyId = getPositionsByCompanyId;
+// exports.searchApplicants = searchApplicants;
 exports.login = login;
 
 function companyUserLogin(req, res, next){
-    let email = _.get(req, ['body', 'account'], ''),
+    var email = _.get(req, ['body', 'account'], ''),
         pwd = _.get(req, ['body', 'pwd'], '');
     if(_.isEmpty(email) || _.isEmpty(pwd)){
         console.log('login id and pwd are required');
@@ -22,7 +23,7 @@ function companyUserLogin(req, res, next){
             if(error)
                 next(error);
             else {
-                let result = {};
+                var result = {};
                 result.success = false;
                 result.company = {};
                 if(!_.isEmpty(companyItem)){
@@ -44,7 +45,7 @@ function login(email, pwd, callback){
             if(_.isEmpty(companyItem)){
                 return callback(null, {});
             } else {
-                let clonedCompany = {
+                var clonedCompany = {
                     _id: companyItem._id,
                     companyName: companyItem.companyName,
                     alias: companyItem.alias,
@@ -234,3 +235,24 @@ function getAllApplicantsByCompanyId(companyId){
     }
 }
 
+// function searchApplicants(req, res, next){
+//     var companyId = _.get(req, ['body', 'companyId'], ''),
+//         applicantName = _.get(req, ['body', 'applicantName'], ''),
+//         startedAt = _.get(req, ['body', 'startedAt'], ''),
+//         endedAt = _.get(req, ['body', 'endedAt'], '');
+//     console.log(companyId, applicantName, startedAt, endedAt);
+//     if(_.isEmpty(companyId)){
+//         res.end();
+//     } else {
+//         var queryCriteria = {$and: []};
+//         queryCriteria.$and.push({'registeredCompanies.companyId': companyId});
+        
+//         if(!_.isEmpty(applicantName))
+//             queryCriteria.name = applicantName;
+//         var $and = [];
+//         if(!_.isEmpty(startedAt)){
+
+//         }
+
+//     }
+// }
