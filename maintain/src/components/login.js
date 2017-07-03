@@ -1,6 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Form, Button, Input, Select, Row, Col} from 'antd'
+import {Form, Button, Input, Select, Row, Col,message} from 'antd'
+import PropTypes from 'prop-types';
+import api from '../apiCollect'
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -22,18 +24,40 @@ import './style/login.less'
 const FormItem = Form.Item;
 const Option = Select.Option;
 class Login extends React.Component{
+    static contextTypes = {
+        login: PropTypes.func
+    }
     state = {
         registerFlag : false,
     }
-    login(){
-        let { form } = this.props;
-        form.validateFieldsAndScroll(async (err, values)=>{
-             if (!!err) return
-             this.props.login(form.getFieldValue('login_acc'), form.getFieldValue('login_pwd'));
-         })
+    loginTo(){
+        debugger;
+        let {form} = this.props;
+             this.context.login(form.getFieldValue('login_acc'), form.getFieldValue('login_pwd'));
     }
-    register(){
+    async register(){
+        let {form} = this.props;
         console.log('注册');
+        let comp = Object.assign({},{
+                companyName: form.getFieldValue('comp_name'),
+                password : form.getFieldValue('comp_pwd'),
+                alias: form.getFieldValue('comp_alias'),
+                companyAddress: form.getFieldValue('comp_addr'),
+                companyType: form.getFieldValue('comp_prop'),
+                companyScale: form.getFieldValue('comp_size'),
+                phoneNumber: form.getFieldValue('comp_phone'),
+                contactPersonName: form.getFieldValue('comp_name'),
+                email: form.getFieldValue('comp_email'), //必须的
+                description: form.getFieldValue('comp_desc'),
+            });
+            let r = await api.createOrUpdateComp(comp);
+            if(r.status === 200){
+                message.success('注册成功');
+                this.setState({
+                    login : false
+                })
+            }
+            console.log(r);
     }
     back(){
         this.setState({
@@ -72,7 +96,7 @@ class Login extends React.Component{
                         </FormItem>
                     </Form>
                     <div style={{textAlign:'center', marginTop:'15px'}}>
-                        <Button type="primary" style={{width:'100%',height:'40px'}} onClick={this.login.bind(this)}>登录</Button>
+                        <Button type="primary" style={{width:'100%',height:'40px'}} onClick={this.loginTo.bind(this)}>登录</Button>
                     </div>
                     <div className='page-action'>
                         <a  href="javascript:" style={{marginRight:'5px'}} onClick={this.back.bind(this)}>新公司注册</a>
@@ -106,7 +130,7 @@ class Login extends React.Component{
                             name='comp_alias'
                             label='公司简称'
                             hasFeedback>
-                            {getFieldDecorator('comp_name',{
+                            {getFieldDecorator('comp_alias',{
                                 rules:[{
                                     type:'string'
                                 }]
@@ -143,7 +167,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_size',{
                                 rules:[{
-                                    type:'email',required:true,message:'请选择公司规模'
+                                    type:'string',required:true,message:'请选择公司规模'
                                 }],initialValue : '0'
                             })(
                                 <Select>
@@ -164,7 +188,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_contact_p',{
                                 rules:[{
-                                    type:'email',required:true
+                                    type:'string',required:true
                                 }]
                             })(
                                 <Input className='login-text' placeholder='联系人'/>
@@ -181,7 +205,7 @@ class Login extends React.Component{
                                     required:true,message:'请输入联系电话！'
                                 }]
                             })(
-                                <Input className='login-text' type='number' placeholder='联系电话' type='password'/>
+                                <Input className='login-text'  placeholder='联系电话' />
                             )}
                         </FormItem>
                         </Col>
@@ -196,6 +220,18 @@ class Login extends React.Component{
                                 }]
                             })(
                                 <Input className='login-text' placeholder='公司邮箱'/>
+                            )}
+                        </FormItem>
+                      <FormItem
+                            name='comp_pwd'
+                            label='登录密码'
+                            hasFeedback>
+                            {getFieldDecorator('comp_pwd',{
+                                rules:[{
+                                    type:'string',required:true
+                                }]
+                            })(
+                                <Input className='login-text'/>
                             )}
                         </FormItem>
                         <FormItem

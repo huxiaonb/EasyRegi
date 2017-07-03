@@ -35,7 +35,7 @@ export default{
         return fetch(url,{
              method:"post",
              //headers:{},
-             body:company
+             body:data
         }).then(data => data).catch(e => console.log(e));
     },
     getBasicInfo(){

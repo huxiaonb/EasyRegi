@@ -1,5 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
+import PropTypes from 'prop-types';
 
 
 // 引入React-Router模块
@@ -25,10 +26,24 @@ import ApplicantManage from './components/applicantManage';
 import PositionManage from './components/positionManage';
 
 import './index.less'
+import api from './apiCollect'
+
 class Index extends React.Component {
+  static childContextTypes = {
+        comp: PropTypes.object,
+        login: PropTypes.func
+    }
+
+  getChildContext(){
+      return {
+          comp: this.state.companyInfo,
+          login : this.login.bind(this)
+      }
+  }
   state = {
     collapsed: false,
-    login : true
+    login : false,
+    companyInfo: {}
   };
   logout(){
     console.log('333');
@@ -36,8 +51,18 @@ class Index extends React.Component {
       login:false
     })
   }
-  login(acc,pwd){
+  async login(acc,pwd){
     //get current login company info and set to state as props to children
+    if(acc && pwd){
+      let r = await api.login(acc,pwd);
+      console.log(r);
+      if(r){
+        this.setState({
+          companyInfo:r,
+          login : true
+        })
+      }
+    }
   }
   render() {
     return (
