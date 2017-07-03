@@ -1,10 +1,14 @@
-let _ = require('lodash');
+let _ = require('lodash'),
+    async = require('async');
 var mongoose = require('mongoose');
 let Company = mongoose.model('Company');
 let Applicant = mongoose.model('Applicant');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
+exports.getPositionsAndApplicantsNum = getPositionsAndApplicantsNum;
+exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
+exports.getPositionsByCompanyId = getPositionsByCompanyId;
 exports.login = login;
 
 function companyUserLogin(req, res, next){
@@ -88,19 +92,6 @@ function upsertCompany(req, res, next){
                         upsertResult.errmsg = 'Password is required';
                         res.json(upsertResult);
                     } else {
-                        // var companyObj = {
-                        //     companyName: companyItem.companyName,
-                        //     password: companyItem.password,
-                        //     alias: companyItem.alias,
-                        //     companyAddress: companyItem.companyAddress,
-                        //     companyType: companyItem.companyType,
-                        //     companyScale: companyItem.companyScale,
-                        //     phoneNumber: companyItem.phoneNumber,
-                        //     contactPersonName: companyItem.contactPersonName,
-                        //     email: companyItem.email,
-                        //     description: companyItem.description,
-                        //     positions: companyItem.positions
-                        // }
                         var companyEntity = new Company(companyItem);
                         console.log(companyEntity)
                         companyEntity.save(function(error, data){
@@ -134,3 +125,112 @@ function upsertCompany(req, res, next){
     }
 
 }
+
+function getPositionsAndApplicantsNum(req, res, next){
+    var countResult = {
+        positionNumber: 0,
+        applicantNumber: 0
+    }
+    var companyId = _.get(req, ['params', 'companyId'], '');
+    console.log(companyId);
+    if(_.isEmpty(companyId)){
+        res.end();
+    } else {
+        var tasks = [];
+        tasks.push(getAllPublishedPositionsByCompanyId(companyId));
+        tasks.push(getAllApplicantsByCompanyId(companyId));
+        async.parallel(tasks, function(error, result){
+            if(error){
+                console.log('Error in getPositionsAndApplicantsNum', companyId, error);
+                countResult.errmsg = 'Error in getPositionsAndApplicantsNum' + error;
+            } else {
+                if(!_.isEmpty(_.get(result, ['0'])))
+                    countResult.positionNumber = result[0].length;
+                if(!_.isEmpty(_.get(result, ['1'])))
+                    countResult.applicantNumber = result[1].length;
+            }
+            res.json(countResult);
+        });
+    }
+}
+
+function getApplicantsByCompanyId(req, res, next){
+    var companyId = _.get(req, ['params', 'companyId'], '');
+    console.log(companyId);
+    if(_.isEmpty(companyId)){
+        res.end();
+    } else {
+        var tasks = [];
+        tasks.push(getAllApplicantsByCompanyId(companyId));
+        async.parallel(tasks, function(error, result){
+            if(error){
+                console.log('Error in finding all applicants by companyId', companyId, error);
+                res.json([]);
+            } else {
+                var applicants = [];
+                if(!_.isEmpty(_.get(result, ['0']))){
+                    applicants = _.get(result, ['0']);
+                }
+                res.json(applicants);
+            }
+
+        });
+    }
+}
+
+function getPositionsByCompanyId(req, res, next){
+    var companyId = _.get(req, ['params', 'companyId'], '');
+    console.log(companyId);
+    if(_.isEmpty(companyId)){
+        res.end();
+    } else {
+        var tasks = [];
+        tasks.push(getAllPublishedPositionsByCompanyId(companyId));
+        async.parallel(tasks, function(error, result){
+            if(error){
+                console.log('Error in finding all positions by companyId', companyId, error);
+                res.json([]);
+            } else {
+                var positions = [];
+                if(!_.isEmpty(_.get(result, ['0']))){
+                    positions = _.get(result, ['0']);
+                }
+                res.json(positions);
+            }
+        });
+    }
+}
+
+function getAllPublishedPositionsByCompanyId(companyId){
+    return function(callback){
+        Company.findOne({_id: companyId}, function(error, companyItem){
+            if(error) {
+                return callback(error, null);
+            } else {
+                if(_.isEmpty(companyItem)){
+                    return callback(null, null);
+                } else {
+                    var positions = _.get(companyItem, ['positions'], []);
+                    return callback(null, positions);
+                }
+            }
+        }); 
+    }
+}
+
+function getAllApplicantsByCompanyId(companyId){
+    return function(callback){
+        Applicant.find({'registeredCompanies.companyId': companyId}, function(error, applicants){
+            if(error){
+                return callback(error, null);
+            } else {
+                if(_.isEmpty(applicants)){
+                    return callback(null, null);
+                } else {
+                    return callback(null, applicants);
+                }
+            }
+        });
+    }
+}
+

@@ -10,4 +10,11 @@ module.exports = function (app) {
         .post(companyController.companyUserLogin);
      app.route('/api/company/update')
         .post(companyController.upsertCompany);
+     app.route('/api/company/getBasicInfo/:companyId')
+        .get(companyController.getPositionsAndApplicantsNum);
+     app.route('/api/company/getApplicantsByCompanyId/:companyId')
+        .get(companyController.getApplicantsByCompanyId);
+     app.route('/api/company/getPositionsByCompanyId/:companyId')
+        .get(companyController.getPositionsByCompanyId);
+
 };

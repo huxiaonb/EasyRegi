@@ -19,7 +19,7 @@ export default{
         /*注册公司或更新公司数据
             var company = {
                 companyName: '大贵金属附属2',
-                password: '111111', //必须的
+                password: '111111', //save时必须的,update时可以没有
                 alias: 'DGMF',
                 companyAddress: '深圳南山区南山医院附近',
                 companyType: '国企',
@@ -40,17 +40,20 @@ export default{
     },
     getBasicInfo(){
         //获取当前公司position计数和Applicant计数
-        let url = '';
+        /*
+        返回值：{ positionNumber: 3, applicantNumber: 2 }
+         */
+        let url = '../api/company/getBasicInfo/:companyId'; //如: ../api/company/getBasicInfo/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
     getApplicants(){
         //获取当前公司所有应聘者信息
-        let url = '';
+        let url = '../api/company/getApplicantsByCompanyId/:companyId'; //如: ../api/company/getApplicantsByCompanyId/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
     getPositions(){
         //获取当前公司所有职位信息
-        let url = '';
+        let url = '../api/company/getPositionsByCompanyId/:companyId'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
     newOrupdatePosition(data){

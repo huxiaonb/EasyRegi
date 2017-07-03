@@ -85,5 +85,53 @@ describe('company', function(){
                 done();
             })
         });
+
+        it('getBasicInfo', function(done){
+            request.get({
+                url: 'http://localhost:3000/api/company/getBasicInfo/5954ef7dc111d2bb00602cb1',
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('getApplicantsByCompanyId', function(done){
+            request.get({
+                url: 'http://localhost:3000/api/company/getApplicantsByCompanyId/5954ef7dc111d2bb00602cb1',
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('getApplicantsByCompanyId', function(done){
+            request.get({
+                url: 'http://localhost:3000/api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1',
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
     });
 });

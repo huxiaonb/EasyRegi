@@ -58,7 +58,7 @@ class Company extends React.Component{
     onPickerChange = (val) => {
         console.log(val)
         this.setState({
-            currentCompany: val
+            selectCompId: val
         })
 
     }
@@ -95,10 +95,10 @@ class Company extends React.Component{
             })
         }
         if(companies.length){
-            var currentCompanyLabel = companies[1].label;
+            var currentCompanyLabel = companies[0].value;
             this.setState({
                companies: companies,
-               currentCompany: [currentCompanyLabel]
+               selectCompId: [currentCompanyLabel]
             });
             
         }
@@ -272,7 +272,7 @@ class Company extends React.Component{
 
         return(
             <div>
-                <div style={{ height:'64px', lineHeight:'64px', padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >提交入职资料</div>
+                <div style={{ height:'64px', lineHeight:'64px', padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'50px'}} >提交入职资料</div>
                 <div style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: 'transparent', minHeight: 360 ,textAlign:'center'}}>
                         <Accordion defaultActiveKey="0" className="personalInfoAccordion" onChange={this.personalInfoAccordionChange}>
@@ -366,7 +366,7 @@ class Company extends React.Component{
             
                          <WhiteSpace size="lg" />
                          <List renderHeader={()=>'选择公司'}>
-                        <Picker data={this.state.companies} cols={1} className="all-companies" value={this.state.currentCompany} onPickerChange={this.onPickerChange}>
+                        <Picker data={this.state.companies} cols={1} className="all-companies" value={this.state.selectCompId} onPickerChange={this.onPickerChange}>
                             <List.Item arrow="horizontal">公司</List.Item>
                         </Picker>
                         </List>
@@ -376,7 +376,7 @@ class Company extends React.Component{
                         <CheckboxItem  key={1} checked={mCheck} onChange={this.changeM.bind(this)}>支付1元支持入职易</CheckboxItem>
                         </List>               
                         <WhiteSpace size="lg" />
-                        <Button type='primary' inline size="small" disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
+                        <Button type='primary' inline size="large" disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
                     </div>
                 </div>
                 <div style={{ textAlign: 'center' }}>

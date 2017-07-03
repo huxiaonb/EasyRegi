@@ -288,7 +288,8 @@ exports.renderRegisterCompanyPage = function(req, res){
 
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
-      companyId = _.get(req, ['body', 'companyId'], '');
+      companyId = _.get(req, ['body', 'companyId', '0'], '');
+      console.log(companyId);
   var current = new Date();
   if(_.isEmpty(openId)){
     console.log('openId does not exist, cannot submit register company');
