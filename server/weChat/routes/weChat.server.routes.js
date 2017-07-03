@@ -22,5 +22,6 @@ module.exports = function (app) {
   app.route('/weChat/applicant/registerForm/submit/:openId').post(weChatController.submitRegisterForm);
   app.route('/registerCompany').get(weChatController.renderRegisterCompanyPage);
   app.route('/weChat/applicant/submitRegisterCompany').post(weChatController.submitRegisterCompany);
+  app.route('/weChat/getAllCompanyNames').get(weChatController.getAllCompanyNames);
   app.route('/maintainn').get(weChatController.maintainn);
 };

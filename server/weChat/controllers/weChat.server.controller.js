@@ -11,6 +11,7 @@ var Applicant = mongoose.model('Applicant');
 var fs = require('fs'),
     path = require('path');
 
+exports.getAllCompanyNames = getAllCompanyNames;
 exports.companyIndex = function (req, res) {
   Dictionary.find({'category': '公司信息类型'}).then(function (types) {
     CompanyTemplate.find({}).then(function (companyTemplates) {
@@ -385,4 +386,32 @@ exports.submitRegisterForm = function(req, res){
       });
     });
   }
+}
+
+function getAllCompanyNames(req, res, next){
+    console.log('getAllCompanyNames');
+    Company.find({}, function(error, companies){
+      console.log(companies);
+      if(error) {
+        console.error('Error in finding company names', error);
+        res.end();
+      } else {
+        var companyNames = [];
+        if(!_.isEmpty(companies)){
+          _.forEach(companies, function(company){
+            var loginId = _.get(company, ['loginId'], ''),
+                alias = _.get(company, ['alias'], '');
+            if(!_.isEmpty(loginId) && !_.isEmpty(alias)){
+              var nameObj = {
+                label: alias,
+                value: loginId
+              }
+              companyNames.push(nameObj);
+            }
+          });
+        }
+        res.json(companyNames); 
+      }
+    });
+
 }

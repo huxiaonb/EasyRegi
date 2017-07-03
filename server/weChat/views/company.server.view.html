@@ -17,10 +17,14 @@
     <script src="../dist/mobile/antm-viewport.min.js">
     </script>
     <link href="../dist/mobile/index.css" rel="stylesheet">
+    <script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"></script>
 </head>
 
 
 <body>
+    <div> 
+        <span id='openId' hidden>{{openId}}</span>
+    </div>
     <div id='compCntr'>
         
     </div>
@@ -31,6 +35,10 @@
     <script src="./js/lib/jquery.min.js"></script>
     <script src="../dist/mobile/index.js"></script>
     <script type="text/javascript">
+        if(!window.Promise) {
+            console.log('no promise')
+            document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
+        }
         $(_.once(function(){
             Lego('#compCntr').selectCompany();
         }))

@@ -1,6 +1,7 @@
 import webpack from 'webpack'
 import path from 'path'
 import ExtractTextPlugin from 'extract-text-webpack-plugin'
+import autoprefixer from 'autoprefixer'
 const pxtorem = require('postcss-pxtorem');
 
 const config = {
@@ -20,6 +21,16 @@ const config = {
     // devtool: "eval",
     module: {
         loaders: [
+        {
+            test: /\.jsx$/, exclude: /node_modules/, loader: 'babel',
+            query: {
+            plugins: [
+                ["transform-runtime", { polyfill: false }],
+                ["import", [{ "style": "css", "libraryName": "antd-mobile" }]]
+            ],
+            presets: ['es2015', 'stage-0', 'react']
+            }
+        },
         {
             test: /\.js$/,
             exclude: /(node_modules)/,
@@ -42,7 +53,12 @@ const config = {
         },
         ]
     },
-    postcss: [],
+    postcss: [
+        autoprefixer({
+        browsers: ['last 2 versions', 'Firefox ESR', '> 1%', 'ie >= 8', 'iOS >= 8', 'Android >= 4'],
+        }),
+        pxtorem({ rootValue: 100, propWhiteList: [] })
+    ],
     
     plugins: [
         new webpack.ProvidePlugin({
@@ -68,5 +84,9 @@ if(process.env.NODE_ENV === 'production'){
         }))
 }
 
+// config.postcss.push(pxtorem({
+//     rootValue: 100,
+//     propWhiteList: [],
+//   }));
 
 export default config

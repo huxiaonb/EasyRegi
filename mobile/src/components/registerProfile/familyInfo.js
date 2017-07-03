@@ -289,6 +289,7 @@ class FamilyInfo extends React.Component {
                         })(
                             <Select>
                                 <Option value="parents">父母</Option>
+                                <Option value="couple">夫妻</Option>
                                 <Option value="bros">兄弟</Option>
                                 <Option value="sis">姐妹</Option>
                                 <Option value="other">其他亲属</Option>

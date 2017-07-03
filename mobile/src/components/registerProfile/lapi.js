@@ -58,5 +58,19 @@ export default {
             type: 'POST',
             data: data
         })
+    },
+    getAllCompanyNames(){
+        // return $.ajax({
+        //     url:'http://localhost:3000/weChat/getAllCompanyNames',
+        //     type: 'GET',
+        //     success: function(data){
+        //         console.log('getAllCompanyNames');
+        //         console.log(data);
+        //     }
+        // })
+        return _request({
+            url: '../weChat/getAllCompanyNames',
+            type: 'GET'
+        })
     }
 }
