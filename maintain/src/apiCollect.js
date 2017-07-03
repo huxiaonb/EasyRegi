@@ -6,13 +6,13 @@
 */
 import fetch from 'isomorphic-fetch';
 export default{
-    login(acc,pwd){
+    login(data){
         //需要返回当前公司信息
         let url = '../api/company/login';
         return fetch(url,{
              method:"post",
-             //headers:{},
-             body:{account : acc, pwd :pwd}
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
         }).then(data => data).catch(e => console.log(e));
     },
     createOrUpdateComp(data){
@@ -34,8 +34,8 @@ export default{
         let url='../api/company/update';
         return fetch(url,{
              method:"post",
-             //headers:{},
-             body:data
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
         }).then(data => data).catch(e => console.log(e));
     },
     getBasicInfo(){

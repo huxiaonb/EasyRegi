@@ -31,7 +31,6 @@ class Login extends React.Component{
         registerFlag : false,
     }
     loginTo(){
-        debugger;
         let {form} = this.props;
              this.context.login(form.getFieldValue('login_acc'), form.getFieldValue('login_pwd'));
     }
@@ -53,9 +52,6 @@ class Login extends React.Component{
             let r = await api.createOrUpdateComp(comp);
             if(r.status === 200){
                 message.success('注册成功');
-                this.setState({
-                    login : false
-                })
             }
             console.log(r);
     }

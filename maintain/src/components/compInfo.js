@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Row, Col,Form,message} from 'antd'
+import {Button, Input, DatePicker, Row, Col,Form,Select} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 // import Form from 'antd/lib/form'
@@ -21,7 +21,7 @@ import api from '../apiCollect'
 import './style/components.less';
 
 import { Link } from 'react-router'
-
+const Option = Select.Option;
 const FormItem = Form.Item;
 class CompInfo extends React.Component{
     static contextTypes = {
@@ -60,6 +60,7 @@ class CompInfo extends React.Component{
         
     }
     render(){
+        let {getFieldDecorator} = this.props.form;
         let infoSection=this.state.editFlag?(
             <div>
             <Row gutter={40}>
