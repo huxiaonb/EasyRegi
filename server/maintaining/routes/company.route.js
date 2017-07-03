@@ -16,5 +16,7 @@ module.exports = function (app) {
         .get(companyController.getApplicantsByCompanyId);
      app.route('/api/company/getPositionsByCompanyId/:companyId')
         .get(companyController.getPositionsByCompanyId);
+     app.route('/api/company/searchApplicants')
+        .post(companyController.searchApplicants);
 
 };

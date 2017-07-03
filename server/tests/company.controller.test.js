@@ -133,5 +133,28 @@ describe('company', function(){
                 done();
             })
         });
+
+        it('searchApplicants', function(done){
+            var data = {
+                applicantName: '李大力',
+                companyId: '5954ef7dc111d2bb00602cb1',
+                startedAt: '2017-07-02',
+                endedAt: '2017-07-03'
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/searchApplicants',
+                body: data,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
     });
 });

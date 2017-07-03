@@ -1,5 +1,6 @@
 var _ = require('lodash'),
-    async = require('async');
+    async = require('async'),
+    moment = require('moment');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
@@ -9,7 +10,7 @@ exports.upsertCompany = upsertCompany;
 exports.getPositionsAndApplicantsNum = getPositionsAndApplicantsNum;
 exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
 exports.getPositionsByCompanyId = getPositionsByCompanyId;
-// exports.searchApplicants = searchApplicants;
+exports.searchApplicants = searchApplicants;
 exports.login = login;
 
 function companyUserLogin(req, res, next){
@@ -109,15 +110,34 @@ function upsertCompany(req, res, next){
                     }
                 } else {
                     //update
-                    Company.update({email: email}, {$set: companyItem}, {upsert: false}, function(error, company){
+                    Company.update({email: email}, {$set: companyItem}, {upsert: false}, function(error, updateResult){
                         if(error) {
                             console.log('Error in updating company', error);
                             upsertResult.errmsg = 'Error in updating company';
                             res.json(upsertResult);
                         } else {
-                            upsertResult.success = true;
-                            upsertResult.company = company;
-                            res.json(upsertResult);
+                            Company.findOne({email: email}, function(err, updatedCompany){
+                                if(err) {
+                                    console.log('Error in finding company', err);
+                                    upsertResult.errmsg = 'Error in finding company';
+                                    res.json(upsertResult);
+                                } else {
+                                    upsertResult.success = true;
+                                    upsertResult.company = {
+                                        companyName: updatedCompany.companyName,
+                                        companyAddress: updatedCompany.companyAddress,
+                                        companyType: updatedCompany.companyType,
+                                        companyScale: updatedCompany.companyScale,
+                                        alias: updatedCompany.alias,
+                                        email: updatedCompany.email,
+                                        contactPersonName: updatedCompany.contactPersonName,
+                                        phoneNumber: updatedCompany.phoneNumber,
+                                        description: updatedCompany.description,
+                                        positions: updatedCompany.positions
+                                    };
+                                    res.json(upsertResult);
+                                }
+                            })
                         }
                     });
                 }
@@ -235,24 +255,47 @@ function getAllApplicantsByCompanyId(companyId){
     }
 }
 
-// function searchApplicants(req, res, next){
-//     var companyId = _.get(req, ['body', 'companyId'], ''),
-//         applicantName = _.get(req, ['body', 'applicantName'], ''),
-//         startedAt = _.get(req, ['body', 'startedAt'], ''),
-//         endedAt = _.get(req, ['body', 'endedAt'], '');
-//     console.log(companyId, applicantName, startedAt, endedAt);
-//     if(_.isEmpty(companyId)){
-//         res.end();
-//     } else {
-//         var queryCriteria = {$and: []};
-//         queryCriteria.$and.push({'registeredCompanies.companyId': companyId});
+function searchApplicants(req, res, next){
+    var companyId = _.get(req, ['body', 'companyId'], ''),
+        applicantName = _.get(req, ['body', 'applicantName'], ''),
+        startedAt = _.get(req, ['body', 'startedAt'], ''),
+        endedAt = _.get(req, ['body', 'endedAt'], '');
+    console.log(companyId, applicantName, startedAt, endedAt);
+    if(_.isEmpty(companyId)){
+        res.end();
+    } else {
+        var queryCriteria = {$and: []};
+        queryCriteria.$and.push({'registeredCompanies.companyId': companyId});
         
-//         if(!_.isEmpty(applicantName))
-//             queryCriteria.name = applicantName;
-//         var $and = [];
-//         if(!_.isEmpty(startedAt)){
+        if(!_.isEmpty(applicantName))
+            queryCriteria.$and.push({'name': applicantName});
+        if(!_.isEmpty(startedAt)){
+            var startDate = convertDateStrToGmtDate(startedAt);
+            Applicant.find({'registeredCompanies.registerDate':{$lt: startDate}}, function(error, applicants){
+                if(error) {
+                    console.log('Error in finding applicants', error);
+                    res.json([]);
+                } else {
+                    console.log(applicants);
+                    res.json(applicants);
+                }
+            });
+        }
 
-//         }
+    }
+}
 
-//     }
-// }
+function convertDateStrToGmtDate(dateStr){
+    if(_.isEmpty(dateStr)){
+        return null;
+    } else {
+        var year = dateStr.substr(0, 4),
+            month = dateStr.substr(5, 2),
+            day = dateStr.substr(9, 2);
+        console.log(year, month, day);
+        var newDateStr = dateStr + 'T00:00:00.000Z';
+        var date = new Date(newDateStr);
+        console.log(date.toGMTString());
+        return date;
+    }
+}
