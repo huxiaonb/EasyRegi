@@ -76,8 +76,22 @@ export default{
     },
     searchApplicant(name,dateRange=[]){
         //may be url like below format
-        let url = ''+ 'name=' + '' + 'start=' + '' + 'end=' +'';
-        return fetch(url).then(data => data).catch(e => console.log(e));
+        let url = '../api/company/searchApplicants';
+        /*
+        var data = {
+            applicantName: '李大力',
+            companyId: '5954ef7dc111d2bb00602cb1', //只有这个是必须的
+            startedAt: '2017-07-02',
+            endedAt: '2017-07-03'
+        } 
+
+        返回值，没有就是[]，有就是applicant的数组
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             body:data
+        }).then(data => data).catch(e => console.log(e));
     },
     searchPostion(name,dateRange=[]){
         let url = ''+ 'name=' + '' + 'start=' + '' + 'end=' +'';

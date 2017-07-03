@@ -18,11 +18,11 @@ function companyUserLogin(req, res, next){
         pwd = _.get(req, ['body', 'pwd'], '');
     if(_.isEmpty(email) || _.isEmpty(pwd)){
         console.log('login id and pwd are required');
-        next('login id and pwd are required');
+        res.status(500).send({error: 'login id and pwd are required'});
     } else {
         login(email, pwd, function(error, companyItem){
             if(error)
-                next(error);
+                res.status(500).send({error: error});
             else {
                 var result = {};
                 result.success = false;
@@ -78,21 +78,18 @@ function upsertCompany(req, res, next){
     console.log(companyItem);
     if(_.isEmpty(email)){
         console.error('no email found in req body');
-        upsertResult.errmsg = 'no email found in req body';
-        res.json(upsertResult);
+        res.status(500).send({error: 'no email found in req body'});
     } else {
         Company.findOne({email: email}, function(error, foundCompany){
             if(error) {
                 console.error('Error in finding company by email', email, error);
-                upsertResult.errmsg = 'Error in finding company by email';
-                res.json(upsertResult);
+                res.status(500).send({error: 'Error in finding company by email'});
             } else {
                 if(_.isEmpty(foundCompany)){
                     //save
                     if(_.isEmpty(pwd)){
                         console.log('Password is required');
-                        upsertResult.errmsg = 'Password is required';
-                        res.json(upsertResult);
+                        res.status(500).send({error: 'Password is required'});
                     } else {
                         var companyEntity = new Company(companyItem);
                         console.log(companyEntity)
@@ -155,7 +152,7 @@ function getPositionsAndApplicantsNum(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.end();
+        res.status(500).send({error: 'company id is required'});
     } else {
         var tasks = [];
         tasks.push(getAllPublishedPositionsByCompanyId(companyId));
@@ -179,7 +176,7 @@ function getApplicantsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.end();
+        res.status(500).send({error: 'company id is required'});
     } else {
         var tasks = [];
         tasks.push(getAllApplicantsByCompanyId(companyId));
@@ -203,7 +200,7 @@ function getPositionsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.end();
+        res.status(500).send({error: 'company id is required'});
     } else {
         var tasks = [];
         tasks.push(getAllPublishedPositionsByCompanyId(companyId));
@@ -262,7 +259,7 @@ function searchApplicants(req, res, next){
         endedAt = _.get(req, ['body', 'endedAt'], '');
     console.log(companyId, applicantName, startedAt, endedAt);
     if(_.isEmpty(companyId)){
-        res.end();
+        res.status(500).send({error: 'company id is required'});
     } else {
         var queryCriteria = {$and: []};
         queryCriteria.$and.push({'registeredCompanies.companyId': companyId});
@@ -270,18 +267,30 @@ function searchApplicants(req, res, next){
         if(!_.isEmpty(applicantName))
             queryCriteria.$and.push({'name': applicantName});
         if(!_.isEmpty(startedAt)){
-            var startDate = convertDateStrToGmtDate(startedAt);
-            Applicant.find({'registeredCompanies.registerDate':{$lt: startDate}}, function(error, applicants){
-                if(error) {
-                    console.log('Error in finding applicants', error);
-                    res.json([]);
-                } else {
-                    console.log(applicants);
-                    res.json(applicants);
-                }
-            });
+            var startDateStr = startedAt + ' 00:00:00.000';
+            var startDate = new Date(startDateStr);
+            console.log(startDate);
+            if(_.isDate(startDate))
+                queryCriteria.$and.push({'registeredCompanies.registerDate':{$gt: startDate}});
         }
 
+        if(!_.isEmpty(endedAt)){
+            var endDateStr = endedAt + ' 23:59:59.999';
+            var endDate = new Date(endDateStr);
+            console.log(endDate);
+            if(_.isDate(endDate))
+                queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
+        }
+
+        Applicant.find(queryCriteria, function(error, applicants){
+            if(error) {
+                console.log('Error in finding applicants', error);
+                res.json([]);
+            } else {
+                console.log(applicants);
+                res.json(applicants);
+            }
+        });
     }
 }
 
@@ -289,13 +298,8 @@ function convertDateStrToGmtDate(dateStr){
     if(_.isEmpty(dateStr)){
         return null;
     } else {
-        var year = dateStr.substr(0, 4),
-            month = dateStr.substr(5, 2),
-            day = dateStr.substr(9, 2);
-        console.log(year, month, day);
-        var newDateStr = dateStr + 'T00:00:00.000Z';
+        var newDateStr = dateStr + ' 00:00:00.000';
         var date = new Date(newDateStr);
-        console.log(date.toGMTString());
         return date;
     }
 }
