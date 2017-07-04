@@ -8,7 +8,7 @@ describe('company', function(){
         it('login', function(done){
             var query = {
                 account: 'wps@wps.com',
-                pwd: '123'
+                pwd: ''
             };
             request.post({
                 url: 'http://maaaace.nat200.top/api/company/login',
@@ -19,6 +19,7 @@ describe('company', function(){
                     console.log('get company login info successfully');
                     console.log(body);
                 } else {
+                    console.log(body);
                     var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
                     console.log(JSON.stringify(errmsg));
                 }
@@ -136,7 +137,7 @@ describe('company', function(){
 
         it('searchApplicants', function(done){
             var data = {
-                applicantName: '李大力',
+                applicantName: '力',
                 companyId: '5954ef7dc111d2bb00602cb1',
                 startedAt: '2017-07-02',
                 endedAt: '2017-07-03'

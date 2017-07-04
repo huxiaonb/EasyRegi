@@ -12,25 +12,36 @@ exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
 exports.getPositionsByCompanyId = getPositionsByCompanyId;
 exports.searchApplicants = searchApplicants;
 exports.login = login;
+exports.logout = logout;
+exports.getCompanyInfo = getCompanyInfo;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
         pwd = _.get(req, ['body', 'pwd'], '');
     if(_.isEmpty(email) || _.isEmpty(pwd)){
         console.log('login id and pwd are required');
-        res.status(500).send({error: 'login id and pwd are required'});
+        res.status(500).send({success: false, errmsg: 'login id and pwd are required'});
     } else {
         login(email, pwd, function(error, companyItem){
             if(error)
-                res.status(500).send({error: error});
+                res.status(500).send({success: false, errmsg: error});
             else {
                 var result = {};
                 result.success = false;
+                result.errmsg = '';
                 result.company = {};
                 if(!_.isEmpty(companyItem)){
                     result.status = 200
                     result.success = true;
                     result.company = companyItem;
+                    var current = new Date(),
+                        timestamp = current.getTime() + 24 * 60 * 60 * 1000;
+                    var expiresDate = new Date(timestamp);
+                    var companyInfo = {
+                        companyId: companyItem._id,
+                        expires: expiresDate.toString()
+                    }
+                    req.session.companyInfo = companyInfo;
                 }
                 res.json(result);
             }
@@ -61,12 +72,78 @@ function login(email, pwd, callback){
                     positions: companyItem.positions
                 };
                 
+                
                 console.log(clonedCompany);
                 return callback(null, clonedCompany);
             }
         }
 
     });
+}
+
+function logout(req, res, next){
+    var companyInfo = _.get(req, ['session', 'companyInfo'], {});
+    if(!_.isEmpty(companyInfo)){
+        req.session.companyInfo = null;
+        console.log('logout');
+        res.render('server/weChat/views/index');
+    } else {
+        console.log('not login');
+        res.render('server/weChat/views/index');
+    }
+}
+
+function getCompanyInfo(req, res, next){
+    var companyInfo = _.get(req, ['session', 'companyInfo'], {});
+    if(_.isEmpty(companyInfo)){
+        console.log('not login');
+        res.render('server/weChat/views/index');
+    } else {
+        var expiresDateStr = _.get(companyInfo, ['expires'], ''),
+            companyId = _.get(companyInfo, ['companyId'], '');
+        var expiresDate = new Date(expiresDateStr),
+            current = new Date();
+        if(current.getTime() > expiresDate.getTime()){
+            console.log('login session expires, please login again');
+            res.render('server/weChat/views/index');
+        } else {
+            if(_.isEmpty(companyId)){
+                res.status(500).send({success: false, errmsg: 'no company id found in session'});
+            } else {
+                Company.findOne({_id: companyId}, function(error, companyItem){
+                    if(error) {
+                        console.log('Error in getCompanyInfo', error);
+                        res.status(500).send({success: false, errmsg: error});
+                    } else {
+                        if(_.isEmpty(companyItem)){
+                            res.status(500).send({success: false, errmsg: 'no company found by id'});
+                        } else {
+                            var clonedCompany = {
+                                _id: companyItem._id,
+                                companyName: companyItem.companyName,
+                                alias: companyItem.alias,
+                                companyAddress: companyItem.companyAddress,
+                                companyScale: companyItem.companyScale,
+                                companyType: companyItem.companyType,
+                                phoneNumber: companyItem.phoneNumber,
+                                contactPersonName: companyItem.contactPersonName,
+                                email: companyItem.email,
+                                description: companyItem.description,
+                                positions: companyItem.positions
+                            };
+                            var result = {
+                                success: true,
+                                errmsg: '',
+                                company: {}
+                            };
+                            result.company = clonedCompany;
+                            res.json(result);
+                        }
+                    }
+                });
+            }
+        }
+    }
 }
 
 function upsertCompany(req, res, next){
@@ -80,18 +157,18 @@ function upsertCompany(req, res, next){
     console.log(companyItem);
     if(_.isEmpty(email)){
         console.error('no email found in req body');
-        res.status(500).send({error: 'no email found in req body'});
+        res.status(500).send({success: false, errmsg: 'no email found in req body'});
     } else {
         Company.findOne({email: email}, function(error, foundCompany){
             if(error) {
                 console.error('Error in finding company by email', email, error);
-                res.status(500).send({error: 'Error in finding company by email'});
+                res.status(500).send({success: false, errmsg: 'Error in finding company by email'});
             } else {
                 if(_.isEmpty(foundCompany)){
                     //save
                     if(_.isEmpty(pwd)){
                         console.log('Password is required');
-                        res.status(500).send({error: 'Password is required'});
+                        res.status(500).send({success: false, errmsg: 'Password is required'});
                     } else {
                         var companyEntity = new Company(companyItem);
                         console.log(companyEntity)
@@ -102,6 +179,7 @@ function upsertCompany(req, res, next){
                                 res.json(upsertResult);
                             } else {
                                 upsertResult.success = true;
+                                upsertResult.errmsg = '';
                                 upsertResult.company = data;
                                 res.json(upsertResult);
                             }
@@ -148,13 +226,16 @@ function upsertCompany(req, res, next){
 
 function getPositionsAndApplicantsNum(req, res, next){
     var countResult = {
+        success: false,
+        errmsg: '',
         positionNumber: 0,
         applicantNumber: 0
     }
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.status(500).send({error: 'company id is required'});
+        countResult.errmsg = 'company id is required';
+        res.status(500).send(countResult);
     } else {
         var tasks = [];
         tasks.push(getAllPublishedPositionsByCompanyId(companyId));
@@ -164,6 +245,7 @@ function getPositionsAndApplicantsNum(req, res, next){
                 console.log('Error in getPositionsAndApplicantsNum', companyId, error);
                 countResult.errmsg = 'Error in getPositionsAndApplicantsNum' + error;
             } else {
+                countResult.success = true;
                 if(!_.isEmpty(_.get(result, ['0'])))
                     countResult.positionNumber = result[0].length;
                 if(!_.isEmpty(_.get(result, ['1'])))
@@ -178,20 +260,25 @@ function getApplicantsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.status(500).send({error: 'company id is required'});
+        res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
         var tasks = [];
         tasks.push(getAllApplicantsByCompanyId(companyId));
         async.parallel(tasks, function(error, result){
             if(error){
                 console.log('Error in finding all applicants by companyId', companyId, error);
-                res.json([]);
+                res.status(500).send({success: false, errmsg: 'Error in finding all applicants by companyId', applicants: []});
             } else {
                 var applicants = [];
                 if(!_.isEmpty(_.get(result, ['0']))){
                     applicants = _.get(result, ['0']);
                 }
-                res.json(applicants);
+                var result = {
+                    success: true,
+                    errmsg: '',
+                    applicants: applicants
+                };
+                res.json(result);
             }
 
         });
@@ -202,20 +289,25 @@ function getPositionsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     console.log(companyId);
     if(_.isEmpty(companyId)){
-        res.status(500).send({error: 'company id is required'});
+        res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
         var tasks = [];
         tasks.push(getAllPublishedPositionsByCompanyId(companyId));
         async.parallel(tasks, function(error, result){
             if(error){
                 console.log('Error in finding all positions by companyId', companyId, error);
-                res.json([]);
+                res.status(500).send({success: false, errmsg: 'Error in finding all applicants by companyId', positions: []});
             } else {
                 var positions = [];
                 if(!_.isEmpty(_.get(result, ['0']))){
                     positions = _.get(result, ['0']);
                 }
-                res.json(positions);
+                var result = {
+                    success: true,
+                    errmsg: '',
+                    positions: positions
+                };
+                res.json(result);
             }
         });
     }
@@ -261,13 +353,14 @@ function searchApplicants(req, res, next){
         endedAt = _.get(req, ['body', 'endedAt'], '');
     console.log(companyId, applicantName, startedAt, endedAt);
     if(_.isEmpty(companyId)){
-        res.status(500).send({error: 'company id is required'});
+        res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
         var queryCriteria = {$and: []};
         queryCriteria.$and.push({'registeredCompanies.companyId': companyId});
         
         if(!_.isEmpty(applicantName))
-            queryCriteria.$and.push({'name': applicantName});
+            queryCriteria.$and.push({'name': {'$regex':applicantName, '$options':"$i"}});
+            // queryCriteria.$and.push({'name': applicantName});
         if(!_.isEmpty(startedAt)){
             var startDateStr = startedAt + ' 00:00:00.000';
             var startDate = new Date(startDateStr);
@@ -287,10 +380,15 @@ function searchApplicants(req, res, next){
         Applicant.find(queryCriteria, function(error, applicants){
             if(error) {
                 console.log('Error in finding applicants', error);
-                res.json([]);
+                res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
             } else {
                 console.log(applicants);
-                res.json(applicants);
+                var result = {
+                    success: true,
+                    errmsg: '',
+                    applicants: applicants
+                };
+                res.json(result);
             }
         });
     }
