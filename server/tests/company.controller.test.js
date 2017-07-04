@@ -215,7 +215,7 @@ describe('company', function(){
             });
         });
 
-        it('create position', function(done){
+        it.skip('create position', function(done){
             var data = {
                 companyId: '5954f059c111d2bb00602cfb', //ObjectId("5954f059c111d2bb00602cfb") 5954ef7dc111d2bb00602cb1
                 position: {
@@ -230,6 +230,30 @@ describe('company', function(){
             }
             request.post({
                 url: 'http://localhost:3000/api/company/createPositionForCompany',
+                body: data,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('searchPositions', function(done){
+            var data = {
+                positionName: '力',
+                companyId: '5954f059c111d2bb00602cfb', //ObjectId("5954f059c111d2bb00602cfb")
+                startedAt: '2017-07-02',
+                endedAt: '2017-07-03'
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/searchPositions',
                 body: data,
                 json: true
             }, function(error, response, body){

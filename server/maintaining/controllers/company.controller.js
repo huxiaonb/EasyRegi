@@ -17,6 +17,7 @@ exports.login = login;
 exports.logout = logout;
 exports.getCompanyInfo = getCompanyInfo;
 exports.createPositionForCompany = createPositionForCompany;
+exports.searchPositions = searchPositions;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -487,5 +488,79 @@ function createPositionForCompany(req, res, next){
                 }
             });
         }
+    }
+}
+
+function searchPositions(req, res, next){
+    var companyId = _.get(req, ['body', 'companyId'], ''),
+        positionName = _.get(req, ['body', 'positionName'], ''),
+        startedAt = _.get(req, ['body', 'startedAt'], ''),
+        endedAt = _.get(req, ['body', 'endedAt'], '');
+    console.log(companyId, positionName, startedAt, endedAt);
+    if(_.isEmpty(companyId)){
+        res.status(500).send({success: false, errmsg: 'company id is required', positions: []});
+    } else {
+        Company.findOne({_id: companyId}, function(error, dbCompany){
+            if(error || _.isEmpty(dbCompany)){
+                console.log('Error in finding company by id', companyId, error);
+                res.status(500).send({success: false, errmsg: 'Error in finding company', positions: []});
+            } else {
+                var dbPositions = _.get(dbCompany, ['positions'], []),
+                    selectPositions = [];
+                if(!_.isEmpty(positionName)){
+                    var reg = new RegExp(positionName, "i");
+                    selectPositions = dbPositions.filter(function(item){
+                        return reg.test(_.get(item, ['positionName'], ''));
+                    });
+                } else {
+                    selectPositions = dbPositions;
+                }
+                var queryCriteria = {$and: []};
+                if(_.isEmpty(selectPositions)){
+                    var result = {
+                        success: true,
+                        errmsg: '',
+                        positions: []
+                    }
+                    res.json(result);
+                } else {
+                    var inQuery = [];
+                    _.forEach(selectPositions, function(pos){
+                        inQuery.push(_.get(pos, ['positionId'], ''));
+                    });
+                    queryCriteria.$and.push({'_id': {$in: inQuery}});
+
+                    if(!_.isEmpty(startedAt)){
+                        var startDateStr = startedAt + ' 00:00:00.000';
+                        var startDate = new Date(startDateStr);
+                        console.log(startDate);
+                        if(_.isDate(startDate))
+                            queryCriteria.$and.push({'createdAt':{$gt: startDate}});
+                    }
+
+                    if(!_.isEmpty(endedAt)){
+                        var endDateStr = endedAt + ' 23:59:59.999';
+                        var endDate = new Date(endDateStr);
+                        console.log(endDate);
+                        if(_.isDate(endDate))
+                            queryCriteria.$and.push({'createdAt':{$lt: endDate}});
+                    }
+
+                    Position.find(queryCriteria, function(err, positionItems){
+                         if(err) {
+                            console.log('Error in finding positions', err);
+                            res.status(500).send({success: false, errmsg: 'Error in finding positions', positions: []});
+                        } else {
+                            var result = {
+                                success: true,
+                                errmsg: '',
+                                positions: positionItems
+                            };
+                            res.json(result);
+                        }
+                    });
+                }
+            }
+        });
     }
 }

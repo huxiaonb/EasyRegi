@@ -137,7 +137,19 @@ export default{
         }).then(data => data).catch(e => console.log(e));
     },
     searchPostion(name,dateRange=[]){
-        let url = ''+ 'name=' + '' + 'start=' + '' + 'end=' +'';
-        return fetch(url).then(data => data).catch(e => console.log(e));
+        let url = '../api/company/searchPositions';
+        /*
+        var data = {
+            positionName: '力',
+            companyId: '5954f059c111d2bb00602cfb', //这个是必须的
+            startedAt: '2017-07-02',
+            endedAt: '2017-07-03'
+        }
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             body:data
+        }).then(data => data).catch(e => console.log(e));
     }
 }
