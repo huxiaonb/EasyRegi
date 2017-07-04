@@ -105,17 +105,17 @@ export default{
              method:"post",
              headers:{ 'Content-Type': 'application/json'
              },
-             body:data
-        }).then(data => data).catch(e => console.log(e));
+             body:JSON.stringify(data)
+        })
     },
     delPosition(data){
         //删除职位
         let url = '';
         return fetch(url,{
              method:"post",
-             //headers:{},
-             body:data
-        }).then(data => data).catch(e => console.log(e));
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        });
     },
     searchApplicant(name,dateRange=[]){
         //may be url like below format
@@ -133,10 +133,11 @@ export default{
         return fetch(url,{
              method:"post",
              //headers:{},
-             body:data
-        }).then(data => data).catch(e => console.log(e));
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        })
     },
-    searchPostion(name,dateRange=[]){
+    searchPostion(data){
         let url = '../api/company/searchPositions';
         /*
         var data = {
@@ -148,8 +149,8 @@ export default{
          */
         return fetch(url,{
              method:"post",
-             //headers:{},
-             body:data
-        }).then(data => data).catch(e => console.log(e));
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        });
     }
 }

@@ -1,6 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, Modal, message, Form} from 'antd'
+import {Button, Input, DatePicker, Table, Modal, message, Form,Select} from 'antd'
+import PropTypes from 'prop-types';
+import api from '../apiCollect'
 
 // import Form from 'antd/lib/form'
 // import Table from 'antd/lib/table'
@@ -23,19 +25,48 @@ import {Button, Input, DatePicker, Table, Modal, message, Form} from 'antd'
 import './style/components.less';
 const {RangePicker } = DatePicker;
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 class PositionManage extends React.Component{
+    static contextTypes = {
+        comp: PropTypes.object
+    }
     state={
+        posiName : '',
+        date : [],
+        results : [],
         resultTotal : 0,
         pFlag : false,
         rowValue : {
             positionName : '',
         }
     }
+    posiNameChange(e){
+        this.setState({
+            posiName : e.target.value
+        })
+    }
+    dateChange(value, dateString){
+        this.setState({
+            date : dateString
+        })
+    }
     onSearch(){
+        let {posiName,date} = this.state;
+        let query = {
+            companyId : this.context.comp._id,
+            positionName : posiName,
+            startAt : date.length ? date[0]:'',
+            endAt : date.length ? date[1]:''
+        }
+        this.searchPosi(query);
         console.log('search');
+        
     }
     clear(){
+        this.setState({
+            posiName : ''
+        })
         console.log('clear');
     }
     toggleP(){
@@ -43,10 +74,28 @@ class PositionManage extends React.Component{
             pFlag : !this.state.pFlag
         })
     }
-    handleOk(){
+    async handleOk(){
         //fetch url edit/create
-        this.toggleP();
-        message.success('操作成功！');
+        let {form} = this.props;
+        form.validateFieldsAndScroll(async (err, values)=>{
+             if (!!err){
+                return;
+             }
+             let newP = Object.assign({},{
+                 name : form.getFieldValue('p_name'),
+                 phoneNumber : form.getFieldValue('p_phone'),
+                 totalRecuriters : form.getFieldValue('p_total'),
+                 salary : form.getFieldValue('p_salary'),
+                 welfares : form.getFieldValue('p_welfare'),
+                 positionDesc : form.getFieldValue('p_desc'),
+                 jobRequire : form.getFieldValue('p_require'),
+             });
+             let res = await api.createPosition({companyId : this.context.comp._id,position:newP});
+             let data = await res.json();
+             message.success('123');
+            })
+            this.toggleP();
+            message.success('操作成功！');
     }
     editP(rec){
         console.log(rec);
@@ -60,23 +109,70 @@ class PositionManage extends React.Component{
             title: '确认删除此职位吗？',
             okText: '确认',
             cancelText: '取消',
+            async onOk() {
+                let res = await api.delPosition(rec);
+                let data = await res.json();
+                console.log(data);
+                message.success('已删除');
+                message.error('出错请联系管理员');
+            } 
         });
     }
-    componentWillMount(){
+    async searchPosi(query={companyId : this.context.comp._id}){
+        let res = await api.searchPostion(query);
+        let data = await res.json();
+        
+        
+        this.setState({
+            results : data.positions
+        })
+        console.log(data);
+    }
+    async componentWillMount(){
         //get table data and set to state,use fetch
+       await this.searchPosi(); 
     }
     render(){
         let {pFlag} = this.state;
         let {getFieldDecorator} = this.props.form;
         const columns = [{
             title: '名称',
-            dataIndex: 'positionName',
+            dataIndex: 'name',
+            key : 'name',
             className: 'log-result-noWrap',
         }, {
-            title: '创建日期',
-            dataIndex: 'submittedAt',
+            title: '联系电话',
+            dataIndex: 'phoneNumber',
+            key : 'phoneNumber',
             className: 'log-result-noWrap',
         },{
+            title: '招聘人数',
+            dataIndex: 'totalRecuriters',
+            key : 'totalRecuriters',
+            className: 'log-result-noWrap',
+        },{
+            title: '薪资',
+            dataIndex: 'salary',
+            key : 'salary',
+            className: 'log-result-noWrap',
+        },{
+            title: '福利',
+            dataIndex: 'welfares',
+            key : 'welfares',
+            className: 'log-result-noWrap',
+            render:(text,record)=>(<span>{text.join(',')}</span>)
+        },{
+            title: '职位要求',
+            dataIndex: 'jobRequire',
+            key : 'jobRequire',
+            className: 'log-result-noWrap',
+        },{
+            title: '职位描述',
+            dataIndex: 'positionDesc',
+            key : 'positionDesc',
+            className: 'log-result-noWrap',
+        }
+        ,{
             title: '操作',
             dataIndex: 'action',
             key: 'action',
@@ -93,11 +189,13 @@ class PositionManage extends React.Component{
             className: 'log-result-noWrap',
         }*/];
         //mock datasource 
-        let list = [
+        /*let list = [
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
-        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]
+        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]*/
+        //let list = [{name:'123',phoneNumber:'123',totalRecuriters:'123',salary:'123',welfares:'123',jobRequire:'123',positionDesc:'1231'}]
+        let list = this.state.results;
         return(
             <div>
             <div className='search-bar-container'>
@@ -107,11 +205,11 @@ class PositionManage extends React.Component{
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>职位名</label>
-                        <Input className='search-bar-input'/>
+                        <Input className='search-bar-input' value={this.state.posiName} onChange={this.posiNameChange.bind(this)}/>
                     </div>
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>创建日期</label>
-                        <RangePicker/>
+                        <RangePicker onChange={this.dateChange.bind(this)} format='YYYY-MM-DD'/>
                     </div>
                 </div>
                 <div className='search-bar-row'>
@@ -153,20 +251,80 @@ class PositionManage extends React.Component{
                                 rules:[{
                                     type:'string',required:true
                                 }],
-                                initialValue:this.state.rowValue.positionName
+                                initialValue:this.state.rowValue.name
                             })(
                                 <Input/>
                             )}
                         </FormItem>
                         <FormItem
-                            label='其他信息'
-                            name='p_other'>
-                            {getFieldDecorator('p_other',{
+                            label='联系电话'
+                            name='p_phone'>
+                            {getFieldDecorator('p_phone',{
                                 rules:[{
                                     type:'string',required:true
-                                }]
+                                }],initialValue:this.state.rowValue.phoneNumber
                             })(
-                                <Input/>
+                                <Input />
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label='招聘人数'
+                            name='p_total'>
+                            {getFieldDecorator('p_total',{
+                                rules:[{
+                                    type:'string',required:true
+                                }],initialValue:this.state.rowValue.totalRecuriters
+                            })(
+                                <Input />
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label='薪资'
+                            name='p_salary'>
+                            {getFieldDecorator('p_salary',{
+                                rules:[{
+                                    type:'string',required:true
+                                }],initialValue:this.state.rowValue.salary
+                            })(
+                                <Input />
+                            )}
+                        </FormItem>
+                         <FormItem
+                            label='福利'
+                            name='p_welfare'>
+                            {getFieldDecorator('p_welfare',{
+                                rules:[{
+                                    type:'array',required:true
+                                }],initialValue:this.state.rowValue.welfares
+                            })(
+                                <Select mode='multiple' placeholder='please select...'>
+                                    <Option value='五险一金'>五险一金</Option>
+                                    <Option value='带薪年假'>带薪年假</Option>
+                                    <Option value='年度旅游'>年度旅游</Option>
+                                    <Option value='商业保险'>商业保险</Option>                                    
+                                </Select>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label='职位要求'
+                            name='p_require'>
+                            {getFieldDecorator('p_require',{
+                                rules:[{
+                                    type:'string',required:true
+                                }],initialValue:this.state.rowValue.jobRequire
+                            })(
+                                <Input />
+                            )}
+                        </FormItem>
+                        <FormItem
+                            label='职位描述'
+                            name='p_desc'>
+                            {getFieldDecorator('p_desc',{
+                                rules:[{
+                                    type:'string',required:true
+                                }],initialValue:this.state.rowValue.positionDesc
+                            })(
+                                <Input />
                             )}
                         </FormItem>
                     </Form>
