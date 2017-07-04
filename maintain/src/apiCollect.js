@@ -110,7 +110,13 @@ export default{
     },
     delPosition(data){
         //删除职位
-        let url = '';
+        let url = '../api/company/deletePositionForCompany';
+        /*
+        var data = {
+            companyId: '5954f059c111d2bb00602cfb',
+            positionId: '595bb5a09b1bf93c1c461cd0'
+        }
+         */
         return fetch(url,{
              method:"post",
              //headers:{},

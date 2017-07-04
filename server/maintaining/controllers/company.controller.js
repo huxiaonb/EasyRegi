@@ -18,6 +18,7 @@ exports.logout = logout;
 exports.getCompanyInfo = getCompanyInfo;
 exports.createPositionForCompany = createPositionForCompany;
 exports.searchPositions = searchPositions;
+exports.deletePositionForCompany = deletePositionForCompany;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -562,5 +563,45 @@ function searchPositions(req, res, next){
                 }
             }
         });
+    }
+}
+
+function deletePositionForCompany(req, res, next){
+    var companyId = _.get(req, ['body', 'companyId'], ''),
+        positionId = _.get(req, ['body', 'positionId'], '');
+    if(_.isEmpty(companyId)){
+        res.status(500).send({success: false, errmsg: 'company id is required', positions: []});
+    } else {
+        Company.findOne({_id: companyId}, function(error, dbCompany){
+            if(error || _.isEmpty(dbCompany)){
+                console.log('Error in finding company by id', companyId, error);
+                res.status(500).send({success: false, errmsg: 'Error in finding company', positions: []});
+            } else {
+                var dbPositions = _.get(dbCompany, ['positions'], []);
+                var newPositions = dbPositions.filter(function(pos){
+                    return pos.positionId !== positionId;
+                });
+                Company.update({_id: companyId}, {$set: {positions: newPositions}}, {upsert: false}, function(err, result){
+                    if(err) {
+                        console.log('Error in updating company positions for company id', companyId, err);
+                        res.status(500).send({success: false, errmsg: 'Error in updating company positions', positions: []});
+                    } else {
+                        Position.remove({_id: positionId}, function(removeErr, removeResult){
+                            if(removeErr){
+                                console.log('Error in removing position for id', positionId, removeErr);
+                                res.status(500).send({success: false, errmsg: 'Error in removing position for id', positions: []});
+                            } else {
+                                var returnedResult = {
+                                    success: true,
+                                    errmsg: '',
+                                    removedPosition: positionId
+                                };
+                                res.json(returnedResult);
+                            }
+                        });
+                    }
+                });
+            }
+        })
     }
 }

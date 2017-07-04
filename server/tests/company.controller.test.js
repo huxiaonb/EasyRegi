@@ -215,7 +215,7 @@ describe('company', function(){
             });
         });
 
-        it.skip('create position', function(done){
+        it('create position', function(done){
             var data = {
                 companyId: '5954f059c111d2bb00602cfb', //ObjectId("5954f059c111d2bb00602cfb") 5954ef7dc111d2bb00602cb1
                 position: {
@@ -254,6 +254,28 @@ describe('company', function(){
             }
             request.post({
                 url: 'http://localhost:3000/api/company/searchPositions',
+                body: data,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('deletePositions', function(done){
+            var data = {
+                companyId: '5954f059c111d2bb00602cfb',
+                positionId: '595bb5a09b1bf93c1c461cd0'
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/deletePositionForCompany',
                 body: data,
                 json: true
             }, function(error, response, body){
