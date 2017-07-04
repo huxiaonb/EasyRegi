@@ -157,5 +157,62 @@ describe('company', function(){
                 done();
             })
         });
+
+        it('get company info without login', function(done){
+            request.post({
+                url: 'http://maaaace.nat200.top/api/company/getCompanyInfo',
+                body: {},
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company info successfully');
+                    console.log(body);
+                    
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            });
+        });
+
+        it('login & get company info', function(done){
+            var query = {
+                account: 'wps@wps.com',
+                pwd: '123'
+            };
+            request.post({
+                url: 'http://maaaace.nat200.top/api/company/login',
+                body: query,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                    request.post({
+                        url: 'http://maaaace.nat200.top/api/company/getCompanyInfo',
+                        body: {},
+                        json: true
+                    }, function(error, response, body){
+                        if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                            console.log('get company info successfully');
+                            console.log(body);
+                            
+                        } else {
+                            console.log(body);
+                            var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                            console.log(JSON.stringify(errmsg));
+                        }
+                        done();
+                    });
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                    done();
+                }
+            });
+        });
     });
 });

@@ -4,6 +4,7 @@ var _ = require('lodash'),
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
+var Session = mongoose.model('Session');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
@@ -26,6 +27,7 @@ function companyUserLogin(req, res, next){
             if(error)
                 res.status(500).send({success: false, errmsg: error});
             else {
+                res.header('Access-Control-Expose-Headers', 'access-token');
                 var result = {};
                 result.success = false;
                 result.errmsg = '';
@@ -40,7 +42,8 @@ function companyUserLogin(req, res, next){
                         companyId: companyItem._id,
                         expires: expiresDate.toString()
                     }
-                    req.session.companyInfo = companyInfo;
+                    req.session.companyInfo = JSON.stringify(companyInfo);
+                    res.header('access-token', req.sessionID);
                 }
                 res.json(result);
             }
@@ -81,68 +84,82 @@ function login(email, pwd, callback){
 }
 
 function logout(req, res, next){
-    var companyInfo = _.get(req, ['session', 'companyInfo'], {});
-    if(!_.isEmpty(companyInfo)){
-        req.session.companyInfo = null;
-        console.log('logout');
-        res.render('server/weChat/views/index');
-    } else {
-        console.log('not login');
-        res.render('server/weChat/views/index');
-    }
+    var sessionId = _.get(req, ['headers', 'access-token'], '');
+    Session.remove({_id: sessionId}, function(sesErr, sessionItem){
+        req.session = null;
+        req.sessionID = null;
+        // res.render('server/weChat/views/index');
+        res.json({success: true, errmsg: '', isLogin: false});
+    });
 }
 
 function getCompanyInfo(req, res, next){
-    var companyInfo = _.get(req, ['session', 'companyInfo'], {});
-    if(_.isEmpty(companyInfo)){
-        console.log('not login');
-        res.render('server/weChat/views/index');
-    } else {
-        var expiresDateStr = _.get(companyInfo, ['expires'], ''),
-            companyId = _.get(companyInfo, ['companyId'], '');
-        var expiresDate = new Date(expiresDateStr),
-            current = new Date();
-        if(current.getTime() > expiresDate.getTime()){
-            console.log('login session expires, please login again');
-            res.render('server/weChat/views/index');
+    var sessionId = _.get(req, ['headers', 'access-token'], '');
+    Session.findOne({_id: sessionId}, function(sesErr, sessionItem){
+        if(sesErr) {
+            console.log('Error in finding session', sesErr);
+            res.status(500).send({success: false, errmsg: 'Error in finding session'});
         } else {
-            if(_.isEmpty(companyId)){
-                res.status(500).send({success: false, errmsg: 'no company id found in session'});
+            if(_.isEmpty(sessionItem)){
+                res.status(500).send({success: false, errmsg: 'no session found by access-token', company: {}});
             } else {
-                Company.findOne({_id: companyId}, function(error, companyItem){
-                    if(error) {
-                        console.log('Error in getCompanyInfo', error);
-                        res.status(500).send({success: false, errmsg: error});
+                var session = JSON.parse(_.get(sessionItem, ['session']), '{}');
+                var companyInfoStr = _.get(session, ['companyInfo'], '{}');
+                var companyInfo = JSON.parse(companyInfoStr);
+                if(_.isEmpty(companyInfo)){
+                    console.log('not login');
+                    res.render('server/weChat/views/index');
+                } else {
+                    var expiresDateStr = _.get(companyInfo, ['expires'], ''),
+                        companyId = _.get(companyInfo, ['companyId'], '');
+                    var expiresDate = new Date(expiresDateStr),
+                        current = new Date();
+                    if(current.getTime() > expiresDate.getTime()){
+                        console.log('login session expires, please login again');
+                        res.render('server/weChat/views/index');
                     } else {
-                        if(_.isEmpty(companyItem)){
-                            res.status(500).send({success: false, errmsg: 'no company found by id'});
+                        if(_.isEmpty(companyId)){
+                            res.status(500).send({success: false, errmsg: 'no company id found in session'});
                         } else {
-                            var clonedCompany = {
-                                _id: companyItem._id,
-                                companyName: companyItem.companyName,
-                                alias: companyItem.alias,
-                                companyAddress: companyItem.companyAddress,
-                                companyScale: companyItem.companyScale,
-                                companyType: companyItem.companyType,
-                                phoneNumber: companyItem.phoneNumber,
-                                contactPersonName: companyItem.contactPersonName,
-                                email: companyItem.email,
-                                description: companyItem.description,
-                                positions: companyItem.positions
-                            };
-                            var result = {
-                                success: true,
-                                errmsg: '',
-                                company: {}
-                            };
-                            result.company = clonedCompany;
-                            res.json(result);
+                            Company.findOne({_id: companyId}, function(error, companyItem){
+                                if(error) {
+                                    console.log('Error in getCompanyInfo', error);
+                                    res.status(500).send({success: false, errmsg: error});
+                                } else {
+                                    if(_.isEmpty(companyItem)){
+                                        res.status(500).send({success: false, errmsg: 'no company found by id'});
+                                    } else {
+                                        var clonedCompany = {
+                                            _id: companyItem._id,
+                                            companyName: companyItem.companyName,
+                                            alias: companyItem.alias,
+                                            companyAddress: companyItem.companyAddress,
+                                            companyScale: companyItem.companyScale,
+                                            companyType: companyItem.companyType,
+                                            phoneNumber: companyItem.phoneNumber,
+                                            contactPersonName: companyItem.contactPersonName,
+                                            email: companyItem.email,
+                                            description: companyItem.description,
+                                            positions: companyItem.positions
+                                        };
+                                        var result = {
+                                            success: true,
+                                            isLogin: true,
+                                            errmsg: '',
+                                            company: {}
+                                        };
+                                        result.company = clonedCompany;
+                                        res.json(result);
+                                    }
+                                }
+                            });
                         }
                     }
-                });
+                }
+
             }
         }
-    }
+    });
 }
 
 function upsertCompany(req, res, next){

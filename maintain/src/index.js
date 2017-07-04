@@ -45,11 +45,14 @@ class Index extends React.Component {
     login : false,
     companyInfo: {}
   };
-  logout(){
-    console.log('333');
-    this.setState({
-      login:false
-    })
+  async logout(){
+    let res = await api.logout({});
+    let data = await res.json();
+    if(data.success && !data.isLogin){
+      this.setState({
+        login:false
+      });
+    }
   }
   async login(acc,pwd){
     //get current login company info and set to state as props to children
@@ -62,6 +65,16 @@ class Index extends React.Component {
           login : true
         })
       }
+    }
+  }
+  async componentWillMount(){
+    let res = await api.getCompanyInfo({});
+    let data = await res.json();
+    if(data.success && data.isLogin){
+      this.setState({
+        companyInfo: data.company,
+        login: true
+      })
     }
   }
   render() {

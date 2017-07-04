@@ -13,7 +13,25 @@ export default{
              method:"post",
              headers:{ 'Content-Type': 'application/json'},
              body:JSON.stringify(data)
-        })
+        }).then((res)=>{
+            if(res.status === 200){
+                const token = res.headers.get('access-token');
+                if (token) {
+                    sessionStorage.setItem('access_token', token);
+                }
+            }
+            return res;    
+        }).catch(e => console.log(e));
+    },
+    logout(data){
+        let url = '../api/company/logout';
+        return fetch(url, {
+             method:"post",
+             headers:{ 'Content-Type': 'application/json',
+             'Access-Token': sessionStorage.getItem('access_token') || ''
+             },
+             body:JSON.stringify(data)
+        }).catch(e => console.log(e));
     },
     createOrUpdateComp(data){
         /*注册公司或更新公司数据
@@ -35,6 +53,16 @@ export default{
         return fetch('../api/company/update',{
              method:"post",
              headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        }).catch(e => console.log(e));
+    },
+    getCompanyInfo(data){
+        let url = '../api/company/getCompanyInfo';
+        return fetch(url,{
+             method:"post",
+             headers:{ 'Content-Type': 'application/json',
+             'Access-Token': sessionStorage.getItem('access_token') || ''
+             },
              body:JSON.stringify(data)
         }).catch(e => console.log(e));
     },
