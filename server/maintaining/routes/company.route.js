@@ -26,4 +26,6 @@ module.exports = function (app) {
         .post(companyController.createPositionForCompany);
      app.route('/api/company/searchPositions')
         .post(companyController.searchPositions);
+     app.route('/api/company/deletePositionForCompany')
+        .post(companyController.deletePositionForCompany);
 };
