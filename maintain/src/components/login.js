@@ -50,6 +50,8 @@ class Login extends React.Component{
                 description: form.getFieldValue('comp_desc'),
             });
             let r = await api.createOrUpdateComp(comp);
+            let data = await r.json();
+            console.log(data);
             if(r.status === 200){
                 message.success('注册成功');
             }

@@ -54,11 +54,11 @@ class Index extends React.Component {
   async login(acc,pwd){
     //get current login company info and set to state as props to children
     if(acc && pwd){
-      let r = await api.login({account:acc,pwd:pwd});
-      console.log(r);
-      if(r){
+      let res = await api.login({account:acc,pwd:pwd});
+      let data = await res.json();
+      if(data.success){
         this.setState({
-          companyInfo:r,
+          companyInfo:data.company,
           login : true
         })
       }

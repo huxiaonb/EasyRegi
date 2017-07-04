@@ -28,6 +28,7 @@ function companyUserLogin(req, res, next){
                 result.success = false;
                 result.company = {};
                 if(!_.isEmpty(companyItem)){
+                    result.status = 200
                     result.success = true;
                     result.company = companyItem;
                 }
@@ -51,6 +52,7 @@ function login(email, pwd, callback){
                     companyName: companyItem.companyName,
                     alias: companyItem.alias,
                     companyAddress: companyItem.companyAddress,
+                    companyType : companyItem.companyType,
                     companyScale: companyItem.companyScale,
                     phoneNumber: companyItem.phoneNumber,
                     contactPersonName: companyItem.contactPersonName,

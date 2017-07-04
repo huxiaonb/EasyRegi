@@ -9,11 +9,11 @@ export default{
     login(data){
         //需要返回当前公司信息
         let url = '../api/company/login';
-        return fetch(url,{
+         return fetch('../api/company/login',{
              method:"post",
              headers:{ 'Content-Type': 'application/json'},
              body:JSON.stringify(data)
-        }).then(data => data).catch(e => console.log(e));
+        })
     },
     createOrUpdateComp(data){
         /*注册公司或更新公司数据
@@ -32,11 +32,11 @@ export default{
             }
         */
         let url='../api/company/update';
-        return fetch(url,{
+        return fetch('../api/company/update',{
              method:"post",
              headers:{ 'Content-Type': 'application/json'},
              body:JSON.stringify(data)
-        }).then(data => data).catch(e => console.log(e));
+        }).catch(e => console.log(e));
     },
     getBasicInfo(){
         //获取当前公司position计数和Applicant计数
