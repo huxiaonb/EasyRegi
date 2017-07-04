@@ -84,12 +84,27 @@ export default{
         let url = '../api/company/getPositionsByCompanyId/:companyId'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
-    newOrupdatePosition(data){
-        //创建或更新职位
-        let url = '';
+    createPosition(data){
+        //创建职位
+        /*
+        var data = {
+            companyId: '5954f059c111d2bb00602cfb', //ObjectId("5954f059c111d2bb00602cfb") 5954ef7dc111d2bb00602cb1
+            position: {
+                name: '人力资源',
+                phoneNumber: '12345678905',
+                totalRecruiters: 3,
+                salary: '5000以上',
+                welfares: ['五险一金', '十天年假', '年度旅游'],
+                positionDesc: '主管人力资源事宜',
+                jobRequire: '擅于处理公司管理事务，能适应出差'
+            }
+        }
+         */
+        let url = '../api/company/createPositionForCompany';
         return fetch(url,{
              method:"post",
-             //headers:{},
+             headers:{ 'Content-Type': 'application/json'
+             },
              body:data
         }).then(data => data).catch(e => console.log(e));
     },

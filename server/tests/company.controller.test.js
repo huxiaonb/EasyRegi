@@ -214,5 +214,35 @@ describe('company', function(){
                 }
             });
         });
+
+        it('create position', function(done){
+            var data = {
+                companyId: '5954f059c111d2bb00602cfb', //ObjectId("5954f059c111d2bb00602cfb") 5954ef7dc111d2bb00602cb1
+                position: {
+                    name: '人力资源',
+                    phoneNumber: '12345678905',
+                    totalRecruiters: 3,
+                    salary: '5000以上',
+                    welfares: ['五险一金', '十天年假', '年度旅游'],
+                    positionDesc: '主管人力资源事宜',
+                    jobRequire: '擅于处理公司管理事务，能适应出差'
+                }
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/createPositionForCompany',
+                body: data,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
     });
 });

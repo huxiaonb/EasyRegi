@@ -22,4 +22,6 @@ module.exports = function (app) {
         .post(companyController.logout);
      app.route('/api/company/getCompanyInfo')
         .post(companyController.getCompanyInfo);
+     app.route('/api/company/createPositionForCompany')
+        .post(companyController.createPositionForCompany);
 };

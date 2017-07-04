@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
 var Session = mongoose.model('Session');
+var Position = mongoose.model('Position');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
@@ -15,6 +16,7 @@ exports.searchApplicants = searchApplicants;
 exports.login = login;
 exports.logout = logout;
 exports.getCompanyInfo = getCompanyInfo;
+exports.createPositionForCompany = createPositionForCompany;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -417,5 +419,73 @@ function convertDateStrToGmtDate(dateStr){
         var newDateStr = dateStr + ' 00:00:00.000';
         var date = new Date(newDateStr);
         return date;
+    }
+}
+
+function createPositionForCompany(req, res, next){
+    var companyId = _.get(req, ['body', 'companyId'], ''),
+        positionObj = _.get(req, ['body', 'position'], {});
+    if(_.isEmpty(companyId)){
+        console.log('company id is required');
+        res.status(500).send({success: false, errmsg: 'company id is required', position: {}});
+    } else {
+        if(_.isEmpty(positionObj)){
+            console.log('position object is empty');
+            res.status(500).send({success: false, errmsg: 'position object is empty', position: {}});
+        } else {
+            Company.findOne({_id: companyId}, function(error, dbCompany){
+                if(error) {
+                    console.log('Error in finding company by id', companyId, error);
+                    res.status(500).send({success: false, errmsg: 'Error in finding company by id', position: {}});
+                } else if(_.isEmpty(dbCompany)){
+                    console.log('no company found by id');
+                    res.status(500).send({success: false, errmsg: 'no company found by id', position: {}});
+                } else {
+                    var positionItem = {
+                        name: _.get(positionObj, ['name'], ''),
+                        phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
+                        totalRecruiters: _.get(positionObj, ['totalRecruiters'], 0),
+                        salary: _.get(positionObj, ['salary'], ''),
+                        welfares: _.get(positionObj, ['welfares'], []),
+                        positionDesc: _.get(positionObj, ['positionDesc'], ''),
+                        jobRequire:_.get(positionObj, ['jobRequire'], '')
+                    }
+                    var positionEntity = new Position(positionItem);
+                    positionEntity.save(function(saveErr, persistedObj){
+                        if(saveErr) {
+                            console.log('Error in saving position', saveErr);
+                            res.status(500).send({success: false, errmsg: 'Error in saving position', position: {}});
+                        } else {
+                            var _id = _.get(persistedObj, ['_id'], ''),
+                                positionName = _.get(persistedObj, ['name'], '');
+                            if(_.isEmpty(_id)){
+                                console.log('Failed in saving position');
+                                res.status(500).send({success: false, errmsg: 'Failed in saving position', position: {}});
+                            } else {
+                                var companyPosition = {
+                                    positionId: _id,
+                                    positionName: positionName
+                                };
+                                var dbPositions = _.get(dbCompany, ['positions'], []);
+                                dbPositions.push(companyPosition);
+                                Company.update({_id: companyId}, {$set: {positions: dbPositions}}, {upsert: false}, function(err, result){
+                                    if(err) {
+                                        console.log('Error in updating company', err);
+                                        res.status(500).send({success: false, errmsg: 'Error in updating company', position: {}});
+                                    } else {
+                                        var updateResult = {
+                                            success: true,
+                                            errmsg: '',
+                                            position: positionObj
+                                        };
+                                        res.json(updateResult);
+                                    }
+                                })
+                            }
+                        }
+                    });
+                }
+            });
+        }
     }
 }
