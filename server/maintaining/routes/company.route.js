@@ -18,5 +18,8 @@ module.exports = function (app) {
         .get(companyController.getPositionsByCompanyId);
      app.route('/api/company/searchApplicants')
         .post(companyController.searchApplicants);
-
+     app.route('/api/company/logout')
+        .post(companyController.logout);
+     app.route('/api/company/getCompanyInfo')
+        .post(companyController.getCompanyInfo);
 };

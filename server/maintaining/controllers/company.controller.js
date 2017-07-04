@@ -31,7 +31,6 @@ function companyUserLogin(req, res, next){
                 result.errmsg = '';
                 result.company = {};
                 if(!_.isEmpty(companyItem)){
-                    result.status = 200
                     result.success = true;
                     result.company = companyItem;
                     var current = new Date(),
