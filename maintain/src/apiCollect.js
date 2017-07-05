@@ -108,6 +108,30 @@ export default{
              body:JSON.stringify(data)
         })
     },
+    updatePosition(data){
+        /*更新职位
+        var data = {
+            companyId: '5954f059c111d2bb00602cfb', //必须的
+            position: {
+                _id: '595bbb0424f4f25570896066', //必须的
+                name: '人事部主管', //最好有，不然被改成空字符串，会影响search
+                phoneNumber: '123123123123',
+                totalRecruiters: 1,
+                salary: '10000以上',
+                welfares: ['五险一金', '十天年假', '年度旅游'],
+                positionDesc: '主管人力资源事宜',
+                jobRequire: '擅长管理行政机构，擅于处理公司管理事务，能适应出差'
+            }
+        }
+         */
+        let url = '../api/company/updatePosition';
+        return fetch(url,{
+             method:"post",
+             headers:{ 'Content-Type': 'application/json'
+             },
+             body:data
+        }).then(data => data).catch(e => console.log(e));
+    },
     delPosition(data){
         //删除职位
         let url = '../api/company/deletePositionForCompany';

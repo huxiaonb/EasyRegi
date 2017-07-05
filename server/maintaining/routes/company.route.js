@@ -28,4 +28,6 @@ module.exports = function (app) {
         .post(companyController.searchPositions);
      app.route('/api/company/deletePositionForCompany')
         .post(companyController.deletePositionForCompany);
+     app.route('/api/company/updatePosition')
+        .post(companyController.updatePosition);
 };

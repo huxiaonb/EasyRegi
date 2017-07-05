@@ -19,6 +19,7 @@ exports.getCompanyInfo = getCompanyInfo;
 exports.createPositionForCompany = createPositionForCompany;
 exports.searchPositions = searchPositions;
 exports.deletePositionForCompany = deletePositionForCompany;
+exports.updatePosition = updatePosition;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -603,5 +604,93 @@ function deletePositionForCompany(req, res, next){
                 });
             }
         })
+    }
+}
+
+function updatePosition(req, res, next){
+    var companyId = _.get(req, ['body', 'companyId'], ''),
+        positionObj = _.get(req, ['body', 'position'], {}),
+        positionId = _.get(positionObj, ['_id']);
+    if(_.isEmpty(companyId) || _.isEmpty(positionId)){
+        res.status(500).send({success: false, errmsg: 'company id and position id are required', positions: []});
+    } else {
+        var tasks = [];
+        tasks.push(updatePositionModel(positionObj));
+        tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
+        async.parallel(tasks, function(error, result){
+            if(error) {
+                console.error('Error in update company position', error);
+                res.status(500).send({success: false, errmsg: 'Error in update company position', positions: []});
+            } else {
+                var tasksResult = {
+                    success: true,
+                    errmsg: '',
+                    positions: []
+                };
+                res.json(tasksResult);
+            }
+        });
+    }
+}
+
+function updatePositionModel(positionObj){
+    return function(callback){
+        var positionEntity = {
+            name: _.get(positionObj, ['name'], ''),
+            phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
+            totalRecruiters: _.get(positionObj, ['totalRecruiters'], 0),
+            salary: _.get(positionObj, ['salary'], ''),
+            welfares: _.get(positionObj, ['welfares'], []),
+            positionDesc: _.get(positionObj, ['positionDesc'], ''),
+            jobRequire:_.get(positionObj, ['jobRequire'], '')
+        },
+        positionId = _.get(positionObj, ['_id'], '');
+        if(_.isEmpty(positionId)){
+            console.log('no position id found, cannot update position');
+            return callback(null, null);
+        } else {
+            Position.update({_id: positionId}, {$set: positionEntity}, {upsert: false}, function(error, updateResult){
+                if(error){
+                    console.log('Error in updating position', error);
+                    return callback(null, null);
+                } else {
+                    return callback(null, updateResult);
+                }
+            });
+
+        }
+    }
+}
+
+function updatePositionNameByCompanyId(companyId, positionObj){
+    return function(callback){
+        var positionId = _.get(positionObj, ['_id'], '');
+        if(_.isEmpty(positionId) || _.isEmpty(companyId)){
+            console.log('no position id or companyId found for update position under company');
+            return callback(null, null)
+        } else {
+            Company.findOne({_id: companyId}, function(err1, dbCompany){
+                if(err1 || _.isEmpty(dbCompany)){
+                    console.log('Error in finding dbcompany by company id', companyId, err1)
+                    return callback(null, null);
+                } else {
+                    var dbPositions = _.get(dbCompany, ['positions'], []);
+                    var targetPosition = _.find(dbPositions, {'positionId': positionId});
+                    if(_.isEmpty(targetPosition))
+                        return callback(null, null);
+                    else {
+                        targetPosition.positionName = _.get(positionObj, ['name'], '');
+                        Company.update({_id: companyId}, {$set: {'positions': dbPositions}}, {upsert: false}, function(err2, updateResult){
+                            if(err2){
+                                console.log('Error in updating positions under company for id', companyId, err2);
+                                return callback(null, null);
+                            } else {
+                                return callback(null, updateResult);
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 }
