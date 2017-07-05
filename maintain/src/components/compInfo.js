@@ -28,7 +28,9 @@ class CompInfo extends React.Component{
         comp: PropTypes.object
     }
     state = {
-        editFlag:false
+        editFlag:false,
+        positionNumber : 0,
+        applicantNumber : 0
     }
     async editCompInfo(){
         if(this.state.editFlag){
@@ -54,10 +56,18 @@ class CompInfo extends React.Component{
                 editFlag : !this.state.editFlag
             });
         }
-        console.log('123');
     }
-    componentWillMount(){
-        
+    async componentWillMount(){
+        try{
+            let res = await api.getBasicInfo(this.context.comp._id)
+            let data = await res.json();
+            this.setState({
+                positionNumber : data.positionNumber,
+                applicantNumber : data.applicantNumber
+            })
+        }catch(e){
+            console.log(e)
+        }
     }
     render(){
         let {getFieldDecorator} = this.props.form;
@@ -311,11 +321,11 @@ class CompInfo extends React.Component{
                     <Row className='inner'>
                             <Col offset={4} span={9}>
                                 <div className="icon-user icon"/>
-                                <p className="span-title">入职员工：10</p>
+                                <p className="span-title">入职员工：{this.state.applicantNumber}</p>
                             </Col>
                             <Col offset={2} span={9}>
                                 <div className="icon-space icon"/>
-                                <p className="span-title">在招职位：5</p>
+                                <p className="span-title">在招职位：{this.state.positionNumber}</p>
                             </Col>
                         </Row>
                         <div className="entrance-wrap">

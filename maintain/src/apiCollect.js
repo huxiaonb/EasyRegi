@@ -66,13 +66,13 @@ export default{
              body:JSON.stringify(data)
         }).catch(e => console.log(e));
     },
-    getBasicInfo(){
+    getBasicInfo(id){
         //获取当前公司position计数和Applicant计数
         /*
         返回值：{ positionNumber: 3, applicantNumber: 2 }
          */
-        let url = '../api/company/getBasicInfo/:companyId'; //如: ../api/company/getBasicInfo/5954ef7dc111d2bb00602cb1
-        return fetch(url).then(data => data).catch(e => console.log(e));
+        let url = '../api/company/getBasicInfo/'+ id; //如: ../api/company/getBasicInfo/5954ef7dc111d2bb00602cb1
+        return fetch(url);
     },
     getApplicants(){
         //获取当前公司所有应聘者信息
@@ -147,7 +147,7 @@ export default{
              body:JSON.stringify(data)
         });
     },
-    searchApplicant(name,dateRange=[]){
+    searchApplicant(data){
         //may be url like below format
         let url = '../api/company/searchApplicants';
         /*

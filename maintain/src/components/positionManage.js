@@ -171,7 +171,9 @@ class PositionManage extends React.Component{
         
         
         this.setState({
-            results : data.positions
+            results : data.positions,
+            resultTotal : data.positions.length,
+            
         })
         console.log(data);
     }

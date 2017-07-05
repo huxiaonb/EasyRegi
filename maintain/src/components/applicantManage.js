@@ -27,7 +27,8 @@ export default class ApplicantManage extends React.Component{
     state={
         resultTotal : 0,
         appiName : '',
-        date :[moment(),moment()]
+        date :[],
+        results:[]
     }
     onDateChange(value, dateString) {
         this.setState({
@@ -71,16 +72,17 @@ export default class ApplicantManage extends React.Component{
         try{
             let res = await api.searchApplicant(query);
             let data = await res.json();
-            return data;
+            this.setState({
+                results : data.applicants,
+                resultTotal : data.applicants
+            })
         }catch(e){
             console.log(e);
         }
     }
     componentWillMount(){
         //get table data and set to state,use fetch
-        let data = this.searchApplicants();
-        console.log(data);
-        
+        this.searchApplicants();
     }
     render(){
         const columns = [{
@@ -105,11 +107,12 @@ export default class ApplicantManage extends React.Component{
             className: 'log-result-noWrap',
         }];
         //mock datasource 
-        let list = [
+        /*let list = [
         {name:'GDGDGDG',gender:'male',birthDate:'2014-12-24',mobile:'1231231312'},
         {name:'GDGDGDG',gender:'male',birthDate:'2014-12-24',mobile:'1231231312'},
         {name:'GDGDGDG',gender:'male',birthDate:'2014-12-24',mobile:'1231231312'},
-        {name:'GDGDGDG',gender:'male',birthDate:'2014-12-24',mobile:'1231231312'}]
+        {name:'GDGDGDG',gender:'male',birthDate:'2014-12-24',mobile:'1231231312'}]*/
+        let list  = this.state.results;
         return(
             <div>
 
@@ -124,7 +127,7 @@ export default class ApplicantManage extends React.Component{
                     </div>
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>入职日期</label>
-                        <RangePicker format="YYYY-MM-DD"  defaultValue={[moment(new Date(), "YYYY-MM-DD"), moment(new Date(), "YYYY-MM-DD")]} onChange={this.onDateChange.bind(this)}/>
+                        <RangePicker format="YYYY-MM-DD"  onChange={this.onDateChange.bind(this)}/>
                     </div>
                 </div>
                 <div className='search-bar-row'>
