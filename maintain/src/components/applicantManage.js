@@ -1,6 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
 import {Button, Input, DatePicker, Table} from 'antd'
+import PropTypes from 'prop-types';
+import moment from 'moment';
 // import Table from 'antd/lib/table'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -13,18 +15,48 @@ import {Button, Input, DatePicker, Table} from 'antd'
 // import 'antd/lib/table/style/index.less';
 // import 'antd/lib/date-picker/style/index.less';
 import './style/components.less';
+import api from '../apiCollect'
 
 const {RangePicker } = DatePicker;
 
+
 export default class ApplicantManage extends React.Component{
+    static contextTypes = {
+        comp: PropTypes.object
+    }
     state={
         resultTotal : 0,
+        appiName : '',
+        date :[moment(),moment()]
+    }
+    onDateChange(value, dateString) {
+        this.setState({
+            date:dateString
+        })
+    }
+    onNameChange(e){
+        this.setState({
+            appiName : e.target.value
+        })
     }
     onSearch(){
         console.log('search');
+        let {date} = this.state;
+        let query = {
+            applicantName:this.state.appiName,
+            companyId:this.context.comp._id,
+            startedAt: date.length>1 ? date[0] :  '',
+            endedAt : date.length>1 ? date[1] :  '',
+        }
+        console.log(query)
+        this.searchApplicants(query)
     }
     clear(){
         console.log('clear');
+        this.setState({
+            appiName:'',
+            date:[]
+        })
     }
     exportCSV(){
         console.log('export csv');
@@ -35,8 +67,20 @@ export default class ApplicantManage extends React.Component{
         //some logic then open a new tab in browser
         let win = window.open('http://www.baidu.com', '_blank');
     }
+    async searchApplicants(query={companyId:this.context.comp._id}){
+        try{
+            let res = await api.searchApplicant(query);
+            let data = await res.json();
+            return data;
+        }catch(e){
+            console.log(e);
+        }
+    }
     componentWillMount(){
         //get table data and set to state,use fetch
+        let data = this.searchApplicants();
+        console.log(data);
+        
     }
     render(){
         const columns = [{
@@ -76,11 +120,11 @@ export default class ApplicantManage extends React.Component{
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>姓名</label>
-                        <Input className='search-bar-input'/>
+                        <Input className='search-bar-input' value={this.state.appiName} onChange={this.onNameChange.bind(this)}/>
                     </div>
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>入职日期</label>
-                        <RangePicker/>
+                        <RangePicker format="YYYY-MM-DD"  defaultValue={[moment(new Date(), "YYYY-MM-DD"), moment(new Date(), "YYYY-MM-DD")]} onChange={this.onDateChange.bind(this)}/>
                     </div>
                 </div>
                 <div className='search-bar-row'>

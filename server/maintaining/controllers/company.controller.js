@@ -447,7 +447,7 @@ function createPositionForCompany(req, res, next){
                     var positionItem = {
                         name: _.get(positionObj, ['name'], ''),
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
-                        totalRecruiters: _.get(positionObj, ['totalRecruiters'], 0),
+                        totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
                         salary: _.get(positionObj, ['salary'], ''),
                         welfares: _.get(positionObj, ['welfares'], []),
                         positionDesc: _.get(positionObj, ['positionDesc'], ''),

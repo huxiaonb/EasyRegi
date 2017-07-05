@@ -129,8 +129,8 @@ export default{
              method:"post",
              headers:{ 'Content-Type': 'application/json'
              },
-             body:data
-        }).then(data => data).catch(e => console.log(e));
+             body:JSON.stringify(data)
+        })
     },
     delPosition(data){
         //删除职位

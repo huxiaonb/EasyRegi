@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, Modal, message, Form,Select} from 'antd'
+import {Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 
@@ -37,9 +37,7 @@ class PositionManage extends React.Component{
         results : [],
         resultTotal : 0,
         pFlag : false,
-        rowValue : {
-            positionName : '',
-        }
+        rowValue : {},
     }
     posiNameChange(e){
         this.setState({
@@ -63,16 +61,18 @@ class PositionManage extends React.Component{
         console.log('search');
         
     }
+    
     clear(){
         this.setState({
             posiName : ''
         })
         console.log('clear');
     }
+    
     toggleP(){
         this.setState({
             pFlag : !this.state.pFlag
-        })
+        });
     }
     async handleOk(){
         //fetch url edit/create
@@ -84,37 +84,84 @@ class PositionManage extends React.Component{
              let newP = Object.assign({},{
                  name : form.getFieldValue('p_name'),
                  phoneNumber : form.getFieldValue('p_phone'),
-                 totalRecuriters : form.getFieldValue('p_total'),
+                 totalRecruiters : form.getFieldValue('p_total'),
                  salary : form.getFieldValue('p_salary'),
                  welfares : form.getFieldValue('p_welfare'),
                  positionDesc : form.getFieldValue('p_desc'),
                  jobRequire : form.getFieldValue('p_require'),
              });
-             let res = await api.createPosition({companyId : this.context.comp._id,position:newP});
-             let data = await res.json();
-             message.success('123');
-            })
+             if(this.state.rowValue.name){
+                 try{
+                    newP._id = this.state.rowValue._id;
+                    
+                    let res = await api.updatePosition({companyId : this.context.comp._id,position:newP});
+                    let data = await res.json();
+                    this.toggleP();
+                    message.success('操作成功！');
+                    this.searchPosi();
+                }catch(e){
+                    message.error('出错请联系管理员');
+                    console.log(e);
+                }
+             }else{
+                 try{
+                    let res = await api.createPosition({companyId : this.context.comp._id,position:newP});
+                    let data = await res.json();
+                    this.toggleP();
+                    message.success('操作成功！');
+                    this.searchPosi();
+                }catch(e){
+                    message.error('出错请联系管理员');
+                    console.log(e);
+                }
+             }
+            })         
+    }
+    createForm(){
+        let {form} = this.props;
+        form.setFieldsValue({
+                'p_name' : '',
+                'p_phone' : '',
+                'p_total' : '',
+                'p_salary' : '',
+                'p_welfare' : [],
+                'p_desc' : '',
+                'p_require' : ''
+            });
             this.toggleP();
-            message.success('操作成功！');
     }
     editP(rec){
-        console.log(rec);
+        let {form} = this.props;
         this.setState({
-            rowValue : rec
+            rowValue : rec,
         });
+        form.setFieldsValue({
+                'p_name' : rec.name,
+                'p_phone' : rec.phoneNumber,
+                'p_total' : rec.totalRecruiters,
+                'p_salary' : rec.salary,
+                'p_welfare' : rec.welfares,
+                'p_desc' : rec.positionDesc,
+                'p_require' : rec.jobRequire
+            });
         this.toggleP();
     }
     deleP(rec){
+        let that = this;
         Modal.confirm({
             title: '确认删除此职位吗？',
             okText: '确认',
             cancelText: '取消',
             async onOk() {
-                let res = await api.delPosition(rec);
-                let data = await res.json();
-                console.log(data);
-                message.success('已删除');
-                message.error('出错请联系管理员');
+                try{
+                    let res = await api.delPosition({companyId:that.context.comp._id, positionId:rec._id});
+                    let data = await res.json();
+                    message.success('已删除');
+                    that.searchPosi();
+                }catch(e){
+                    message.error('出错请联系管理员');
+                    console.log(e)
+                }
             } 
         });
     }
@@ -196,11 +243,12 @@ class PositionManage extends React.Component{
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]*/
         //let list = [{name:'123',phoneNumber:'123',totalRecuriters:'123',salary:'123',welfares:'123',jobRequire:'123',positionDesc:'1231'}]
         let list = this.state.results;
+        let {createF} = this.state
         return(
             <div>
             <div className='search-bar-container'>
                 <div className='search-title'>
-                    招聘职位管理<span title='新增职位' style={{marginLeft:'10px'}}><Button shape="circle" type='primary' icon='plus' onClick={this.toggleP.bind(this)} /></span>
+                    招聘职位管理<span title='新增职位' style={{marginLeft:'10px'}}><Button shape="circle" type='primary' icon='plus' onClick={this.createForm.bind(this)} /></span>
                 </div>
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
@@ -246,56 +294,66 @@ class PositionManage extends React.Component{
                     <Form>
                         <FormItem
                             label='职位名'
-                            name='p_name'>
+                            name='p_name'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_name',{
                                 rules:[{
                                     type:'string',required:true
-                                }],
-                                initialValue:this.state.rowValue.name
+                                }]
+                                
                             })(
                                 <Input/>
                             )}
                         </FormItem>
                         <FormItem
                             label='联系电话'
-                            name='p_phone'>
+                            name='p_phone'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_phone',{
                                 rules:[{
                                     type:'string',required:true
-                                }],initialValue:this.state.rowValue.phoneNumber
+                                }]
                             })(
                                 <Input />
                             )}
                         </FormItem>
                         <FormItem
                             label='招聘人数'
-                            name='p_total'>
+                            name='p_total'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_total',{
                                 rules:[{
                                     type:'string',required:true
-                                }],initialValue:this.state.rowValue.totalRecuriters
+                                }]
                             })(
                                 <Input />
                             )}
                         </FormItem>
                         <FormItem
                             label='薪资'
-                            name='p_salary'>
+                            name='p_salary'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_salary',{
                                 rules:[{
                                     type:'string',required:true
-                                }],initialValue:this.state.rowValue.salary
+                                }]
                             })(
                                 <Input />
                             )}
                         </FormItem>
                          <FormItem
                             label='福利'
-                            name='p_welfare'>
+                            name='p_welfare'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_welfare',{
                                 rules:[{
                                     type:'array',required:true
-                                }],initialValue:this.state.rowValue.welfares
+                                }]
                             })(
                                 <Select mode='multiple' placeholder='please select...'>
                                     <Option value='五险一金'>五险一金</Option>
@@ -307,24 +365,28 @@ class PositionManage extends React.Component{
                         </FormItem>
                         <FormItem
                             label='职位要求'
-                            name='p_require'>
+                            name='p_require'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_require',{
                                 rules:[{
                                     type:'string',required:true
-                                }],initialValue:this.state.rowValue.jobRequire
+                                }]
                             })(
                                 <Input />
                             )}
                         </FormItem>
                         <FormItem
                             label='职位描述'
-                            name='p_desc'>
+                            name='p_desc'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_desc',{
                                 rules:[{
                                     type:'string',required:true
-                                }],initialValue:this.state.rowValue.positionDesc
+                                }]
                             })(
-                                <Input />
+                                <Input type='textarea' style={{resize:"none"}}/>
                             )}
                         </FormItem>
                     </Form>
