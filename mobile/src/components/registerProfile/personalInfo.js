@@ -139,7 +139,7 @@ class PersonalInfo extends React.Component {
         const uploadButton = ( <Button>
                             <Icon type="upload" /> Click to Upload
                         </Button>);
-        const { getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
+        const {getFieldProps, getFieldError } = this.props.form;
         let nationOptions = [],
             {healthFlag,fileList} = this.state;
         for (let key in nations) {
@@ -176,6 +176,7 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue:personal.gender || '男'
                 })}
+                
                 >
                 
                     <Picker cols={1} data={[{label:'男',value:'男'},{label:'女',value:'女'}]}>
@@ -192,6 +193,7 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.folk || '汉族'
                 })}
+                
                 >
                 
                     <Picker data={nationOptions}>
@@ -207,7 +209,12 @@ class PersonalInfo extends React.Component {
                 {...getFieldProps('birthDate', {
                     rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                     initialValue : personal.date
-                })}>
+                })}
+                clear
+                error={!!getFieldError('birthDate')}
+                onErrorClick={() => {
+                    alert(getFieldError('birthDate').join('、'));
+                }}>
                     <DatePicker mode="date" maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
             </FormItem>
             <FormItem
@@ -216,7 +223,8 @@ class PersonalInfo extends React.Component {
                 {...getFieldProps('healthState', {
                     rules: [{ type:'string', required: true, message: '请选择健康状况!' }],
                     initialValue : personal.healthState || '良好'
-                })}>
+                })}
+                >
                     <Picker
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
                         <List.Item arrow="horizontal">健康状况</List.Item>
@@ -233,6 +241,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.idCardNumber
                 })}
+                clear
+                error={!!getFieldError('idCardNumber')}
+                onErrorClick={() => {
+                    alert(getFieldError('idCardNumber').join('、'));
+                }}
                 >
                 身份证号码
             </InputItem>
@@ -247,6 +260,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.homeAddress
                 })}
+                clear
+                error={!!getFieldError('homeAddress')}
+                onErrorClick={() => {
+                    alert(getFieldError('homeAddress').join('、'));
+                }}
                 >
                 家庭住址
             </InputItem>
@@ -257,7 +275,12 @@ class PersonalInfo extends React.Component {
                         required:true,message:'请输入有效的家庭住址！'
                     }],
                     initialValue : personal.currentAddress
-                })}>
+                })}
+                clear
+                error={!!getFieldError('currentAddress')}
+                onErrorClick={() => {
+                    alert(getFieldError('currentAddress').join('、'));
+                }}>
                 现住址
             </InputItem>
             
@@ -271,6 +294,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.mobile
                 })}
+                clear
+                error={!!getFieldError('mobile')}
+                onErrorClick={() => {
+                    alert(getFieldError('mobile').join('、'));
+                }}
                >
                联系手机          
              </InputItem>
@@ -284,6 +312,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.email
                 })}
+                clear
+                error={!!getFieldError('email')}
+                onErrorClick={() => {
+                    alert(getFieldError('email').join('、'));
+                }}
                 >
                 邮箱
             </InputItem>
@@ -295,6 +328,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.tele
                 })}
+                clear
+                error={!!getFieldError('tele')}
+                onErrorClick={() => {
+                    alert(getFieldError('tele').join('、'));
+                }}
                 >
                 联系座机
             </InputItem>
@@ -306,6 +344,11 @@ class PersonalInfo extends React.Component {
                     }],
                     initialValue : personal.qqNumber
                 })}
+                clear
+                error={!!getFieldError('qqNumber')}
+                onErrorClick={() => {
+                    alert(getFieldError('qqNumber').join('、'));
+                }}
                >
                QQ             
              </InputItem>
@@ -315,7 +358,8 @@ class PersonalInfo extends React.Component {
                 {...getFieldProps('upload',{
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
-                })}>
+                })}
+                >
                 
                      <Upload
                         action={`../weChat/applicant/personalInfo/submit/` + openId}
