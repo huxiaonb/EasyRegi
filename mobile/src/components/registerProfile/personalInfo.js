@@ -52,7 +52,7 @@ class PersonalInfo extends React.Component {
     nextStep(){
         //validateAndSetValue
         let { form } = this.props;
-        form.validateFieldsAndScroll(async (err, values)=>{
+        form.validateFields(async (err, values)=>{
              if (!!err) return
              //set value to context
              let personalInfo = Object.assign({},{
@@ -151,158 +151,172 @@ class PersonalInfo extends React.Component {
         <List >
             <InputItem
                 name="name"
-                value={personal.name}
-                >
-                {getFieldDecorator('name', {
+                {...getFieldProps('name', {
                     rules:[{
                         type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                     },{
                         required:true,message:'请输入有效的姓名！'
                     }]
-                })}姓名
+                })}
+                clear
+                error={!!getFieldError('name')}
+                onErrorClick={() => {
+                    alert(getFieldError('name').join('、'));
+                }}
+                placeholder="请输入姓名"
+                >
+                姓名
             </InputItem>
             <FormItem
                 label="性别"
                 name="gender"
-                >
-                {getFieldDecorator('gender', {
+                {...getFieldProps('gender', {
                     rules:[{
                         required:true, message:'请选择性别！'
                     }],
                     initialValue:personal.gender || '男'
-                })(
+                })}
+                >
+                
                     <Picker cols={1} data={[{label:'男',value:'男'},{label:'女',value:'女'}]}>
                     <List.Item arrow="horizontal">性别</List.Item>
                     </Picker>
-                )}
+               
             </FormItem>
             <FormItem
                 label="民族"
                 name="folk"
-                >
-                {getFieldDecorator('folk', {
+                {...getFieldProps('folk', {
                     rules:[{
-                        type:'string', required:true, message:'请选择民族！'
+                        required:true, message:'请选择民族！'
                     }],
                     initialValue : personal.folk || '汉族'
-                })(
+                })}
+                >
+                
                     <Picker data={nationOptions}>
                     <List.Item arrow="horizontal">民族</List.Item>
                     </Picker>
-                )}
+                
             </FormItem>
             
             <FormItem
                 label="出生日期"
                 name='birthDate'
-                style={{textAlign:'left'}}>
-                {getFieldDecorator('birthDate', {
+                style={{textAlign:'left'}}
+                {...getFieldProps('birthDate', {
                     rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                     initialValue : personal.date
-                })(
+                })}>
                     <DatePicker mode="date" maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
-                )}
             </FormItem>
             <FormItem
                 label="健康状况"
-                name='healthState'>
-                {getFieldDecorator('healthState', {
+                name='healthState'
+                {...getFieldProps('healthState', {
                     rules: [{ type:'string', required: true, message: '请选择健康状况!' }],
                     initialValue : personal.healthState || '良好'
-                })(
+                })}>
                     <Picker
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
                         <List.Item arrow="horizontal">健康状况</List.Item>
                     </Picker>
-                )}
             </FormItem>
             <InputItem
                 label="身份证号码"
                 name="idCardNumber"
-                >
-                {getFieldDecorator('idCardNumber', {
+                {...getFieldProps('idCardNumber', {
                     rules:[{
                         type:'string', pattern:/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/, message:'请输入有效的身份证号码！'
                     },{
                         required:true, message:'请输入有效的身份证号码！'
                     }],
                     initialValue : personal.idCardNumber
-                })}身份证号码
+                })}
+                >
+                身份证号码
             </InputItem>
              
             <InputItem
                 name="homeAddress"
-                >
-                {getFieldDecorator('homeAddress', {
+                {...getFieldProps('homeAddress', {
                     rules:[{
                         type:'string'
                     },{
                         required:true,message:'请输入有效的家庭住址！'
                     }],
                     initialValue : personal.homeAddress
-                })}家庭住址
+                })}
+                >
+                家庭住址
             </InputItem>
            <InputItem
-                name="currentAddress">
-                {getFieldDecorator('currentAddress', {
+                name="currentAddress"
+                {...getFieldProps('currentAddress', {
                     rules:[{type:'string'},{
                         required:true,message:'请输入有效的家庭住址！'
                     }],
                     initialValue : personal.currentAddress
-                })}现住址
+                })}>
+                现住址
             </InputItem>
             
             <InputItem
                name="mobile"
-               >
-               {getFieldDecorator('mobile', {
+               {...getFieldProps('mobile', {
                     rules: [{
                         type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
                     }, {
                         whitespace: true, required: true, message: '请输入有效的联系手机！'
                     }],
                     initialValue : personal.mobile
-                })}联系手机          
+                })}
+               >
+               联系手机          
              </InputItem>
              <InputItem
                 name='email'
-                >
-                {getFieldDecorator('email', {
+                {...getFieldProps('email', {
                     rules: [{
                         type: 'email', message: '请输入有效的邮箱!',
                     }, {
                         required: true, message: '请输入有效的邮箱!',
                     }],
                     initialValue : personal.email
-                })}邮箱
+                })}
+                >
+                邮箱
             </InputItem>
             <InputItem
                 name="tele"
-                >
-                {getFieldDecorator('tele', {
+                {...getFieldProps('tele', {
                     rules: [{
                         type: 'string', pattern: /^([0-9]{3,4}\-)?[0-9]{6,10}(\-[0-9]{1,4})?$/, message: '请输入有效的联系座机！'
                     }],
                     initialValue : personal.tele
-                })}联系座机
+                })}
+                >
+                联系座机
             </InputItem>
             <InputItem
                name="qqNumber"
-               >
-               {getFieldDecorator('qqNumber', {
+               {...getFieldProps('qqNumber', {
                     rules: [{
                         type: 'string', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
                     }],
                     initialValue : personal.qqNumber
-                })}QQ             
+                })}
+               >
+               QQ             
              </InputItem>
              <FormItem
                 label='上传图片'
-                name='upload'>
-                {getFieldDecorator('upload',{
+                name='upload'
+                {...getFieldProps('upload',{
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
-                })(
+                })}>
+                
                      <Upload
                         action={`../weChat/applicant/personalInfo/submit/` + openId}
                         name= 'file' 
@@ -312,7 +326,7 @@ class PersonalInfo extends React.Component {
                         {fileList.length >= 1 ? null : uploadButton}
                        
                     </Upload>
-                )}
+               
              </FormItem>
         </List>
          <Button type="primary" inline onClick={this.nextStep.bind(this)}>下一步</Button>
