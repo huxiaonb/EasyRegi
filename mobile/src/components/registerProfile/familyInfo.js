@@ -1,31 +1,33 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import { createForm } from 'rc-form';
 
-import Form from 'antd/lib/form'
-import Input from 'antd/lib/input'
-import Button from 'antd/lib/button'
-import Select from 'antd/lib/select'
-import Card from 'antd/lib/card'
-import Icon from 'antd/lib/icon'
-import Badge from 'antd/lib/badge'
-import Checkbox from 'antd/lib/checkbox'
-
-
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
-import 'antd/lib/input/style/index.less';
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/form/style/index.less';
-import 'antd/lib/select/style/index.less';
-import 'antd/lib/card/style/index.less';
-import 'antd/lib/badge/style/index.less';
-import 'antd/lib/checkbox/style/index.less';
+import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast, Badge, Checkbox } from 'antd-mobile'
+// import Form from 'antd/lib/form'
+// import Input from 'antd/lib/input'
+// import Button from 'antd/lib/button'
+// import Select from 'antd/lib/select'
+// import Card from 'antd/lib/card'
+// import Icon from 'antd/lib/icon'
+// import Badge from 'antd/lib/badge'
+// import Checkbox from 'antd/lib/checkbox'
 
 
+// import 'antd/lib/style/index.less';
+// import 'antd/lib/grid/style/index.less';
+// import 'antd/lib/input/style/index.less';
+// import 'antd/lib/button/style/index.less';
+// import 'antd/lib/form/style/index.less';
+// import 'antd/lib/select/style/index.less';
+// import 'antd/lib/card/style/index.less';
+// import 'antd/lib/badge/style/index.less';
+// import 'antd/lib/checkbox/style/index.less';
 
-const FormItem = Form.Item;
-const {Option} = Select;
+
+
+const FormItem = List.Item;
+const CheckboxItem = Checkbox.CheckboxItem;
 let uuid = 0;
 let count = 0;
 
@@ -37,7 +39,7 @@ class FamilyInfo extends React.Component {
     }
     prevStep(){
         let { form } = this.props;
-        form.validateFieldsAndScroll(async (err, values)=>{
+        form.validateFields(async (err, values)=>{
              if (!!err){
                  this.props.prev();
              }  
@@ -67,12 +69,12 @@ class FamilyInfo extends React.Component {
     nextStep(){
         //validate form value and set data
         let { form } = this.props;
-        form.validateFieldsAndScroll(async (err, values)=>{
+        form.validateFields(async (err, values)=>{
              if (!!err) return
              //set value to context
              let familyInfos = [Object.assign({},{
                  name : form.getFieldValue('name'),
-                 relationship : form.getFieldValue('relationship'),
+                 relationship : form.getFieldValue('relationship1'),
                  phoneNumber : form.getFieldValue('mphoneNumber'),
                  emergencyFlag : form.getFieldValue('em_check')
              })];
@@ -147,19 +149,9 @@ class FamilyInfo extends React.Component {
     }
 
     render(){
-        const { getFieldDecorator, getFieldValue  } = this.props.form;
-        const formItemLayout = {
-            labelCol: {
-                xs: { span: 24 },
-                sm: { span: 4 },
-                md: {span:12}
-            },
-            wrapperCol: {
-                xs: { span: 24 },
-                sm: { span: 20 },
-                md: {span:12}
-            },
-        };
+        const relations = [{label:'父母',value:'父母'},{label:'夫妻',value:'夫妻'},{label:'兄弟',value:'兄弟'},{label:'姐妹',value:'姐妹'},{label:'其他',value:'其他'}];
+        const { getFieldDecorator, getFieldValue, getFieldProps,getFieldError } = this.props.form;
+        
         const noti = (
             <Badge dot>
                 <span title='新增的家庭成员' style={{color:'#108ee9',cursor:'pointer'}}>
@@ -182,73 +174,58 @@ class FamilyInfo extends React.Component {
         const keys = getFieldValue('keys');
         const formItems = keys.map((key, index) => {
             return (
-                <Card title={noti} key={`${key}`} style={{marginTop:'20px'}} extra={<span title='删除此列'><Icon onClick={() => this.remove(key)} style={{cursor: 'pointer',transition: 'all .3s'}} type='close'/></span>}>  
-                    <FormItem
-                        {...formItemLayout}
-                        label="姓名"
-                        name={`name_${key}`}
-                        hasFeedback
-                        key={`name_${key}`}>
-                        {getFieldDecorator(`name_${key}`, {
-                            validateTrigger: ['onChange', 'onBlur'],
+                <Card  key={`${key}`} style={{marginTop:'20px'}} >  
+                    <Card.Header title={noti} extra={<span title='删除此列'><Icon onClick={() => this.remove(key)} style={{cursor: 'pointer',transition: 'all .3s'}} type='cross'/></span>}>
+                    </Card.Header>
+                    <InputItem
+                        name="name"
+                        {...getFieldProps(`name_${key}`, {
                             rules:[{
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                             },{
-                                required:true, message:'请输入有效的姓名！'
+                                required:true,message:'请输入有效的姓名！'
                             }]
-                        })(
-                            <Input placeholder='请输入姓名！'/>
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="关系"
-                        name={`relationship_${key}`}
-                        hasFeedback
-                        key={`relationship_${key}`}>
-                        {getFieldDecorator(`relationship_${key}`, {
+                        })}
+                        clear
+                        error={!!getFieldError(`name_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`name_${key}`).join('、'));
+                        }}
+                        placeholder="请输入姓名"
+                        >
+                        姓名
+                    </InputItem>
+                    <FormItem>
+                        <Picker 
+                            cols={1}
+                            {...getFieldProps(`relationship_${key}`, {
                             rules:[{
                                 required:true, message:'请选择关系！'
-                            }],
-                            initialValue:'父母'
-                        })(
-                            <Select>
-                                <Option value="parents">父母</Option>
-                                <Option value="bros">兄弟</Option>
-                                <Option value="sis">姐妹</Option>
-                                <option value="other">其他亲属</option>
-                        </Select>
-                        )}
+                            }],initialValue:['父母']
+                            })}
+                            data={relations}
+                            >
+                            <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>关系</List.Item>
+                        </Picker>
                     </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="联系手机"
-                        name={`mphoneNumber_${key}`}
-                        hasFeedback
-                        key={`mphoneNumber_${key}`}>
-                        {getFieldDecorator(`mphoneNumber_${key}`, {
-                            validateTrigger: ['onChange', 'onBlur'],
+                    <InputItem
+                        {...getFieldProps(`mphoneNumber_${key}`, {
                             rules: [{
                                 type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
                             }, {
                                 required: true, message: '请输入有效的联系手机！'
                             }]
-                        })(
-                            <Input placeholder='请输入联系手机！'/>                        
-                    )}
-                    </FormItem>
-                 <FormItem
-                        label=''
-                        name={`em_check_${key}`}>
-                        {getFieldDecorator(`em_check_${key}`,{
-                            valuePropName: 'checked',
-                            initialValue: false
-                        })(
-                            <Checkbox>
-                                标记为紧急联系人
-                            </Checkbox>
-                        )}
-                    </FormItem>
+                        })}
+                        clear
+                        error={!!getFieldError(`mphoneNumber_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`mphoneNumber_${key}`).join('、'));
+                        }}
+                        placeholder="请输入联系手机">联系手机
+                    </InputItem>
+                 <FormItem extra={<CheckboxItem {...getFieldProps('1', { initialValue: false, valuePropName: 'checked' })} />}>
+                    标记为紧急联系人
+                 </FormItem>
                 </Card>
             )});
         
@@ -256,78 +233,62 @@ class FamilyInfo extends React.Component {
         return(
             <div key='fam_info'>
                 <Card title="家庭成员(最多6条)">
-                    <Form layout='inline'>
+                    <form>
                     <Card>
-                     <FormItem
-                     {...formItemLayout}
-                        label="姓名"
-                        name='name'
-                        hasFeedback
-                        key='name'>
-                        {getFieldDecorator('name', {
-                            validateTrigger: ['onChange', 'onBlur'],
+                     <InputItem
+                        name="name"
+                        {...getFieldProps('name', {
                             rules:[{
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                             },{
                                 required:true,message:'请输入有效的姓名！'
                             }]
-                        })(
-                            <Input placeholder='请输入姓名！'/>
-                        )}
+                        })}
+                        clear
+                        error={!!getFieldError('name')}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError('name').join('、'));
+                        }}
+                        placeholder="请输入姓名"
+                        >
+                        姓名
+                    </InputItem>
+                    
+                   
+                    <FormItem>
+                        <Picker 
+                            cols={1}
+                            {...getFieldProps('relationship1', {
+                                rules:[{
+                                    required:true, message:'请选择关系！'
+                                }],initialValue:['父母']
+                            })}
+                            data={relations}
+                            >
+                            <List.Item arrow="horizontal" name="relationship1" style={{padding : 0}}>关系</List.Item>
+                        </Picker>
                     </FormItem>
-                    <FormItem
-                    {...formItemLayout}
-                        label="关系"
-                        name='relationship'
-                        hasFeedback
-                        key='relationship'>
-                        {getFieldDecorator('relationship', {
-                            rules:[{
-                                required:true, message:'请选择关系！'
-                            }],
-                            initialValue:'parents'
-                        })(
-                            <Select>
-                                <Option value="parents">父母</Option>
-                                <Option value="couple">夫妻</Option>
-                                <Option value="bros">兄弟</Option>
-                                <Option value="sis">姐妹</Option>
-                                <Option value="other">其他亲属</Option>
-                        </Select>
-                        )}
-                    </FormItem>
-                    <FormItem
-                    {...formItemLayout}
-                        label="联系手机"
-                        name='mphoneNumber'
-                        key='mphoneNumber'
-                        hasFeedback>
-                        {getFieldDecorator('mphoneNumber', {
-                            validateTrigger: ['onChange', 'onBlur'],
+                    <InputItem
+                        {...getFieldProps('mphoneNumber', {
                             rules: [{
                                 type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
                             }, {
                                 required: true, message: '请输入有效的联系手机！'
                             }]
-                        })(
-                            <Input placeholder='请输入联系手机！'/>                        
-                    )}
-                    </FormItem>
-                    <FormItem
-                        label=''
-                        name='em_check'>
-                        {getFieldDecorator('em_check',{
-                            valuePropName: 'checked',
-                            initialValue: true,
-                        })(
-                            <Checkbox>
-                                标记为紧急联系人
-                            </Checkbox>
-                        )}
+                        })}
+                        clear
+                        error={!!getFieldError('mphoneNumber')}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError('mphoneNumber').join('、'));
+                        }}
+                        placeholder="请输入联系手机">联系手机
+                    </InputItem>
+                    <FormItem extra={<CheckboxItem {...getFieldProps('1', { initialValue: true, valuePropName: 'checked' })} />}>
+                        标记为紧急联系人
                     </FormItem>
                     </Card>
                         {formItems}
-                    </Form>
+                    </form>
                     <div>
                         <Button type="primary" size='large' icon="plus-circle-o" onClick={this.add.bind(this)} style={{width:'100%'}}>新增家庭成员</Button>
                     </div>
@@ -341,4 +302,4 @@ class FamilyInfo extends React.Component {
     }
 }
 
-export default Form.create()(FamilyInfo)
+export default createForm()(FamilyInfo)

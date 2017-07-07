@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Button from 'antd/lib/button'
+
 import PropTypes from 'prop-types';
 
-import message from 'antd/lib/message'
+import {Button, Toast} from 'antd-mobile'
 
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/message/style/index.less';
+
 
 import WorkExp from './work';
 import EduExp from './education'
@@ -31,7 +30,7 @@ export default class OhterInfo extends React.Component {
         let wFlag, eFlag = false;
         let { workF, eduF } = this.refs;
         let workFs,eduFs = [];
-        workF.validateFieldsAndScroll(async (err, values)=>{
+        workF.validateFields(async (err, values)=>{
              if (!!err) return
              //set value to context 
              //rangetime set config
@@ -54,7 +53,7 @@ export default class OhterInfo extends React.Component {
                  workFs.push(fmObj);
              })
         });
-        eduF.validateFieldsAndScroll(async (err, values)=>{
+        eduF.validateFields(async (err, values)=>{
              if (!!err) return
              //set value to context
              //rangetime set config
@@ -79,7 +78,7 @@ export default class OhterInfo extends React.Component {
         });
         if(wFlag && eFlag){
             this.context.updateProfile({otherInfo:{workExps:workFs,wkeys:workF.fieldsStore.getFieldValue('keys'),edus:eduFs,ekeys:eduF.fieldsStore.getFieldValue('keys')},flag:3});
-            if(!!pFlag)message.success('暂存成功!');
+            if(!!pFlag)Toast.success('暂存成功!');
         }
     }
     /*componentDidMount(){

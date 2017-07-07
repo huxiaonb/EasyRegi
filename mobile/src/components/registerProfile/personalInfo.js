@@ -2,10 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { List, InputItem, Button,Picker,DatePicker,Card, Icon} from 'antd-mobile'
+import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast} from 'antd-mobile'
 import { createForm } from 'rc-form';
 import moment from 'moment';
-
+import  '../less/index.less';
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -46,7 +46,10 @@ class PersonalInfo extends React.Component {
         healthFlag : false,
         previewVisible: false,
         previewImage: '',
-        fileList:[]
+        fileList:[],
+        healthState:['良好'],
+        folk:['汉族'],
+        gender:['男']
     }
 
     nextStep(){
@@ -73,9 +76,7 @@ class PersonalInfo extends React.Component {
              this.props.next();
         });
     }
-    handleHealthChange(value){
-        value==='其他'? this.setState({healthFlag: true}) : this.setState({healthFlag : false});
-    }
+    
 /*
     componentWillReceiveProps(){
         debugger;
@@ -95,6 +96,7 @@ class PersonalInfo extends React.Component {
         if(!personal.name){
             personal = pers;
         }
+        console.log('pe',personal);
         if(personal.name){
             form.setFieldsValue({
                 name : personal.name,
@@ -139,13 +141,15 @@ class PersonalInfo extends React.Component {
         const uploadButton = ( <Button>
                             <Icon type="upload" /> Click to Upload
                         </Button>);
-        const {getFieldProps, getFieldError } = this.props.form;
+        const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let nationOptions = [],
             {healthFlag,fileList} = this.state;
         for (let key in nations) {
             nationOptions.push({label:nations[key],value:nations[key]})
         }
+    
         let {personal} = this.props;
+        
         return(
         <form key='per-info' style={{textAlign:'center'}}>
         <List >
@@ -156,81 +160,72 @@ class PersonalInfo extends React.Component {
                         type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                     },{
                         required:true,message:'请输入有效的姓名！'
-                    }]
+                    }],initialValue : personal.name
                 })}
                 clear
                 error={!!getFieldError('name')}
                 onErrorClick={() => {
-                    alert(getFieldError('name').join('、'));
+                    Toast.info(getFieldError('name').join('、'));
                 }}
                 placeholder="请输入姓名"
                 >
                 姓名
             </InputItem>
-            <FormItem
-                label="性别"
-                name="gender"
-                {...getFieldProps('gender', {
-                    rules:[{
-                        required:true, message:'请选择性别！'
-                    }],
-                    initialValue:personal.gender || '男'
-                })}
-                
-                >
-                
-                    <Picker cols={1} data={[{label:'男',value:'男'},{label:'女',value:'女'}]}>
-                    <List.Item arrow="horizontal">性别</List.Item>
+            <FormItem>                
+                    <Picker 
+                        cols={1}
+                        {...getFieldProps('gender', {
+                        rules:[{
+                            required:true, message:'请选择性别！'
+                        }],initialValue : [personal.gender]
+                        })}
+                        data={[{label:'男',value:'男'},{label:'女',value:'女'}]}
+                        >
+                        <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>性别</List.Item>
                     </Picker>
-               
             </FormItem>
-            <FormItem
-                label="民族"
-                name="folk"
-                {...getFieldProps('folk', {
-                    rules:[{
-                        required:true, message:'请选择民族！'
-                    }],
-                    initialValue : personal.folk || '汉族'
-                })}
-                
-                >
-                
-                    <Picker data={nationOptions}>
-                    <List.Item arrow="horizontal">民族</List.Item>
+            <FormItem>
+                    <Picker 
+                        cols={1}
+                        name="folk"
+                        {...getFieldProps('data', {
+                            rules:[{
+                                required:true, message:'请选择民族！'
+                            }],
+                            initialValue : [personal.folk]
+                        })} 
+                        
+                        data={nationOptions}>
+                    <List.Item arrow="horizontal" style={{padding : 0}}>民族</List.Item>
                     </Picker>
-                
             </FormItem>
             
             <FormItem
                 label="出生日期"
                 name='birthDate'
                 style={{textAlign:'left'}}
-                {...getFieldProps('birthDate', {
-                    rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
-                    initialValue : personal.date
-                })}
-                clear
-                error={!!getFieldError('birthDate')}
-                onErrorClick={() => {
-                    alert(getFieldError('birthDate').join('、'));
-                }}>
-                    <DatePicker mode="date" maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal">出生日期</List.Item></DatePicker>
-            </FormItem>
-            <FormItem
-                label="健康状况"
-                name='healthState'
-                {...getFieldProps('healthState', {
-                    rules: [{ type:'string', required: true, message: '请选择健康状况!' }],
-                    initialValue : personal.healthState || '良好'
-                })}
                 >
+                    <DatePicker mode="date"
+                    {...getFieldProps('birthDate', {
+                        rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
+                        initialValue : personal.date
+                    })} 
+                    maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期</List.Item></DatePicker>
+            </FormItem>
+            <FormItem>
                     <Picker
+                        cols={1}
+                        name='healthState'
+                        {...getFieldProps('healthState', {
+                            rules: [{ required: true, message: '请选择健康状况!' }],
+                            initialValue : [personal.healthState]
+                        })}
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
-                        <List.Item arrow="horizontal">健康状况</List.Item>
+                        <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
                     </Picker>
             </FormItem>
             <InputItem
+                style={{color:'inherit'}}
                 label="身份证号码"
                 name="idCardNumber"
                 {...getFieldProps('idCardNumber', {
@@ -244,8 +239,9 @@ class PersonalInfo extends React.Component {
                 clear
                 error={!!getFieldError('idCardNumber')}
                 onErrorClick={() => {
-                    alert(getFieldError('idCardNumber').join('、'));
+                    Toast.info(getFieldError('idCardNumber').join('、'));
                 }}
+                placeholder="请输入身份证号码"
                 >
                 身份证号码
             </InputItem>
@@ -263,24 +259,24 @@ class PersonalInfo extends React.Component {
                 clear
                 error={!!getFieldError('homeAddress')}
                 onErrorClick={() => {
-                    alert(getFieldError('homeAddress').join('、'));
+                    Toast.info(getFieldError('homeAddress').join('、'));
                 }}
+                placeholder="请输入家庭住址"
                 >
                 家庭住址
             </InputItem>
            <InputItem
                 name="currentAddress"
                 {...getFieldProps('currentAddress', {
-                    rules:[{type:'string'},{
-                        required:true,message:'请输入有效的家庭住址！'
-                    }],
+                    rules:[{type:'string'}],
                     initialValue : personal.currentAddress
                 })}
                 clear
                 error={!!getFieldError('currentAddress')}
                 onErrorClick={() => {
-                    alert(getFieldError('currentAddress').join('、'));
-                }}>
+                    Toast.info(getFieldError('currentAddress').join('、'));
+                }}
+                placeholder="请输入现住址">
                 现住址
             </InputItem>
             
@@ -288,7 +284,7 @@ class PersonalInfo extends React.Component {
                name="mobile"
                {...getFieldProps('mobile', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
+                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系手机！'
                     }, {
                         whitespace: true, required: true, message: '请输入有效的联系手机！'
                     }],
@@ -297,8 +293,9 @@ class PersonalInfo extends React.Component {
                 clear
                 error={!!getFieldError('mobile')}
                 onErrorClick={() => {
-                    alert(getFieldError('mobile').join('、'));
+                    Toast.info(getFieldError('mobile').join('、'));
                 }}
+                placeholder="请输入联系手机"
                >
                联系手机          
              </InputItem>
@@ -315,8 +312,9 @@ class PersonalInfo extends React.Component {
                 clear
                 error={!!getFieldError('email')}
                 onErrorClick={() => {
-                    alert(getFieldError('email').join('、'));
+                    Toast.info(getFieldError('email').join('、'));
                 }}
+                placeholder="请输入邮箱"
                 >
                 邮箱
             </InputItem>
@@ -331,8 +329,9 @@ class PersonalInfo extends React.Component {
                 clear
                 error={!!getFieldError('tele')}
                 onErrorClick={() => {
-                    alert(getFieldError('tele').join('、'));
+                    Toast.info(getFieldError('tele').join('、'));
                 }}
+                placeholder="请输入联系座机"
                 >
                 联系座机
             </InputItem>
@@ -340,27 +339,26 @@ class PersonalInfo extends React.Component {
                name="qqNumber"
                {...getFieldProps('qqNumber', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
+                        type: 'number', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
                     }],
                     initialValue : personal.qqNumber
                 })}
                 clear
                 error={!!getFieldError('qqNumber')}
                 onErrorClick={() => {
-                    alert(getFieldError('qqNumber').join('、'));
+                    Toast.info(getFieldError('qqNumber').join('、'));
                 }}
+                placeholder="请输入QQ"
                >
                QQ             
              </InputItem>
              <FormItem
                 label='上传图片'
-                name='upload'
-                {...getFieldProps('upload',{
+                name='upload'>
+                {getFieldDecorator('upload',{
                     valuePropName: 'fileList',
                     getValueFromEvent: this.normFile,
-                })}
-                >
-                
+                })(
                      <Upload
                         action={`../weChat/applicant/personalInfo/submit/` + openId}
                         name= 'file' 
@@ -370,7 +368,7 @@ class PersonalInfo extends React.Component {
                         {fileList.length >= 1 ? null : uploadButton}
                        
                     </Upload>
-               
+                )}
              </FormItem>
         </List>
          <Button type="primary" inline onClick={this.nextStep.bind(this)}>下一步</Button>

@@ -2,19 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-
+import {Steps,Button,Toast,Icon} from 'antd-mobile'
 import Layout from 'antd/lib/Layout'
-import Steps from 'antd/lib/steps'
-import Button from 'antd/lib/button'
-import message from 'antd/lib/message'
 import moment from 'moment'
 
-import 'antd/lib/style/index.less';
-import 'antd/lib/grid/style/index.less';
+
 import 'antd/lib/layout/style/index.less'
-import 'antd/lib/steps/style/index.less';
-import 'antd/lib/button/style/index.less';
-import 'antd/lib/message/style/index.less';
+
 
 import PersonalInfo from './personalInfo';
 import FamilyInfo from './familyInfo';
@@ -140,7 +134,7 @@ class Index extends React.Component {
       let r = re.length ? await lapi.updateApplicant(re[0]._id ,appi) : await lapi.createApplicant(appi)
       console.log(r);
     }
-    message.success('Processing complete!');
+    Toast.success('Processing complete!');
   }
 
   async componentWillMount(){
@@ -200,7 +194,7 @@ class Index extends React.Component {
     let { personal, family, otherInfo } = this.state.info;
     const myStep = (
       <div style={{textAlign:'left'}}>
-        <Steps current={current} style={{marginBottom:'50px'}}>
+        <Steps current={current} direction="horizontal" style={{marginBottom:'50px'}}>
           {steps.map(item => <Step key={item.title} title={item.title} />)}
         </Steps>
         <div className="steps-content">
