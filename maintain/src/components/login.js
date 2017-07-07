@@ -49,7 +49,7 @@ class Login extends React.Component{
                 email: form.getFieldValue('comp_email'), //必须的
                 description: form.getFieldValue('comp_desc'),
             });
-            let r = await api.createOrUpdateComp(comp);
+            let r = await api.createComp(comp);
             let data = await r.json();
             console.log(data);
             if(r.status === 200){

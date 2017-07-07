@@ -46,7 +46,7 @@ class CompInfo extends React.Component{
                 email: form.getFieldValue('comp_email'), //必须的
                 description: form.getFieldValue('comp_desc'),
             });
-            let r = await api.createOrUpdateComp(compInfo);
+            let r = await api.updateComp(compInfo);
             message.success('更新成功');
             this.setState({
                 editFlag : !this.state.editFlag
