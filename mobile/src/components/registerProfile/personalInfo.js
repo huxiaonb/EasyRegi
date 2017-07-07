@@ -177,7 +177,7 @@ class PersonalInfo extends React.Component {
                         {...getFieldProps('gender', {
                         rules:[{
                             required:true, message:'请选择性别！'
-                        }],initialValue : [personal.gender]
+                        }], initialValue : personal.gender ? [personal.gender] : ['男']
                         })}
                         data={[{label:'男',value:'男'},{label:'女',value:'女'}]}
                         >
@@ -192,7 +192,7 @@ class PersonalInfo extends React.Component {
                             rules:[{
                                 required:true, message:'请选择民族！'
                             }],
-                            initialValue : [personal.folk]
+                            initialValue : personal.folk ? [personal.folk] : ['汉族']
                         })} 
                         
                         data={nationOptions}>
@@ -218,7 +218,7 @@ class PersonalInfo extends React.Component {
                         name='healthState'
                         {...getFieldProps('healthState', {
                             rules: [{ required: true, message: '请选择健康状况!' }],
-                            initialValue : [personal.healthState]
+                            initialValue : personal.healthState ? [personal.healthState] : ['良好']
                         })}
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
                         <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
@@ -339,7 +339,7 @@ class PersonalInfo extends React.Component {
                name="qqNumber"
                {...getFieldProps('qqNumber', {
                     rules: [{
-                        type: 'number', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
+                        type: 'string', pattern: /^[0-9]{6,11}$/, message: '请输入有效的QQ！'
                     }],
                     initialValue : personal.qqNumber
                 })}
