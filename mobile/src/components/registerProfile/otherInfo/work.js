@@ -65,14 +65,16 @@ class WorkExp extends React.Component {
                 if(idx){
                     form.setFieldsValue({
                         ['title_' + idx] : wk.companyName,
-                        ['rangeTime_' + idx] : wk.date,
+                        ['rangeTime_' + idx] : wk.date[0],
+                        ['rangeTime_end_' + idx] : wk.date[1],
                         ['position_' + idx] : wk.title,
                         ['salary_' + idx] : wk.salaryRange
                     })  
                 }else{
                     form.setFieldsValue({
                         title : wk.companyName,
-                        rangeTime : wk.date,
+                        rangeTime : wk.date[0],
+                        rangeTime_end : wk.date[1],
                         position : wk.title,
                         salary : wk.salaryRange
                     })

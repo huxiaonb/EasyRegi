@@ -151,7 +151,7 @@ class PersonalInfo extends React.Component {
         let {personal} = this.props;
         
         return(
-        <form key='per-info' style={{textAlign:'center'}}>
+        <form key='per-info' style={{textAlign:'center',fontFamily:'PingFang SC,Helvetica Neue,Hiragino Sans GB,Helvetica,Microsoft YaHei,Arial'}}>
         <List >
             <InputItem
                 name="name"

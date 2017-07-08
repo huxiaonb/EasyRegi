@@ -35,20 +35,20 @@ export default class OhterInfo extends React.Component {
              //set value to context 
              //rangetime set config
              wFlag = true;
-             let keys = workF.fieldsStore.getFieldValue('keys')
+             let keys = workF.getFieldValue('keys')
              workFs = [Object.assign({},{
-                 companyName : workF.fieldsStore.getFieldValue('title'),
-                 date : workF.fieldsStore.getFieldValue('rangeTime'),
-                 title : workF.fieldsStore.getFieldValue('position'),
-                 salaryRange : workF.fieldsStore.getFieldValue('salary'),
+                 companyName : workF.getFieldValue('title'),
+                 date : [workF.getFieldValue('rangeTime'),workF.getFieldValue('rangeTime_end')],
+                 title : workF.getFieldValue('position'),
+                 salaryRange : workF.getFieldValue('salary'),
              })];
              
              keys.map((key, index) => {
                  let fmObj = Object.assign({},{
-                    companyName : workF.fieldsStore.getFieldValue('title_' + key),
-                    date : workF.fieldsStore.getFieldValue('rangeTime_' + key),
-                    title : workF.fieldsStore.getFieldValue('position_' + key),
-                    salaryRange : workF.fieldsStore.getFieldValue('salary_' + key),
+                    companyName : workF.getFieldValue('title_' + key),
+                    date : [workF.getFieldValue('rangeTime_' + key), workF.getFieldValue('rangeTime_end_' + key)],
+                    title : workF.getFieldValue('position_' + key),
+                    salaryRange : workF.getFieldValue('salary_' + key),
                  });
                  workFs.push(fmObj);
              })
@@ -58,26 +58,26 @@ export default class OhterInfo extends React.Component {
              //set value to context
              //rangetime set config
              eFlag = true
-             let keys = eduF.fieldsStore.getFieldValue('keys');
+             let keys = eduF.getFieldValue('keys');
              eduFs = [Object.assign({},{
-                 colledgeName : eduF.fieldsStore.getFieldValue('title'),
-                 date : eduF.fieldsStore.getFieldValue('rangeTime'),
-                 major : eduF.fieldsStore.getFieldValue('position'),
-                 isGraduated : eduF.fieldsStore.getFieldValue('grad'),
+                 colledgeName : eduF.getFieldValue('title'),
+                 date : [eduF.getFieldValue('erangeTime'), eduF.getFieldValue('erangeTime_end')],
+                 major : eduF.getFieldValue('position'),
+                 isGraduated : eduF.getFieldValue('grad'),
              })];
              
              keys.map((key, index) => {
                  let fmObj = Object.assign({},{
-                    colledgeName : eduF.fieldsStore.getFieldValue('title_'+ key),
-                    date : eduF.fieldsStore.getFieldValue('rangeTime_'+ key),
-                    major : eduF.fieldsStore.getFieldValue('position_'+ key),
-                    isGraduated : eduF.fieldsStore.getFieldValue('grad_'+ key),
+                    colledgeName : eduF.getFieldValue('title_'+ key),
+                    date : [eduF.getFieldValue('erangeTime_'+ key), eduF.getFieldValue('erangeTime_end_'+ key)],
+                    major : eduF.getFieldValue('position_'+ key),
+                    isGraduated : eduF.getFieldValue('grad_'+ key),
                  });
                  eduFs.push(fmObj);
              })
         });
         if(wFlag && eFlag){
-            this.context.updateProfile({otherInfo:{workExps:workFs,wkeys:workF.fieldsStore.getFieldValue('keys'),edus:eduFs,ekeys:eduF.fieldsStore.getFieldValue('keys')},flag:3});
+            this.context.updateProfile({otherInfo:{workExps:workFs,wkeys:workF.getFieldValue('keys'),edus:eduFs,ekeys:eduF.getFieldValue('keys')},flag:3});
             if(!!pFlag)Toast.success('暂存成功!');
         }
     }
@@ -134,7 +134,6 @@ export default class OhterInfo extends React.Component {
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>
-                    
                     <Button type="primary" onClick={this.sumitAll.bind(this)}>确认提交</Button>
                 </div>
             </div>

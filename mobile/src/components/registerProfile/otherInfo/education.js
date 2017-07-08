@@ -65,20 +65,25 @@ class EduExp extends React.Component {
             if(idx){
                 form.setFieldsValue({
                     ['title_' + idx] : wk.colledgeName,
-                    ['rangeTime_' + idx] : wk.date,
+                    ['erangeTime_' + idx] : wk.date[0],
+                    ['erangeTime_end_' + idx] : wk.date[1],
                     ['position_' + idx] : wk.major,
                     ['grad_' + idx] : wk.isGraduated
                 })  
             }else{
                 form.setFieldsValue({
                     title : wk.colledgeName,
-                    rangeTime : wk.date,
+                    erangeTime : wk.date[0],
+                    erangeTime_end : wk.date[1],
                     position : wk.major,
                     grad : wk.isGraduated
                 })
             }
             })
         }
+    }
+    validateFDate(rule, value, callback){
+        let sDate = this
     }
     render(){
          const { getFieldDecorator, getFieldValue,getFieldProps,getFieldError } = this.props.form;
@@ -196,8 +201,11 @@ class EduExp extends React.Component {
                     <FormItem>
                         <DatePicker mode="date"
                             name='erangeTime'
-                            {...getFieldProps('rangeTime', {
-                                rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
+                            {...getFieldProps('erangeTime', {
+                                rules: [
+                                        { type:'object', required: true, message: '请选择起始日期!' },
+                                        { validator: this.validateFDate.bind(this)}
+                                    ],
                             })} 
                             maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
                         </DatePicker>
@@ -205,8 +213,8 @@ class EduExp extends React.Component {
                     <FormItem>
                         <DatePicker mode="date"
                             name='erangeTime_end'
-                            {...getFieldProps('rangeTime_end', {
-                                rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
+                            {...getFieldProps('erangeTime_end', {
+                                rules: [{ type:'object', required: true, message: '请选择结束日期!' },{ validator: this.validateSDate.bind(this)}],
                             })} 
                             maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
                         </DatePicker>
