@@ -9,6 +9,9 @@ var Position = mongoose.model('Position');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
+exports.updateCompanyInfo = updateCompanyInfo
+exports.registerCompany = registerCompany;
+exports.resetPassword = resetPassword;
 exports.getPositionsAndApplicantsNum = getPositionsAndApplicantsNum;
 exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
 exports.getPositionsByCompanyId = getPositionsByCompanyId;
@@ -243,6 +246,112 @@ function upsertCompany(req, res, next){
         });
     }
 
+}
+
+function updateCompanyInfo(req, res, next){
+    var companyItem = _.get(req, ['body'], {}),
+        email = _.get(companyItem, ['email'], '');
+    if(_.isEmpty(email)){
+        console.error('no email found in req body');
+        res.status(500).send({success: false, errmsg: 'no email found in req body'});
+    } else {
+        var companyEntity = {
+            companyName: _.get(companyItem, ['companyName'], ''),
+            companyAddress: _.get(companyItem, ['companyAddress'], ''),
+            companyType: _.get(companyItem, ['companyType'], ''),
+            companyScale: _.get(companyItem, ['companyScale'], ''),
+            alias: _.get(companyItem, ['alias'], ''),
+            contactPersonName: _.get(companyItem, ['contactPersonName'], ''),
+            phoneNumber: _.get(companyItem, ['phoneNumber'], ''),
+            description: _.get(companyItem, ['description'], ''),
+            positions: _.get(companyItem, ['positions'], []),
+        };
+        Company.update({email: email}, {$set: companyEntity}, {upsert: false}, function(err1, updateResult){
+            if(err1) {
+                console.log('Error in updating company', email, err1);
+                res.status(500).send({success: false, errmsg: 'Error in updating company'});
+            } else {
+                Company.findOne({email: email}, function(err2, dbCompany){
+                    if(err2){
+                        console.log('Error in finding company', email, err1);
+                        res.status(500).send({success: false, errmsg: 'Error in finding company'});
+                    } else if(_.isEmpty(dbCompany)){
+                        console.log('company for %s does not exists', email);
+                        res.status(500).send({success: false, errmsg: 'company does not exists'});
+                    } else {
+                        dbCompany.password = '';
+                        res.status(200).send({success: true, errmsg: '', company: dbCompany});
+                    }
+                });
+            }
+        });
+    }
+}
+
+function registerCompany(req, res, next){
+    var companyItem = _.get(req, ['body'], {}),
+        email = _.get(req, ['body', 'email'], ''),
+        pwd = _.get(req, ['body', 'password'], '');
+    if(_.isEmpty(email) || _.isEmpty(pwd)){
+        res.status(500).send({success: false, errmsg: 'email and password are required'});
+    } else {
+        Company.findOne({email: email}, function(err1, dbCompany){
+            if(err1) {
+                console.log('Error in finding company by email', email, err1);
+                res.status(500).send({success: false, errmsg: 'Error in find company by company email'});
+            } else if(_.isEmpty(dbCompany)){
+                console.log('no comany found, system will create new account for company');
+                var companyEntity = new Company(companyItem);
+                console.log(companyEntity);
+                companyEntity.save(function(error, data){
+                    if(error || _.isEmpty(data)) {
+                        console.log('Error in saving company', error)
+                        res.status(500).send({success: false, errmsg: 'Error in saving company'});
+                    } else {
+                        data.password = '';
+                        var result = {
+                            success: true,
+                            errmsg: '',
+                            company: data
+                        };
+                        res.json(result);
+                    }
+                });
+            } else {
+                console.log('Company already exists');
+                res.status(500).send({success: false, errmsg: 'email has been registered'});
+            }
+        });
+
+    }
+}
+
+function resetPassword(req, res, next){
+    var email = _.get(req, ['body', 'email'], ''),
+        oldPwd = _.get(req, ['body', 'oldPwd'], ''),
+        newPwd = _.get(req, ['body', 'newPwd'], '');
+    if(_.isEmpty(email) || _.isEmpty(oldPwd) || _.isEmpty(newPwd)){
+        res.status(500).send({success: false, errmsg: 'email and password are required'});
+    } else {
+        Company.findOne({email: email, password: oldPwd}, function(err1, dbCompany){
+            if(err1) {
+                console.log('error in finding company by email', email, err1);
+                res.status(500).send({success: false, errmsg: 'Error in finding company by company email'});
+            } else if(_.isEmpty(dbCompany)){
+                console.log('email or password is not correct');
+                res.status(500).send({success: false, errmsg: 'email or password is not correct'});
+            } else {
+                Company.update({email: email, password: oldPwd}, {$set: {password: newPwd}}, {upsert: false}, function(err2, updateResult){
+                    if(err2){
+                        console.log('Error in updating password for company', email, err2);
+                        res.status(500).send({success: false, errmsg: 'Error in updating company by company email'});
+                    } else {
+                        res.status(200).send({success: true, errmsg: ''});
+                    }
+                });
+            }
+        });
+    }
 }
 
 function getPositionsAndApplicantsNum(req, res, next){

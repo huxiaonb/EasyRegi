@@ -59,14 +59,14 @@ describe('company', function(){
 
         it('update', function(done){
             var company = {
-                companyName: '大贵金属附属2',
+                companyName: '大贵金属附属3',
                 password: '111111',
                 alias: 'DGMF',
-                companyAddress: '深圳南山区南山医院附近',
-                companyType: '国企',
-                companyScale: '3000人以上',
-                phoneNumber: '1111111',
-                contactPersonName: '李先生',
+                companyAddress: '深圳南山区华侨城创新软件园',
+                companyType: '中外合资',
+                companyScale: '4000人以上',
+                phoneNumber: '12345678908',
+                contactPersonName: '王先生',
                 email: '3215@qq.com',
                 description: '超级金属附属厂',
                 positions: []
@@ -307,6 +307,60 @@ describe('company', function(){
             }
             request.post({
                 url: 'http://localhost:3000/api/company/updatePosition',
+                body: data,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('register company', function(done){
+            var company = {
+                companyName: '高氏集团',
+                password: '123456',
+                alias: 'GD946',
+                companyAddress: '珠海市港珠澳大湾区',
+                companyType: '国企',
+                companyScale: '5000人以上',
+                phoneNumber: '12345678909',
+                contactPersonName: '高先生',
+                email: 'gd946@gd.com',
+                description: '医疗，化工，金融，物流，IT，证券，银行',
+                positions: []
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/register',
+                body: company,
+                json: true
+            }, function(error, response, body){
+                if(!error && response.statusCode == 200 && !_.isEmpty(body)) {
+                    console.log('get company login info successfully');
+                    console.log(body);
+                } else {
+                    console.log(body);
+                    var errmsg = {errmsg: _.get(body, ['errmsg'], ''), error: error, statusCode: response.statusCode};
+                    console.log(JSON.stringify(errmsg));
+                }
+                done();
+            })
+        });
+
+        it('reset password', function(done){
+            var data = {
+                oldPwd: '123456',
+                email: 'gd946@gd.com',
+                newPwd: '123'
+            }
+            request.post({
+                url: 'http://localhost:3000/api/company/resetPassword',
                 body: data,
                 json: true
             }, function(error, response, body){

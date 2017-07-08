@@ -9,7 +9,7 @@ module.exports = function (app) {
      app.route('/api/company/login')
         .post(companyController.companyUserLogin);
      app.route('/api/company/update')
-        .post(companyController.upsertCompany);
+        .post(companyController.updateCompanyInfo);
      app.route('/api/company/getBasicInfo/:companyId')
         .get(companyController.getPositionsAndApplicantsNum);
      app.route('/api/company/getApplicantsByCompanyId/:companyId')
@@ -30,4 +30,8 @@ module.exports = function (app) {
         .post(companyController.deletePositionForCompany);
      app.route('/api/company/updatePosition')
         .post(companyController.updatePosition);
+     app.route('/api/company/register')
+        .post(companyController.registerCompany);
+     app.route('/api/company/resetPassword')
+        .post(companyController.resetPassword);
 };

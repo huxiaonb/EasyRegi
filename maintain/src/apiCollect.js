@@ -33,11 +33,33 @@ export default{
              body:JSON.stringify(data)
         }).catch(e => console.log(e));
     },
-    createOrUpdateComp(data){
-        /*注册公司或更新公司数据
+    createComp(data){
+        /*注册公司，email重复会返回500
+        var company = {
+            companyName: '高氏集团',
+            password: '123456', //必须的
+            alias: 'GD946',
+            companyAddress: '珠海市港珠澳大湾区',
+            companyType: '国企',
+            companyScale: '5000人以上',
+            phoneNumber: '12345678909',
+            contactPersonName: '高先生',
+            email: 'gd946@gd.com', 必须的
+            description: '医疗，化工，金融，物流，IT，证券，银行',
+            positions: []
+        }
+         */
+        let url='../api/company/register';
+        return fetch('../api/company/register',{
+             method:"post",
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        }).catch(e => console.log(e));
+    },
+    updateComp(data){
+        /*更新公司数据
             var company = {
                 companyName: '大贵金属附属2',
-                password: '111111', //save时必须的,update时可以没有
                 alias: 'DGMF',
                 companyAddress: '深圳南山区南山医院附近',
                 companyType: '国企',
@@ -51,6 +73,22 @@ export default{
         */
         let url='../api/company/update';
         return fetch('../api/company/update',{
+             method:"post",
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        }).catch(e => console.log(e));
+    },
+    resetPassword(data){
+        /**
+         * var data = {
+                oldPwd: '123456',
+                email: 'gd946@gd.com',
+                newPwd: '123'
+            }
+         * 
+         */
+        let url='../api/company/resetPassword';
+        return fetch('../api/company/resetPassword',{
              method:"post",
              headers:{ 'Content-Type': 'application/json'},
              body:JSON.stringify(data)
