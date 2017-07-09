@@ -133,7 +133,7 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_size',{
                                 rules:[{
-                                    type:'email',required:true,message:'请选择公司规模'
+                                    type:'string',required:true,message:'请选择公司规模'
                                 }],initialValue:comp.companyScale
                             })(
                                 <Select>
@@ -153,7 +153,7 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_contact_p',{
                                 rules:[{
-                                    type:'email',required:true
+                                    type:'string',required:true
                                 }],initialValue:comp.contactPersonName
                             })(
                                 <Input className='login-text' placeholder='联系人'/>
@@ -226,8 +226,6 @@ class CompInfo extends React.Component{
                         </FormItem></Form></div>)
         : (
             <div className='inner'>
-            
-                        
                         <FormItem
                             name='comp_name'
                             label='公司全称'
@@ -293,9 +291,7 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {comp.companyAddress}
                         </FormItem>
-                        
-                        
-
+                       
                         <FormItem
                             name='comp_desc'
                             label='公司简介'

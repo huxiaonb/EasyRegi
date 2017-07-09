@@ -301,7 +301,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_name',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,maxLength:15
                                 }]
                                 
                             })(
@@ -328,7 +328,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_total',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,maxLength:3
                                 }]
                             })(
                                 <Input />

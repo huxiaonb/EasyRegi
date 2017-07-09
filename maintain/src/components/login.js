@@ -32,7 +32,13 @@ class Login extends React.Component{
     }
     loginTo(){
         let {form} = this.props;
+        form.validateFields(async (err, values)=>{
+             if (!!err){
+                 return;
+             }
              this.context.login(form.getFieldValue('login_acc'), form.getFieldValue('login_pwd'));
+        })
+        
     }
     async register(){
         let {form} = this.props;
