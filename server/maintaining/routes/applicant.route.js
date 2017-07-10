@@ -6,6 +6,6 @@
 var applicantController = require('../controllers/applicant.controller');
 
 module.exports = function (app) {
-     app.route('/api/applicant/renderPreviewPage/:id')
+     app.route('/applicant/preview/:id')
         .get(applicantController.renderPreviewPage);
 };
