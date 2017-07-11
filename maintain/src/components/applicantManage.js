@@ -41,7 +41,6 @@ export default class ApplicantManage extends React.Component{
         })
     }
     onSearch(){
-        console.log('search');
         let {date} = this.state;
         let query = {
             applicantName:this.state.appiName,
@@ -63,7 +62,7 @@ export default class ApplicantManage extends React.Component{
         console.log('export csv');
     }
     preview(record, index, event){
-       window.open('../../api/applicant/renderPreviewPage/' + record._id, '_blank');
+       window.open('../../applicant/preview/' + record._id, '_blank');
     }
     async searchApplicants(query={companyId:this.context.comp._id}){
         try{
@@ -71,7 +70,7 @@ export default class ApplicantManage extends React.Component{
             let data = await res.json();
             this.setState({
                 results : data.applicants,
-                resultTotal : data.applicants
+                resultTotal : data.applicants.length
             })
         }catch(e){
             console.log(e);
