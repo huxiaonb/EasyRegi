@@ -13,6 +13,7 @@
             <h3>重置密码</h3>
             <div style='margin-top:30px'>
                 <div class='form-inline row' style='margin-bottom:20px'><div class='col-md-offset-5 col-md-4' style='text-align:left'><label class='control-label col-md-3'>Email：</label><input type="email" class="form-control" id="r_mail" placeholder="请输入邮箱！"/><button class='btn default' id='getCode'>获取验证码</button></div></div>
+                <div class='form-inline row' style='margin-bottom:20px'><div class='col-md-offset-5 col-md-4' style='text-align:left'><label class='control-label col-md-3'>验证码：</label><input class='form-control' type="text" id='code' placeholder="请输入验证码"/></div></div>
                 <div class='form-inline row' style='margin-bottom:20px'><div class='col-md-offset-5 col-md-4' style='text-align:left'><label class='control-label col-md-3'>旧密码：</label><input class='form-control' type="text" id='oPwd' placeholder="请输入旧密码"/></div></div>
                 <div class='form-inline row' style='margin-bottom:20px'><div class='col-md-offset-5 col-md-4' style='text-align:left'><label class='control-label col-md-3'>新密码：</label><input class='form-control' type="text" id='nPwd' placeholder="请输入新密码"></div></div>
                 <div class='form-inline row' style='margin-bottom:20px'><div class='col-md-offset-5 col-md-4' style='text-align:left'><label class='control-label col-md-3'>重复新密码：</label><input class='form-control' type="text" id='r_nPwd' placeholder="请确认新密码"></div></div>
@@ -37,6 +38,7 @@
                     contentType :'application/json',
                     data: JSON.stringify({
                         email : $('#r_mail').val(),
+                        code : $('#code').val(),
                         oldPwd : $('#oPwd').val(),
                         newPwd : $('#nPwd').val(), 
                     }),
