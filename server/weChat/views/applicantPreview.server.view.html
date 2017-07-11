@@ -9,8 +9,8 @@
     </head>
     <body style="background:rgb(246,246,246)">
         <div class='container-fluid' style="margin:0 atuo;background:rgb(255,255,255);color:black;text-align:center;width:900px">
-            <h1>XXX的个人简历</h1>
-            <div>
+            <h1>{{ applicant.name }}的个人简历</h1>
+            <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
@@ -89,7 +89,7 @@
 
             <h3>家庭信息</h3>
             {% for family in applicant.familyMembers %}
-            <div>
+            <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
@@ -115,7 +115,7 @@
 
             <h3>工作经历</h3>
             {% for work in applicant.workExperiences %}
-            <div>
+            <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">公司</label>
@@ -159,7 +159,7 @@
 
             <h3>教育经历</h3>
             {% for edu in applicant.educationHistories %}
-            <div>
+            <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">学校</label>
