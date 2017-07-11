@@ -13,7 +13,7 @@
             <h3>基本信息</h3>
             <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
                 <form class="form-horizontal">
-                    <div class="form-group form-group-md">
+                    <div class="form-group form-group-md" style='padding:10px'>
                         <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
                         <div class="col-md-8">
                             <span>{{ applicant.name }}</span>
@@ -91,7 +91,7 @@
             <h3>家庭信息</h3>
             {% for family in applicant.familyMembers %}
             <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
-                <form class="form-horizontal">
+                <form class="form-horizontal" style='padding:10px'>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
                         <div class="col-md-8">
@@ -117,7 +117,7 @@
             <h3>工作经历</h3>
             {% for work in applicant.workExperiences %}
             <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
-                <form class="form-horizontal">
+                <form class="form-horizontal" style='padding:10px'>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">公司</label>
                         <div class="col-md-8">
@@ -161,7 +161,7 @@
             <h3>教育经历</h3>
             {% for edu in applicant.educationHistories %}
             <div style='border:1px solid #ddd;margin:20px;border-radius:15px'>
-                <form class="form-horizontal">
+                <form class="form-horizontal" style='padding:10px'>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">学校</label>
                         <div class="col-md-8">
