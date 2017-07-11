@@ -56,10 +56,17 @@ export default class ApplicantManage extends React.Component{
         this.setState({
             appiName:'',
             date:[]
-        })
+        });
+        this.searchApplicants();
     }
     exportCSV(){
-        console.log('export csv');
+        let {date} = this.state;
+        let applicantName = this.state.appiName,
+            companyId = this.context.comp._id,
+            startedAt = date.length>1 ? date[0] :  '',
+            endedAt = date.length>1 ? date[1] :  '';
+        let url = '../../api/applicant/export?name=' + applicantName + '&id=' + companyId + '&startedAt=' + startedAt + '&endedAt=' + endedAt;
+        window.open(url, '_blank');
     }
     preview(record, index, event){
        window.open('../../applicant/preview/' + record._id, '_blank');
