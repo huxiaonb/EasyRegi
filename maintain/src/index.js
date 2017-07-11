@@ -84,7 +84,7 @@ class Index extends React.Component {
         <Layout className='main-container'>
            <Sider>
               <div style={{fontSize:'24px',color:'white',margin:'20px 0'}}>入职易</div>
-              <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']}>
+              <Menu theme='dark' mode='inline'>
                 <Menu.Item key="1">
                   <Link to='/comp' className="nav-text">公司信息</Link>
                 </Menu.Item>
@@ -98,8 +98,8 @@ class Index extends React.Component {
             </Sider>
           <Layout style={{position:'relative'}}>
             <Menu mode="horizontal">
-              <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />GDGDGD</span>}>
-                <Menu.Item key="setting:1" ><span onClick={this.logout.bind(this)}>退出</span></Menu.Item>
+              <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{this.state.companyInfo.companyName}</span>}>
+                <Menu.Item key="setting:1"><span onClick={this.logout.bind(this)}>退出</span></Menu.Item>
               </SubMenu>
             </Menu>
             <Content style={{ margin: '24px 16px 0px', background: '#fff' }}>
