@@ -63,10 +63,7 @@ export default class ApplicantManage extends React.Component{
         console.log('export csv');
     }
     preview(record, index, event){
-        //record is table row record
-        console.log('123');
-        //some logic then open a new tab in browser
-        let win = window.open('http://www.baidu.com', '_blank');
+       window.open('../../api/applicant/renderPreviewPage/' + record._id, '_blank');
     }
     async searchApplicants(query={companyId:this.context.comp._id}){
         try{

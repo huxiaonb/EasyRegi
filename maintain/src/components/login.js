@@ -32,7 +32,9 @@ class Login extends React.Component{
     }
     loginTo(){
         let {form} = this.props;
-        form.validateFields(async (err, values)=>{
+        form.isFieldValidating()
+        debugger;
+        form.validateFields(['login_acc', 'login_pwd'],async (err, values)=>{
              if (!!err){
                  return;
              }
@@ -42,7 +44,6 @@ class Login extends React.Component{
     }
     async register(){
         let {form} = this.props;
-        console.log('注册');
         let comp = Object.assign({},{
                 companyName: form.getFieldValue('comp_name'),
                 password : form.getFieldValue('comp_pwd'),
@@ -75,7 +76,7 @@ class Login extends React.Component{
             <div className='login-background'>
                 <div className='loginForm'>
                     <h1 className='login-title'>入职易后台管理</h1>
-                    <Form>
+                    
                         <FormItem
                             name='login_acc'
                             hasFeedback>
@@ -98,7 +99,7 @@ class Login extends React.Component{
                                 <Input className='login-text' placeholder='请输入密码' type='password'/>
                             )}
                         </FormItem>
-                    </Form>
+                    
                     <div style={{textAlign:'center', marginTop:'15px'}}>
                         <Button type="primary" style={{width:'100%',height:'40px'}} onClick={this.loginTo.bind(this)}>登录</Button>
                     </div>
@@ -113,7 +114,7 @@ class Login extends React.Component{
             <div className='regis-background'>
                 <div className='regisForm'>
                     <h1 className='login-title'>公司注册</h1>
-                    <Form>
+                    
                     <Row gutter={40}>
                         <Col span={12}>
                         <FormItem
@@ -122,7 +123,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_name',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,message:'请输入公司全称'
                                 }]
                             })(
                                 <Input className='login-text' placeholder='公司全称'/>
@@ -136,7 +137,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_alias',{
                                 rules:[{
-                                    type:'string'
+                                    type:'string', required:true, message:'请输入公司全称'
                                 }]
                             })(
                                 <Input className='login-text' placeholder='公司简称'/>
@@ -172,7 +173,7 @@ class Login extends React.Component{
                             {getFieldDecorator('comp_size',{
                                 rules:[{
                                     type:'string',required:true,message:'请选择公司规模'
-                                }],initialValue : '0'
+                                }],initialValue : '1000 人以下'
                             })(
                                 <Select>
                                     <Option value="1000 人以下">1000 人以下</Option>
@@ -192,7 +193,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_contact_p',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, required:true,message:'请输入联系人'
                                 }]
                             })(
                                 <Input className='login-text' placeholder='联系人'/>
@@ -206,7 +207,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_phone',{
                                 rules:[{
-                                    required:true,message:'请输入联系电话！'
+                                    required:true,pattern: /^[0-9]{11,13}$/,message:'请输入联系电话！'
                                 }]
                             })(
                                 <Input className='login-text'  placeholder='联系电话' />
@@ -232,7 +233,7 @@ class Login extends React.Component{
                             hasFeedback>
                             {getFieldDecorator('comp_pwd',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,message:'请输入登录密码'
                                 }]
                             })(
                                 <Input className='login-text'/>
@@ -266,7 +267,7 @@ class Login extends React.Component{
                             )}
                         </FormItem>
 
-                    </Form>
+                    
                     <div style={{textAlign:'center', marginTop:'15px'}}>
                         <Button type="primary" style={{width:'100%',height:'40px'}} onClick={this.register.bind(this)}>注册</Button>
                     </div>
@@ -278,7 +279,9 @@ class Login extends React.Component{
         )
         
         return(
-            registerFlag ? (registerPage) : (loginPage)
+            <Form>
+                {registerFlag ? (registerPage) : (loginPage)}
+            </Form>
         )
     }
 }

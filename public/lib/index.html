@@ -9,164 +9,173 @@
     </head>
     <body style="background:rgb(246,246,246)">
         <div class='container-fluid' style="margin:0 atuo;background:rgb(255,255,255);color:black;text-align:center;width:900px">
-            <p>XXX的个人简历</p>
+            <h1>XXX的个人简历</h1>
             <div>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">姓名</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.name }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">性别</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.gender }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">民族</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.folk }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">出生日期</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.birthDate }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">健康状况</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.healthState }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">身份证号</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.idCardNumber }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">家庭住址</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.homeAddress }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">现住址</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.currentAddress }} | 无</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">手机号码</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.mobile }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">邮箱</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.email }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">座机号码</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.tele }} | 无</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">QQ</label>
+                        <div class="col-md-8">
+                            <span>{{ applicant.qqNumber }} | 无</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <h3>家庭信息</h3>
+            {% for family in applicant.familyMembers %}
+            <div>
+                <form class="form-horizontal">
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">性别</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">关系</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">民族</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">出生日期</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">健康状况</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">身份证号</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">家庭住址</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">现住址</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">手机号码</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">邮箱</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">座机号码</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">QQ</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">联系电话</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                 </form>
             </div>
-            <div>家庭信息</div>
+            {% endfor %}
+
+            <h3>工作经历</h3>
+            {% for work in applicant.workExperiences %}
             <div>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">姓名</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">公司</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">关系</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">职位</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">联系电话</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">薪资范围</label>
+                        <div class="col-md-8">
+                            <span>XXX</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">起止时间</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                 </form>
             </div>
-            <div>工作经历</div>
+            {% endfor %}
+
+            <h3>教育经历</h3>
+            {% for edu in applicant.educationHistories %}
             <div>
                 <form class="form-horizontal">
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">公司</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">学校</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">职位</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">专业</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">薪资范围</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">是否毕业</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">起止时间</label>
-                        <div class="col-md-10">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">起止时间</label>
+                        <div class="col-md-8">
                             <span>XXX</span>
                         </div>
                     </div>
                 </form>
             </div>
-            <div>教育</div>
-            <div>
-                <form class="form-horizontal">
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">学校</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">专业</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">是否毕业</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                    <div class="form-group form-group-md">
-                        <label class="col-md-2 control-label" for="formGroupInputLarge">起止时间</label>
-                        <div class="col-md-10">
-                            <span>XXX</span>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            {% endfor %}
         </div>
     </body>
 </html>
