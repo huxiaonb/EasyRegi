@@ -140,7 +140,7 @@ function exportApplicants(req, res, next){
                     }, {
                         caption: '邮箱',
                         type: 'string',
-                        width: 15
+                        width: 20
                     }, {
                         caption: 'QQ',
                         type: 'string',
