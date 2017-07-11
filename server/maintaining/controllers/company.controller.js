@@ -23,6 +23,8 @@ exports.createPositionForCompany = createPositionForCompany;
 exports.searchPositions = searchPositions;
 exports.deletePositionForCompany = deletePositionForCompany;
 exports.updatePosition = updatePosition;
+exports.validateEmail = validateEmail;
+exports.resetPwd = resetPwd;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -802,4 +804,17 @@ function updatePositionNameByCompanyId(companyId, positionObj){
             });
         }
     }
+}
+
+function validateEmail(req, res, next){
+    var activeToken = _.get(req, ['params', 'activeToken'], '');
+    if(activeToken === 'failed'){
+        res.render('server/weChat/views/error');
+    } else {
+        res.render('server/weChat/views/success');
+    }
+}
+
+function resetPwd(req, res, next) {
+    res.render('server/weChat/views/resetPwd');
 }

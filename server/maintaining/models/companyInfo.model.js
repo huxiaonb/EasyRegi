@@ -17,6 +17,10 @@ var PositionSchema = new Schema({
 })
 
 var CompanySchema = new Schema({
+    active: {
+        type: Boolean,
+        default: false
+    },
     password: {
         type: String,
         required: true

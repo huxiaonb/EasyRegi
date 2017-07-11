@@ -34,4 +34,8 @@ module.exports = function (app) {
         .post(companyController.registerCompany);
      app.route('/api/company/resetPassword')
         .post(companyController.resetPassword);
+     app.route('/account/verification/:activeToken')
+        .get(companyController.validateEmail);
+     app.route('/account/reset/display')
+        .get(companyController.resetPwd);
 };
