@@ -155,7 +155,6 @@ function exportApplicants(req, res, next){
                         appRow.push(_.get(app, ['gender'], ''));
                         appRow.push(_.get(app, ['folk'], ''));
                         var birthDate = _.get(app, ['birthDate'], '');
-                        console.log(_.isDate(birthDate))
                         if(_.isDate(birthDate)){
                             appRow.push(birthDate.toLocaleDateString());    
                         } else {
@@ -175,7 +174,7 @@ function exportApplicants(req, res, next){
                 }
                 var result = ExcelExporter.execute(conf);
                 res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
-                res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
+                res.setHeader("Content-Disposition", "attachment; filename=" + encodeURIComponent("入职员工") + ".xlsx");
                 res.end(result, 'binary');
 
             }
