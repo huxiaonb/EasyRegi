@@ -4,6 +4,10 @@ var Applicant = mongoose.model('Applicant');
 
 exports.renderPreviewPage = renderPreviewPage;
 
+function dateFormat(date){
+    var fMonth = date.getMonth() + 1 +'月';
+    return date.getFullYear() +'年' +  fMonth +  date.getDate()+'日';
+}
 function renderPreviewPage(req, res, next){
     var applicantId = _.get(req, ['params', 'id'], '');
     console.log('preview of applicant id by', applicantId);
@@ -20,10 +24,14 @@ function renderPreviewPage(req, res, next){
                 console.log('Error in finding applicant by id', applicantId, err1);
                 res.status(500).send({success: false, errmsg: 'Error in finding applicant'});
             } else {
-                var date = _.get(dbApplicant, ['birthDate'], '');
-                var fMonth = date.getMonth() + 1 +'月';
-                var formatDate = date.getFullYear() +'年' +  fMonth +  date.getDate()+'日';
-                console.log(formatDate);
+                //var that = this;
+                var formatDate = dateFormat(_.get(dbApplicant, ['birthDate'], ''));
+                var his = _.get(dbApplicant, ['educationHistories'], []);
+                var works = _.get(dbApplicant, ['workExperiences'], []);
+                
+                var newH = his.map(item=>(Object.assign(item,{range: dateFormat(item.startedAt) +'~' + dateFormat(item.endedAt)})));
+                var newW = works.map(item=>(Object.assign(item,{range: dateFormat(item.startedAt) +'~' + dateFormat(item.endedAt)})));
+
                 var app = {
                     name: _.get(dbApplicant, ['name'], ''),
                     gender: _.get(dbApplicant, ['gender'], ''),
@@ -40,8 +48,8 @@ function renderPreviewPage(req, res, next){
                     photoName: _.get(dbApplicant, ['photoName'], ''),
                     idCardPhotoName: _.get(dbApplicant, ['idCardPhotoName'], ''),
                     familyMembers: _.get(dbApplicant, ['familyMembers'], []),
-                    educationHistories: _.get(dbApplicant, ['educationHistories'], []),
-                    workExperiences: _.get(dbApplicant, ['workExperiences'], [])
+                    educationHistories:newH,
+                    workExperiences: newW
                 }
                 res.render('./server/weChat/views/applicantPreview', {
                     applicant: app

@@ -75,13 +75,13 @@
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">座机号码</label>
                         <div class="col-md-8">
-                            <span>{{ applicant.tele }} | 无</span>
+                            <span>{{ applicant.tele }}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">QQ</label>
                         <div class="col-md-8">
-                            <span>{{ applicant.qqNumber }} | 无</span>
+                            <span>{{ applicant.qqNumber }}</span>
                         </div>
                     </div>
                 </form>
@@ -94,19 +94,19 @@
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">姓名</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{family.name}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">关系</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{family.relationship}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">联系电话</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{family.phoneNumber}}</span>
                         </div>
                     </div>
                 </form>
@@ -120,25 +120,37 @@
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">公司</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{work.companyName}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">职位</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{work.title}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">薪资范围</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{work.salaryRange}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">起止时间</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{work.range}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">联系人</label>
+                        <div class="col-md-8">
+                            <span>{{work.contactPersonName}}</span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-md">
+                        <label class="col-md-4 control-label" for="formGroupInputLarge">联系电话</label>
+                        <div class="col-md-8">
+                            <span>{{work.phoneNumber}}</span>
                         </div>
                     </div>
                 </form>
@@ -152,27 +164,28 @@
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">学校</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{edu.colledgeName}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">专业</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{edu.major}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">是否毕业</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{edu.isGraduated}}</span>
                         </div>
                     </div>
                     <div class="form-group form-group-md">
                         <label class="col-md-4 control-label" for="formGroupInputLarge">起止时间</label>
                         <div class="col-md-8">
-                            <span>XXX</span>
+                            <span>{{edu.range}}</span>
                         </div>
                     </div>
+                   
                 </form>
             </div>
             {% endfor %}
