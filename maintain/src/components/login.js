@@ -32,8 +32,7 @@ class Login extends React.Component{
     }
     loginTo(){
         let {form} = this.props;
-        form.isFieldValidating()
-        debugger;
+        form.isFieldValidating();
         form.validateFields(['login_acc', 'login_pwd'],async (err, values)=>{
              if (!!err){
                  return;

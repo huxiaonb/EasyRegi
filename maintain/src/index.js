@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { Router, Route, Link, hashHistory , IndexRoute, Redirect, IndexLink} from 'react-router'
 
 // 配置导航
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu, Icon, message } from 'antd';
 // import Layout from 'antd/lib/layout'
 // import Menu from 'antd/lib/menu'
 // import 'antd/lib/style/index.less';
@@ -64,6 +64,8 @@ class Index extends React.Component {
           companyInfo:data.company,
           login : true
         })
+      } else {
+        message.error('用户名或密码错误');
       }
     }
   }
@@ -78,6 +80,7 @@ class Index extends React.Component {
     }
   }
   render() {
+    let {companyInfo} = this.state;
     return (
       this.state.login ? 
       (<div>
@@ -98,7 +101,7 @@ class Index extends React.Component {
             </Sider>
           <Layout style={{position:'relative'}}>
             <Menu mode="horizontal">
-              <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{this.state.companyInfo.companyName}</span>}>
+              <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{companyInfo.alias}</span>}>
                 <Menu.Item key="setting:1"><span onClick={this.logout.bind(this)}>退出</span></Menu.Item>
               </SubMenu>
             </Menu>
@@ -106,7 +109,7 @@ class Index extends React.Component {
               { this.props.children }
             </Content>
             <Footer style={{ textAlign: 'center',padding:0 }}>
-              M & G PRESENTS ©2017  (づ￣ 3￣)づ 
+              M & G PRESENTS ©2017  (づ￣ 3￣)づ
             </Footer>
           </Layout>
           
