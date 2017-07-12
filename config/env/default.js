@@ -58,5 +58,17 @@ module.exports = {
   wechat: {
     appId: 'wx54e94ab2ab199342',
     appSecret: 'd5e42e98caebab277fb8cc0c6ee5a797'
+  },
+  emailConfig: {
+    adminEmailBanner: '入职易<easyregitest@126.com>',
+    smtp: 'smtp.126.com',
+    port: 25,
+    auth: {
+      user: 'easyregitest@126.com',
+      pass: 'easyregi123'
+    },
+    emailFrom: '入职易<easyregitest@126.com>',
+    verificationSubject: '请验证您在入职易的注册邮箱',
+    verificationHtmlTemplate: '<p>您好！</p><p>入职易收到了邮箱 [Registered_Email] 的注册申请，请点击一下链接完成注册:</p><br><a href="[Verification_Link]">[Verification_Link]</a><br><p>如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。</p>'
   }
 };

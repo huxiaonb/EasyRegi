@@ -1,11 +1,14 @@
 var _ = require('lodash'),
     async = require('async'),
-    moment = require('moment');
+    moment = require('moment'),
+    crypto = require('crypto');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
 var Session = mongoose.model('Session');
 var Position = mongoose.model('Position');
+var EmailUtil = require('../utils/email.util.js');
+var config = require('../../../config/config');
 
 exports.companyUserLogin = companyUserLogin;
 exports.upsertCompany = upsertCompany;
@@ -25,6 +28,7 @@ exports.deletePositionForCompany = deletePositionForCompany;
 exports.updatePosition = updatePosition;
 exports.validateEmail = validateEmail;
 exports.resetPwd = resetPwd;
+exports.testSendEmail = testSendEmail;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -305,18 +309,42 @@ function registerCompany(req, res, next){
                 console.log('no comany found, system will create new account for company');
                 var companyEntity = new Company(companyItem);
                 console.log(companyEntity);
-                companyEntity.save(function(error, data){
-                    if(error || _.isEmpty(data)) {
+                Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
+                    if(error) {
                         console.log('Error in saving company', error)
                         res.status(500).send({success: false, errmsg: 'Error in saving company'});
                     } else {
-                        data.password = '';
-                        var result = {
-                            success: true,
-                            errmsg: '',
-                            company: data
-                        };
-                        res.json(result);
+                        Company.findOne({email: email}, function(err2, data){
+                            crypto.randomBytes(20, function(err3, buf){
+                                var activeToken = data._id + buf.toString('hex'),
+                                verificationInfo = {
+                                    activeToken: activeToken,
+                                    active: false,
+                                    activeTokenExpires: Date.now() + 24 * 3600 * 1000
+                                },
+                                verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                var opts = {
+                                    emailTo: email,
+                                    verificationLink: verificationLink
+                                };
+                                sendVerificationEmail(opts, function(err4, emailResult){
+                                    if(err4) {
+                                        console.log('Error in sending verification email', err4);
+                                        res.status(500).send({success: false, errmsg: 'Error in sending verification email'});
+                                    } else {
+                                        Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
+                                            if(err5) {
+                                                console.log('Error in update verification info', err5);
+                                            } else 
+                                                console.log('update verification info');
+                                            res.render('server/weChat/views/active');
+                                        });
+                                    }
+                                })
+
+                            });
+                        });
+                        
                     }
                 });
             } else {
@@ -817,4 +845,42 @@ function validateEmail(req, res, next){
 
 function resetPwd(req, res, next) {
     res.render('server/weChat/views/resetPwd');
+}
+
+function testSendEmail(req, res, next){
+    var email = {
+        from: '入职易<easyregitest@126.com>',
+        subject: '请验证您在入职易的注册邮箱',
+        to: 'fireman88.ok@163.com',
+        // text: '您好！\n入职易收到了邮箱fireman88.ok@163.com的注册申请，请点击一下链接完成注册：\n\nhttp://www.baidu.com \n如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。',
+        html: '<p>您好！</p><p>入职易收到了邮箱 fireman88.ok@163.com 的注册申请，请点击一下链接完成注册:</p><br><a href="http://www.baidu.com">http://www.baidu.com</a><br><p>如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。</p>'
+    }
+    EmailUtil.sendEmail(email, function(error, info){
+        if(error) console.log(error);
+        else console.log(info.response);
+        res.json({success: true, errmsg: ''});
+    });
+}
+
+function sendVerificationEmail(opts, callback){
+    var emailTo = _.get(opts, ['emailTo'], ''),
+        verificationLink = _.get(opts, ['verificationLink'], ''),
+        verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
+    var email = {
+        from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
+        subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
+        to: emailTo
+    };
+    var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, emailTo).replace(/\[Verification_Link\]/ig, verificationLink);
+    email.html = verificationEmailContent;
+    EmailUtil.sendEmail(email, function(error, info){
+        if(error) {
+            console.log(error);
+            return callback(error, null);
+        }
+        else {
+            console.log(info.response);
+            return callback(null, {success: true, errmsg: ''});
+        }
+    });
 }

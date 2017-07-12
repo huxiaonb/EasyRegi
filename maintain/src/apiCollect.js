@@ -220,5 +220,10 @@ export default{
              headers:{ 'Content-Type': 'application/json'},
              body:JSON.stringify(data)
         });
+    },
+    testSendEmail(){
+        //获取当前公司所有职位信息
+        let url = '../account/email/send/test'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
+        return fetch(url).then(data => data).catch(e => console.log(e));
     }
 }

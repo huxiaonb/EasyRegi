@@ -47,7 +47,9 @@ var CompanySchema = new Schema({
         default: '',
         trim: true
     },
-    positions: [PositionSchema]
+    positions: [PositionSchema],
+    activeToken: String,
+    activeTokenExpires: String
 },{
     collection: 'companies',
     timestamps: true

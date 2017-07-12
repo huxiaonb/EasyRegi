@@ -38,4 +38,6 @@ module.exports = function (app) {
         .get(companyController.validateEmail);
      app.route('/account/reset/display')
         .get(companyController.resetPwd);
+     app.route('/account/email/send/test')
+        .get(companyController.testSendEmail);
 };
