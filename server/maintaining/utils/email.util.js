@@ -14,6 +14,7 @@ var config = {
 var transporter = nodemailer.createTransport(config);
 
 exports.sendEmail = sendEmail;
+exports.generateCaptcha = generateCaptcha;
 
 var mailTemplate = {
     from: '入职易<easyregitest@126.com>',
@@ -27,4 +28,12 @@ function sendEmail(mail, callback){
         if(error) return callback(error, null);
         return callback(null, info);
     });
+}
+
+function generateCaptcha(num){
+    var numberOfCaptcha = 6;
+    if(!_.isNumber(num) && num > 0){
+        numberOfCaptcha = num;
+    }
+    return Math.random().toString(36).substr(2, numberOfCaptcha);
 }

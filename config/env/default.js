@@ -69,6 +69,8 @@ module.exports = {
     },
     emailFrom: '入职易<easyregitest@126.com>',
     verificationSubject: '请验证您在入职易的注册邮箱',
-    verificationHtmlTemplate: '<p>您好！</p><p>入职易收到了邮箱 [Registered_Email] 的注册申请，请点击一下链接完成注册:</p><br><a href="[Verification_Link]">[Verification_Link]</a><br><p>如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。</p>'
+    verificationHtmlTemplate: '<p>您好！</p><p>入职易收到了邮箱 [Registered_Email] 的注册申请，请点击一下链接完成注册:</p><br><a href="[Verification_Link]">[Verification_Link]</a><br><p>如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。</p>',
+    resetPwdSubject: '您更改帐号信息的验证码是:[Reset_Password_Captcha]',
+    resetPwdHtmlTemplate: '<p>您好!</p><p>此次帐号信息变更需要的验证码如下，请在 30 分钟内输入验证码进行下一步操作。</p><br><p>[Reset_Password_Captcha]</p><br><p>如果非你本人操作，你的帐号可能存在安全风险，请立即修改密码。</p>'
   }
 };

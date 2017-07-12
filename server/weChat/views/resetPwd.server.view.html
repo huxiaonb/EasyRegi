@@ -43,6 +43,11 @@
         $(_.once(function(){
             
             $("#getCode").bind("click",function(){
+                var email = $('#r_mail').val();
+                console.log(email);
+                if(!email){
+                    return;
+                }
                 //exam :http://kamranahmed.info/toast#quick-demos
                 $.toast({
                     heading: 'Error',
@@ -53,7 +58,18 @@
                     position: 'top-left',
                 })
                 $.ajax({
-                    url:''
+                    url:'/account/getCaptcha/' + email,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data){
+                        console.log(data);
+                    },
+                    error: function(err){
+                        console.log(err);
+                        if(!!err.responseJSON && !!err.responseJSON.errmsg){
+                            // message.error(err.responseJSON.errmsg)
+                        }
+                    }
                 })
             });
             $("#resetSubmit").bind("click",function(){
