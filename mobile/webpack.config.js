@@ -40,12 +40,12 @@ module.exports = {
       },
       { test: /\.(jpg|png)$/, loader: "url?limit=8192" },
       // svg-sprite for antd-mobile@1.0
-      { test: /\.(svg)$/i, loader: 'svg-sprite', include: [
+      { test: /\.(svg)$/i, loader: 'svg-sprite-loader', include: [
         require.resolve('antd-mobile').replace(/warn\.js$/, ''),  // 1. 属于 antd-mobile 内置 svg 文件
         // path.resolve(__dirname, 'src/my-project-svg-foler'),  // 自己私人的 svg 存放目录
       ]},
       // { test: /\.css$/, loader: 'style!css' }, // 把css处理成内联style，动态插入到页面
-      { test: /\.less$/i, loader: ExtractTextPlugin.extract('style', 'css!postcss!less') },
+      { test: /\.less$/i, loader: ExtractTextPlugin.extract('style', 'css!less') },
       { test: /\.css$/i, loader: ExtractTextPlugin.extract('style', 'css') }
     ]
   },
