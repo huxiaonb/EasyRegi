@@ -34,7 +34,7 @@ module.exports = function (app) {
         .post(companyController.registerCompany);
      app.route('/api/company/resetPassword')
         .post(companyController.resetPassword);
-     app.route('/account/verification/:activeToken')
+     app.route('/account/verification')
         .get(companyController.validateEmail);
      app.route('/account/reset/display')
         .get(companyController.resetPwd);
@@ -47,5 +47,9 @@ module.exports = function (app) {
      app.route('/error')
         .get(companyController.commonErr);
      app.route('/resetPwd')
-        .get(companyController.resetPwd);    
+        .get(companyController.resetPwd);  
+     app.route('/account/getCaptcha/:email')
+        .get(companyController.getCaptchaCode);
+     app.route('/account/resetByCode')
+        .post(companyController.resetPasswordByCaptcha);
 };

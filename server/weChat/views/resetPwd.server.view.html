@@ -44,19 +44,11 @@
             
             $("#getCode").bind("click",function(){
                 var email = $('#r_mail').val();
-                console.log(email);
                 if(!email){
                     return;
                 }
+                $("#getCode").attr("disabled", true)
                 //exam :http://kamranahmed.info/toast#quick-demos
-                $.toast({
-                    heading: 'Error',
-                    loader : true,
-                    text: 'some error text',
-                    showHideTransition: 'fade',
-                    icon: 'error',
-                    position: 'top-left',
-                })
                 $.ajax({
                     url:'/account/getCaptcha/' + email,
                     type: 'GET',
@@ -65,19 +57,28 @@
                         console.log(data);
                     },
                     error: function(err){
-                        console.log(err);
                         if(!!err.responseJSON && !!err.responseJSON.errmsg){
-                            // message.error(err.responseJSON.errmsg)
+                            $.toast({
+                                heading: 'Error',
+                                loader : true,
+                                text: err.responseJSON.errmsg,
+                                showHideTransition: 'fade',
+                                icon: 'error',
+                                position: 'top-left',
+                            })
                         }
                     }
-                })
+                });
+                setTimeout(function(){
+                    $("#getCode").attr("disabled", false);
+                }, 10000)
             });
             $("#resetSubmit").bind("click",function(){
                 $("#resetform").validate({
                 debug:true,
                 submitHandler: function(form) {
                     $.ajax({
-                        url : '',
+                        url : '/account/resetByCode',
                         type : 'POST',
                         contentType :'application/json',
                         data: JSON.stringify({
@@ -87,9 +88,20 @@
                         }),
                         dataType: 'json',
                         success: function(data){
+                            console.log(data);
                         },
                         error:function(err){
                             console.log(err);
+                            if(!!err.responseJSON && !!err.responseJSON.errmsg){
+                                $.toast({
+                                    heading: 'Error',
+                                    loader : true,
+                                    text: err.responseJSON.errmsg,
+                                    showHideTransition: 'fade',
+                                    icon: 'error',
+                                    position: 'top-left',
+                                })
+                            }
                         }
                     });
                 },

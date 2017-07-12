@@ -32,6 +32,8 @@ exports.testSendEmail = testSendEmail;
 exports.activeEmail = activeEmail;
 exports.activeSuccess = activeSuccess;
 exports.commonErr = commonErr;
+exports.getCaptchaCode = getCaptchaCode;
+exports.resetPasswordByCaptcha = resetPasswordByCaptcha
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -325,12 +327,17 @@ function registerCompany(req, res, next){
                                     active: false,
                                     activeTokenExpires: Date.now() + 24 * 3600 * 1000
                                 },
-                                verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
-                                var opts = {
-                                    emailTo: email,
-                                    verificationLink: verificationLink
+                                // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
+                                var emailOpt = {
+                                    from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
+                                    subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
+                                    to: email
                                 };
-                                sendVerificationEmail(opts, function(err4, emailResult){
+                                var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, email).replace(/\[Verification_Link\]/ig, verificationLink);
+                                emailOpt.html = verificationEmailContent;
+                                sendVerificationEmail(emailOpt, function(err4, emailResult){
                                     if(err4) {
                                         console.log('Error in sending verification email', err4);
                                         res.status(500).send({success: false, errmsg: 'Error in sending verification email'});
@@ -838,11 +845,38 @@ function updatePositionNameByCompanyId(companyId, positionObj){
 }
 
 function validateEmail(req, res, next){
-    var activeToken = _.get(req, ['params', 'activeToken'], '');
-    if(activeToken === 'failed'){
-        res.render('server/weChat/views/error');
+    var activeToken = _.get(req, ['query', 'activeToken'], ''),
+        email = _.get(req, ['query', 'account'], '');
+    if(_.isEmpty(email) || _.isEmpty(activeToken)){
+        res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '激活失败，请重新登陆发送激活邮件'});
     } else {
-        res.render('server/weChat/views/success');
+        Company.findOne({email: email}, function(err1, dbCompany){
+            if(err1 || _.isEmpty(dbCompany)) {
+                console.log('Error in finding company by email', email, err1);
+                res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '激活失败，请联系管理员'});
+            } else {
+                if(!_.isUndefined(dbCompany.active) && dbCompany.active){
+                    return res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '账号已经激活,请直接登陆'});
+                }
+                if(!_.isUndefined(dbCompany.activeToken) && dbCompany.activeToken != activeToken){
+                    return res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '激活链接错误，请使用最新激活邮件中的激活链接'});
+                }
+                var currentTimeStamp = Date.now();
+                if(!_.isUndefined(dbCompany.activeTokenExpires) && Number.parseInt(dbCompany.activeTokenExpires) < currentTimeStamp){
+                    return res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '激活链接已过期，请重新登陆发送激活邮件'});
+                }
+                Company.update({email: email}, {$set: {active: true}}, {upsert: false}, function(err2, updResult){
+                    if(err2) {
+                        console.log('Error in activating company account for email', email, err2);
+                        res.render('server/weChat/views/error', {errmsg: '激活失败，请联系管理员'});
+                    } else {
+                        console.log('Activating successfully for company account', email);
+                        res.render('server/weChat/views/success');
+                    }
+                });
+            }
+        });
+        
     }
 }
 
@@ -863,17 +897,7 @@ function testSendEmail(req, res, next){
     });
 }
 
-function sendVerificationEmail(opts, callback){
-    var emailTo = _.get(opts, ['emailTo'], ''),
-        verificationLink = _.get(opts, ['verificationLink'], ''),
-        verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
-    var email = {
-        from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
-        subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
-        to: emailTo
-    };
-    var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, emailTo).replace(/\[Verification_Link\]/ig, verificationLink);
-    email.html = verificationEmailContent;
+function sendVerificationEmail(email, callback){
     EmailUtil.sendEmail(email, function(error, info){
         if(error) {
             console.log(error);
@@ -897,4 +921,96 @@ function commonErr(req, res, next){
 }
 function resetPwd(req, res, next) {
     res.render('server/weChat/views/resetPwd');
+}
+
+function getCaptchaCode(req, res, next){
+    var email = _.get(req, ['params', 'email']);
+    if(_.isEmpty(email)){
+        res.status(500).send({success: false, errmsg: 'Email is required'});
+    } else {
+        Company.findOne({email: email}, function(err1, dbCompany){
+            if(err1 || _.isEmpty(dbCompany)){
+                console.log('Error in finding company by email', email, err1);
+                res.status(500).send({success: false, errmsg: 'Error in finding account'});
+            } else {
+                var currentTimeStamp = Date.now();
+                if(!_.isEmpty(dbCompany.resetPwdTokenGeneratedTimeStamp) && Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp){
+                    console.log(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000), currentTimeStamp);
+                    console.log(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp);
+                    console.log('the captcha does not expire');
+                    res.status(500).send({success: false, errmsg: '验证码请求过于频繁，请查看邮箱获取验证码或者等待一分钟'});
+                } else {
+                    var code = EmailUtil.generateCaptcha(4);
+                    var updInfo = {
+                        resetPwdToken: code,
+                        resetPwdTokenGeneratedTimeStamp: currentTimeStamp,
+                        resetPwdTokenExpires: currentTimeStamp + 30 * 60 * 1000
+                    };
+                    Company.update({email: email}, {$set: updInfo}, {upsert: false}, function(err2, updResult){
+                        if(err2) {
+                            console.log('Error in updating account', email, err2);
+                            res.status(500).send({success: false, errmsg: '更新验证码失败'});
+                        } else {
+                            var resetPwdSubject = _.get(config, ['emailConfig', 'resetPwdSubject'], ''),
+                                resetPwdHtmlTemplate = _.get(config, ['emailConfig', 'resetPwdHtmlTemplate'], ''),
+                                adminEmailBanner = _.get(config, ['emailConfig', 'adminEmailBanner'], '');
+                            resetPwdSubject = resetPwdSubject.replace(/\[Reset_Password_Captcha\]/i, code);
+                            var resetPwdEmailContent = resetPwdHtmlTemplate.replace(/\[Reset_Password_Captcha\]/i, code);
+                            var emailOpt = {
+                                from: adminEmailBanner,
+                                subject: resetPwdSubject,
+                                to: email,
+                                html: resetPwdEmailContent
+                            };
+                            sendVerificationEmail(emailOpt, function(err3, sendEmailResult){
+                                if(err3) {
+                                    console.log('Error in sending captcha to email', email, err3);
+                                    res.status(500).send({success: false, errmsg: '验证码邮件发送失败，请联系管理员'});
+                                } else {
+                                    console.log('send captcha successfully');
+                                    res.json({success: true, errmsg: ''});
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+}
+
+function resetPasswordByCaptcha(req, res, next){
+    var email = _.get(req, ['body', 'email'], ''),
+        code = _.get(req, ['body', 'code'], ''),
+        newPwd = _.get(req, ['body', 'newPwd'], '');
+    console.log(email, code, newPwd);
+    if(_.isEmpty(email) || _.isEmpty(code) || _.isEmpty(newPwd)){
+        console.log('necessary info is required');
+        res.status(500).send({success: false, errmsg: 'Please check all necessary information is passed'});
+    } else {
+        Company.findOne({email: email}, function(err1, dbCompany){
+            if(err1 || _.isEmpty(dbCompany)){
+                console.log('Error in finding account by email', email, err1);
+                res.status(500).send({success: false, errmsg: 'Error in finding account'});
+            } else {
+                if(!_.isUndefined(dbCompany.resetPwdToken) && dbCompany.resetPwdToken !== code){
+                    return res.status(500).send({success: false, errmsg: '激活码错误'});
+                }
+                var currentTimeStamp = Date.now();
+                if(!_.isUndefined(dbCompany.resetPwdTokenExpires) && Number.parseInt(dbCompany.resetPwdTokenExpires) < currentTimeStamp){
+                    return res.status(500).send({success: false, errmsg: '激活码已过期，请重新获取激活码'});
+                }
+                Company.update({email: email}, {$set:{password: newPwd, resetPwdTokenExpires: currentTimeStamp}}, {upsert: false}, function(err2, updResult){
+                    if(err2) {
+                        console.log('Error in updating company by email', email, err2);
+                        res.status(500).send({success: false, errmsg: '更改密码失败'});
+                    } else {
+                        console.log('reset password successfully');
+                        res.json({success: true, errmsg: ''});
+                    }
+                });
+
+            }
+        });
+    }
 }
