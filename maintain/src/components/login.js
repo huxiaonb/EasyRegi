@@ -264,7 +264,7 @@ class Login extends React.Component{
                                     type:'string'
                                 }]
                             })(
-                                <Input className='login-text' placeholder='公司简介'/>
+                                <Input className='login-text' type='textarea' style={{resize:"none"}}/>
                             )}
                         </FormItem>
 

@@ -217,7 +217,7 @@ class CompInfo extends React.Component{
                                     type:'string'
                                 }],initialValue:comp.description
                             })(
-                                <Input className='login-text' placeholder='公司简介'/>
+                                <Input className='login-text' type='textarea' style={{resize:"none"}}/>
                             )}
                         </FormItem>
                         <FormItem

@@ -6,6 +6,7 @@
         <meta name="renderer" content="webkit">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="../../lib/bootstrap.min.css" rel="stylesheet">
+        <link href="../../lib/jquery.toast.min.css" rel="stylesheet">
         <style>
             input.error { border: 1px solid red; }
             label.error {
@@ -19,7 +20,7 @@
     </head>
     <body style='margin:0'>
        <div style='height:80px;width:100%;text-align:center;color:white;background: rgb(16, 142, 233);display:flex;justify-content:center;align-items:center;color:white;font-weight:bold;font-size:3rem'>入职易</div>
-       <div style='text-align:center;height:400px;width:100%;'>
+       <div style='text-align:center;width:100%;'>
             <h2>重置密码</h2>
             <div style='margin-top:30px'>
                 <form id="resetform">
@@ -38,10 +39,20 @@
     <script src="../../lib/underscore-min.js"></script>
     <script src="../../lib/jquery.min.js"></script>
     <script src="../../lib/jquery.validate.min.js"></script>
+    <script src="../../lib/jquery.toast.min.js"></script>
     <script type="text/javascript">
         $(_.once(function(){
             
             $("#getCode").bind("click",function(){
+                //exam :http://kamranahmed.info/toast#quick-demos
+                $.toast({
+                    heading: 'Error',
+                    loader : true,
+                    text: 'some error text',
+                    showHideTransition: 'fade',
+                    icon: 'error',
+                    position: 'top-left',
+                })
                 $.ajax({
                     url:''
                 })
