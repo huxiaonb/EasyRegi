@@ -29,6 +29,9 @@ exports.updatePosition = updatePosition;
 exports.validateEmail = validateEmail;
 exports.resetPwd = resetPwd;
 exports.testSendEmail = testSendEmail;
+exports.activeEmail = activeEmail;
+exports.activeSuccess = activeSuccess;
+exports.commonErr = commonErr;
 
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
@@ -337,7 +340,7 @@ function registerCompany(req, res, next){
                                                 console.log('Error in update verification info', err5);
                                             } else 
                                                 console.log('update verification info');
-                                            res.render('server/weChat/views/active');
+                                                res.status(200).send({success: true, errmsg: '', redirect: true});
                                         });
                                     }
                                 })
@@ -843,9 +846,7 @@ function validateEmail(req, res, next){
     }
 }
 
-function resetPwd(req, res, next) {
-    res.render('server/weChat/views/resetPwd');
-}
+
 
 function testSendEmail(req, res, next){
     var email = {
@@ -883,4 +884,17 @@ function sendVerificationEmail(opts, callback){
             return callback(null, {success: true, errmsg: ''});
         }
     });
+}
+
+function activeEmail(req, res, next){
+    res.render('server/weChat/views/active');
+}
+function activeSuccess(req, res, next){
+    res.render('server/weChat/views/success');
+}
+function commonErr(req, res, next){
+    res.render('server/weChat/views/error');
+}
+function resetPwd(req, res, next) {
+    res.render('server/weChat/views/resetPwd');
 }

@@ -40,4 +40,12 @@ module.exports = function (app) {
         .get(companyController.resetPwd);
      app.route('/account/email/send/test')
         .get(companyController.testSendEmail);
+     app.route('/register/active')
+        .get(companyController.activeEmail);
+     app.route('/account/success')
+        .get(companyController.activeSuccess);
+     app.route('/error')
+        .get(companyController.commonErr);
+     app.route('/resetPwd')
+        .get(companyController.resetPwd);    
 };

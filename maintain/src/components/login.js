@@ -58,8 +58,10 @@ class Login extends React.Component{
             let r = await api.createComp(comp);
             let data = await r.json();
             console.log(data);
-            if(r.status === 200){
-                message.success('注册成功');
+            if(data.success && data.redirect){
+                window.location.href = '../../register/active';
+            }else{
+                message.error('未知错误请联系管理员！');
             }
             console.log(r);
     }
@@ -104,7 +106,7 @@ class Login extends React.Component{
                     </div>
                     <div className='page-action'>
                         <a  href="javascript:" style={{marginRight:'5px'}} onClick={this.back.bind(this)}>新公司注册</a>
-                        <a  href="javascript:" >忘记密码</a>
+                        <a  href="../../resetPwd" >忘记密码</a>
                     </div>
                 </div>
             </div>
