@@ -64,8 +64,12 @@ class Index extends React.Component {
           companyInfo:data.company,
           login : true
         })
-      } else {
+      } else if(data.isAccountValid == false){
         message.error('用户名或密码错误');
+      } else if(data.isAccountActive == false){
+        message.error('账户未激活，请在注册邮箱中查看激活邮件');
+      } else {
+        message.error('未知错误');
       }
     }
   }

@@ -43,8 +43,10 @@ function companyUserLogin(req, res, next){
         res.status(500).send({success: false, errmsg: 'login id and pwd are required'});
     } else {
         login(email, pwd, function(error, companyItem){
-            if(error)
-                res.status(500).send({success: false, errmsg: error});
+            if(error){
+                console.log('Error in finding an account', email, error);
+                res.status(500).send({success: false, errmsg: '用户名或密码错误', isAccountValid: false, isAccountActive: false});
+            }
             else {
                 res.header('Access-Control-Expose-Headers', 'access-token');
                 var result = {};
@@ -52,19 +54,36 @@ function companyUserLogin(req, res, next){
                 result.errmsg = '';
                 result.company = {};
                 if(!_.isEmpty(companyItem)){
-                    result.success = true;
-                    result.company = companyItem;
-                    var current = new Date(),
-                        timestamp = current.getTime() + 24 * 60 * 60 * 1000;
-                    var expiresDate = new Date(timestamp);
-                    var companyInfo = {
-                        companyId: companyItem._id,
-                        expires: expiresDate.toString()
+                    if(companyItem.active){
+                        result.success = true;
+                        companyItem.activeTokenExpires = '';
+                        result.company = companyItem;
+                        var current = new Date(),
+                            timestamp = current.getTime() + 24 * 60 * 60 * 1000;
+                        var expiresDate = new Date(timestamp);
+                        var companyInfo = {
+                            companyId: companyItem._id,
+                            expires: expiresDate.toString()
+                        }
+                        req.session.companyInfo = JSON.stringify(companyInfo);
+                        res.header('access-token', req.sessionID);
+                        res.json(result);
+                    } else {
+                        var currentTimeStamp = Date.now();
+                        if(_.isUndefined(companyItem.activeTokenExpires) || (!_.isUndefined(companyItem.activeTokenExpires) && Number.parseInt(companyItem.activeTokenExpires) < currentTimeStamp)){
+                            generateVerificationEmail(email, function(err1, sendEmailResult){
+                                if(err1) console.log('Error in generate verification email', email, err1);
+                                else console.log('resend verification email successfully');
+                                res.status(500).send({success: false, errmsg: '账户未激活', isAccountValid: true, isAccountActive: false});                                        
+                            });
+                        } else {
+                            res.status(500).send({success: false, errmsg: '账户未激活', isAccountValid: true, isAccountActive: false});    
+                        }
                     }
-                    req.session.companyInfo = JSON.stringify(companyInfo);
-                    res.header('access-token', req.sessionID);
+                } else {
+                    console.log('cannot find an account with email %s and pwd %s', email, pwd);
+                    res.status(500).send({success: false, errmsg: '用户名或密码错误', isAccountValid: false, isAccountActive: false});
                 }
-                res.json(result);
             }
         })
     }
@@ -90,7 +109,9 @@ function login(email, pwd, callback){
                     contactPersonName: companyItem.contactPersonName,
                     email: companyItem.email,
                     description: companyItem.description,
-                    positions: companyItem.positions
+                    positions: companyItem.positions,
+                    active: _.get(companyItem, ['active'], false),
+                    activeTokenExpires: _.get(companyItem, ['activeTokenExpires'], '')
                 };
                 
                 
@@ -291,7 +312,20 @@ function updateCompanyInfo(req, res, next){
                         res.status(500).send({success: false, errmsg: 'company does not exists'});
                     } else {
                         dbCompany.password = '';
-                        res.status(200).send({success: true, errmsg: '', company: dbCompany});
+                        var clonedCompany = {
+                            _id: dbCompany._id,
+                            companyName: dbCompany.companyName,
+                            alias: dbCompany.alias,
+                            companyAddress: dbCompany.companyAddress,
+                            companyScale: dbCompany.companyScale,
+                            companyType: dbCompany.companyType,
+                            phoneNumber: dbCompany.phoneNumber,
+                            contactPersonName: dbCompany.contactPersonName,
+                            email: dbCompany.email,
+                            description: dbCompany.description,
+                            positions: dbCompany.positions
+                        };
+                        res.status(200).send({success: true, errmsg: '', company: clonedCompany});
                     }
                 });
             }
@@ -926,12 +960,12 @@ function resetPwd(req, res, next) {
 function getCaptchaCode(req, res, next){
     var email = _.get(req, ['params', 'email']);
     if(_.isEmpty(email)){
-        res.status(500).send({success: false, errmsg: 'Email is required'});
+        res.status(500).send({success: false, errmsg: '请输入正确的验证邮箱'});
     } else {
         Company.findOne({email: email}, function(err1, dbCompany){
             if(err1 || _.isEmpty(dbCompany)){
                 console.log('Error in finding company by email', email, err1);
-                res.status(500).send({success: false, errmsg: 'Error in finding account'});
+                res.status(500).send({success: false, errmsg: '无效的验证邮箱'});
             } else {
                 var currentTimeStamp = Date.now();
                 if(!_.isEmpty(dbCompany.resetPwdTokenGeneratedTimeStamp) && Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp){
@@ -991,7 +1025,7 @@ function resetPasswordByCaptcha(req, res, next){
         Company.findOne({email: email}, function(err1, dbCompany){
             if(err1 || _.isEmpty(dbCompany)){
                 console.log('Error in finding account by email', email, err1);
-                res.status(500).send({success: false, errmsg: 'Error in finding account'});
+                res.status(500).send({success: false, errmsg: '无效的验证邮箱'});
             } else {
                 if(!_.isUndefined(dbCompany.resetPwdToken) && dbCompany.resetPwdToken !== code){
                     return res.status(500).send({success: false, errmsg: '激活码错误'});
@@ -1013,4 +1047,48 @@ function resetPasswordByCaptcha(req, res, next){
             }
         });
     }
+}
+
+function generateVerificationEmail(email, callback){
+    Company.findOne({email: email}, function(err2, data){
+        if(err2) return callback(err2, null);
+        else {
+            crypto.randomBytes(20, function(err3, buf){
+                var activeToken = data._id + buf.toString('hex'),
+                verificationInfo = {
+                    activeToken: activeToken,
+                    active: false,
+                    activeTokenExpires: Date.now() + 24 * 3600 * 1000
+                },
+                // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
+                verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
+                var emailOpt = {
+                    from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
+                    subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
+                    to: email
+                };
+                var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, email).replace(/\[Verification_Link\]/ig, verificationLink);
+                emailOpt.html = verificationEmailContent;
+                sendVerificationEmail(emailOpt, function(err4, emailResult){
+                    if(err4) {
+                        console.log('Error in sending verification email', err4);
+                        return callback('Error in sending verification email', null);
+                    } else {
+                        Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
+                            if(err5) {
+                                console.log('Error in update verification info', err5);
+                                return callback('Error in update verification info', null);
+                            } else {
+                                console.log('update verification info');
+                                return callback(null, null);
+                            }
+                        });
+                    }
+                })
+            });
+
+        }
+    });
+    
 }
