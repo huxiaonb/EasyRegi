@@ -1,8 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Form, Button, Input, Select, Row, Col,message} from 'antd'
+import {Form, Button, Input, Select, Row, Col,message,Cascader} from 'antd'
 import PropTypes from 'prop-types';
-import api from '../apiCollect'
+import api from '../apiCollect';
+import district from './district';
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -27,8 +28,10 @@ class Login extends React.Component{
     static contextTypes = {
         login: PropTypes.func
     }
+
     state = {
         registerFlag : false,
+        province:''
     }
     loginTo(){
         let {form} = this.props;
@@ -40,6 +43,11 @@ class Login extends React.Component{
              this.context.login(form.getFieldValue('login_acc'), form.getFieldValue('login_pwd'));
         })
         
+    }
+    onChange(value){
+        this.setState({
+            province : value
+        })
     }
     async register(){
         let {form} = this.props;
@@ -70,7 +78,22 @@ class Login extends React.Component{
             registerFlag : !this.state.registerFlag
         })
     }
+    getFormatProv(){
+        return district.provinces.map(item => {
+            if (!item.children[0].label) {
+                return {
+                    label:item.label,
+                    value:item.value,
+                    children:item.children.map(child => ({label:child,value:child}))
+                }
+            } else {
+                return item
+            }
+        });
+
+    }
     render(){
+        const provinces = this.getFormatProv();
         let {getFieldDecorator} = this.props.form;
         let {registerFlag} = this.state;
         const loginPage = (
@@ -252,7 +275,22 @@ class Login extends React.Component{
                                 <Input className='login-text' placeholder='公司地址'/>
                             )}
                         </FormItem>
-                        
+                        <FormItem
+                            label="城市"
+                            name="province">
+                            {getFieldDecorator('province', {
+                                rules: [{
+                                    type: 'array',  message: '请输入有效的联系城市！'
+                                }]
+                            })(
+                                <Cascader
+                                    size='large'
+                                    options={provinces}
+                                    onChange={this.onChange.bind(this)}
+                                    placeholder="Please select"
+                                />
+                            )}
+                        </FormItem>
                         
 
                         <FormItem
