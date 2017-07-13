@@ -62,7 +62,8 @@ module.exports = {
   emailConfig: {
     adminEmailBanner: '入职易<easyregitest@126.com>',
     smtp: 'smtp.126.com',
-    port: 25,
+    port: 465,
+    secure: true,
     auth: {
       user: 'easyregitest@126.com',
       pass: 'easyregi123'

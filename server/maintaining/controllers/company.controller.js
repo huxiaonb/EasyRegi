@@ -348,6 +348,7 @@ function registerCompany(req, res, next){
                 console.log('no comany found, system will create new account for company');
                 var companyEntity = new Company(companyItem);
                 console.log(companyEntity);
+                companyItem.active = false;
                 Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
                     if(error) {
                         console.log('Error in saving company', error)
