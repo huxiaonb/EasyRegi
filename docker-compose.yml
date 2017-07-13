@@ -12,6 +12,7 @@ web:
   image: easyregister:4.0
   ports: 
   - 80:80
+  - 465:465
   - 3000:3000
   volumes:
     - /home/nfsshare/easyregister/upload:/home/easyRegister/public/upload
