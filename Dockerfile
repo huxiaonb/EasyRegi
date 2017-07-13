@@ -1,5 +1,5 @@
 #FROM easyRegister-server-dependency:latest
-FROM node:4.8.3
+FROM node:6.11.0
 
 MAINTAINER "Mace Fu"
 

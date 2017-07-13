@@ -2,7 +2,7 @@ var nodemailer = require('nodemailer'),
     _ = require('lodash');
 var config = require('../../../config/config');
 
-var config = {
+var emailConfig = {
     host: _.get(config, ['emailConfig', 'smtp'], ''),
     port: _.get(config, ['emailConfig', 'port']),
     auth: {
@@ -11,7 +11,7 @@ var config = {
     }
 };
 
-var transporter = nodemailer.createTransport(config);
+var transporter = nodemailer.createTransport(emailConfig);
 
 exports.sendEmail = sendEmail;
 exports.generateCaptcha = generateCaptcha;
