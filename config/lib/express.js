@@ -213,6 +213,7 @@ module.exports.initRestifyMongoose = function (app) {
   restify.serve(router,mongoose.model('Position'));
   restify.serve(router,mongoose.model('Applicant'));
   restify.serve(router, mongoose.model('Company'));
+  restify.serve(router, mongoose.model('District'));
   restify.serve(router, mongoose.model('CompanyInfoSegment'));
   restify.serve(router, mongoose.model('CompanyTemplate'));
   restify.serve(router, mongoose.model('Dictionary'));
