@@ -7,7 +7,7 @@ db:
 web:
   environment:
    # DB_1_PORT_27017_TCP_ADDR: db
-    PORT: '3000'
+    PORT: '80'
   tty: true
   image: easyregister:4.0
   ports: 

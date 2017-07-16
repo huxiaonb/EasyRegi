@@ -260,7 +260,7 @@ class Login extends React.Component{
                                     type:'string',required:true,message:'请输入登录密码'
                                 }]
                             })(
-                                <Input className='login-text'/>
+                                <Input className='login-text' type='password'/>
                             )}
                         </FormItem>
                         <FormItem
