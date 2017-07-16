@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 80,
   // Binding to 127.0.0.1 is safer in production.
   host: process.env.HOST || '0.0.0.0',
   db: {

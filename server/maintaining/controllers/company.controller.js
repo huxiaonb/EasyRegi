@@ -363,7 +363,8 @@ function registerCompany(req, res, next){
                                     activeTokenExpires: Date.now() + 24 * 3600 * 1000
                                 },
                                 // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
-                                verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                // verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                verificationLink = 'http://www.mfca.com.cn/account/verification?account=' + email + '&activeToken=' + activeToken;
                                 var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
                                 var emailOpt = {
                                     from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
@@ -1062,7 +1063,8 @@ function generateVerificationEmail(email, callback){
                     activeTokenExpires: Date.now() + 24 * 3600 * 1000
                 },
                 // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
-                verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                // verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                verificationLink = 'http://www.mfca.com.cn/account/verification?account=' + email + '&activeToken=' + activeToken;
                 var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
                 var emailOpt = {
                     from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
