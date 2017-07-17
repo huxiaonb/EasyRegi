@@ -13,5 +13,5 @@ RUN cd mobile && cnpm install --quiet && cd .. && cnpm install -g gulp && cnpm i
 
 EXPOSE 80 465 3000
 
-CMD ["gulp","dev"]
+CMD ["node","server.js"]
 #ENTRYPOINT ["npm run dev"]   
