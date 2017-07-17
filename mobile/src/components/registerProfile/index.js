@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
 import {Steps,Button,Toast,Icon} from 'antd-mobile'
-import Layout from 'antd/lib/Layout'
-import moment from 'moment'
+import moment from 'moment';
+import '../less/index.less'
 
 
-import 'antd/lib/layout/style/index.less'
+
 
 
 import PersonalInfo from './personalInfo';
@@ -18,7 +18,6 @@ import lapi from './lapi'
 import 'moment/locale/zh-cn';
 moment.locale('zh-cn');
 
-const { Header, Content, Footer, Sider } = Layout;
 
 const Step = Steps.Step;
 const openId = $('#openId').text();
@@ -210,17 +209,17 @@ class Index extends React.Component {
       </div>
     );
     return(
-      <Layout>
-          <Header style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >编辑个人简历</Header>
-          <Content style={{ margin: '24px 16px 0' }}>
+      <div className='ant-layout'>
+          <div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >编辑个人简历</div>
+          <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'center'}}>
               {myStep}
             </div>
-          </Content>
-          <Footer style={{ textAlign: 'center' }}>
+          </div>
+          <div className='ant-layout-footer' style={{ textAlign: 'center' }}>
               M & G PRESENTS ©2017  (づ￣ 3￣)づ 
-          </Footer>
-      </Layout>
+          </div>
+      </div>
     )
   }
 }
