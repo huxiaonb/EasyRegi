@@ -89,7 +89,9 @@ class Index extends React.Component {
       let personalCopy = Object.assign({},personal);
       // let pdate = Object.assign(personalCopy.birthDate,{});
       let appi = Object.assign({},personalCopy,{
-        birthDate : personalCopy.birthDate.toDate()
+        birthDate : personalCopy.birthDate.toDate(),
+        validFrom: personalCopy.validFrom.toDate(),
+        validTo: personalCopy.validTo.toDate()
       });
       appi.familyMembers = family.family;
       let workExperiences = [],educationHistories = [];
@@ -171,6 +173,10 @@ class Index extends React.Component {
               date : moment(info.birthDate),
               healthState : info.healthState,
               idCardNumber : info.idCardNumber,
+              validFrom: moment(info.validFrom),
+              validTo: moment(info.validTo),
+              issuingAuthority: info.issuingAuthority,
+              nativePlace: info.nativePlace,
               homeAddress : info.homeAddress,
               currentAddress : info.currentAddress,
               mobile : info.mobile,
