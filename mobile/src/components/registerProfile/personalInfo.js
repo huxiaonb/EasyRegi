@@ -243,9 +243,44 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入身份证号码"
                 >
-                身份证号码
+                身份证号
             </InputItem>
-             
+             <InputItem
+                name="issuingAuthority"
+                {...getFieldProps('issuingAuthority', {
+                    rules:[{
+                        type:'string', pattern:/^[\u4e00-\u9fa5]{1,20}$/, message:'请输入有效的发证机关！'
+                    },{
+                        required:true,message:'请输入有效的发证机关！'
+                    }],initialValue : personal.issuingAuthority
+                })}
+                clear
+                error={!!getFieldError('issuingAuthority')}
+                onErrorClick={() => {
+                    Toast.info(getFieldError('issuingAuthority').join('、'));
+                }}
+                placeholder="请输入发证机关"
+                >
+                发证机关
+            </InputItem>
+            <InputItem
+                name="nativePlace"
+                {...getFieldProps('nativePlace', {
+                    rules:[{
+                        type:'string', pattern:/^[\u4e00-\u9fa5]{1,20}$/, message:'请输入有效的籍贯！'
+                    },{
+                        required:true,message:'请输入有效的籍贯！'
+                    }],initialValue : personal.nativePlace
+                })}
+                clear
+                error={!!getFieldError('nativePlace')}
+                onErrorClick={() => {
+                    Toast.info(getFieldError('nativePlace').join('、'));
+                }}
+                placeholder="请输入籍贯"
+                >
+                籍贯
+            </InputItem>
             <InputItem
                 name="homeAddress"
                 {...getFieldProps('homeAddress', {
