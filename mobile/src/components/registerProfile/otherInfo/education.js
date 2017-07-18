@@ -26,7 +26,7 @@ import moment from 'moment';
 
 
 const FormItem = List.Item;
-const maxDate = moment('2017-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const minDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 
 let uuid = 0;
