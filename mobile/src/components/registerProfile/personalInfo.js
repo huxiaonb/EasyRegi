@@ -28,9 +28,14 @@ import lapi from './lapi'
 // import 'antd/lib/card/style/index.less';
 // import 'antd/lib/upload/style/index.less';
 // import 'antd/lib/modal/style/index.less';
-
-const maxDate = moment('2017-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+var today = new Date();
+const currentDate = moment().utcOffset(8);
+// const currentDate = moment('1997-07-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+console.log(currentDate);
+const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const minDate = moment('1950-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const validityMaxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const validityMinDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const openId = $('#openId').text();
 const FormItem = List.Item;
 //const Option = Select.Option;
@@ -57,7 +62,35 @@ class PersonalInfo extends React.Component {
         //validateAndSetValue
         let { form } = this.props;
         form.validateFields(async (err, values)=>{
-             if (!!err) return
+             if (!!err) {
+                console.log(Object.keys(err));
+                let errKeys = Object.keys(err);
+                let errMsg = '请填写';
+                errKeys.map(function(key){
+                    if(key === 'name'){
+                        errMsg += '姓名, '
+                    }else if(key === 'idCardNumber'){
+                        errMsg += '身份证号码, '
+                    }else if(key === 'issuingAuthority'){
+                        errMsg += '发证机关, '
+                    }else if(key === 'nativePlace'){
+                        errMsg += '籍贯, '
+                    }else if(key === 'validFrom'){
+                        errMsg += '身份证有效期开始时间, '
+                    }else if(key === 'validTo'){
+                        errMsg += '身份证有效期结束时间, '
+                    }else if(key === 'homeAddress'){
+                        errMsg += '家庭住址, '
+                    }else if(key === 'mobile'){
+                        errMsg += '手机号码, '
+                    }
+                });
+                if(errMsg !== '请填写'){
+                    errMsg = errMsg.substr(0, errMsg.length-2);
+                    Toast.info(errMsg, 3);
+                }
+                return   
+             }
              //set value to context
              let personalInfo = Object.assign({},{
                  name : form.getFieldValue('name'),
@@ -66,6 +99,8 @@ class PersonalInfo extends React.Component {
                  birthDate : form.getFieldValue('birthDate'),
                  healthState : form.getFieldValue('healthState'),
                  idCardNumber : form.getFieldValue('idCardNumber'),
+                 validFrom: form.getFieldValue('validFrom'),
+                 validTo: form.getFieldValue('validTo'),
                  issuingAuthority: form.getFieldValue('issuingAuthority'),
                  nativePlace: form.getFieldValue('nativePlace'),
                  homeAddress : form.getFieldValue('homeAddress'),
@@ -108,6 +143,8 @@ class PersonalInfo extends React.Component {
                 birthDate : personal.birthDate,
                 healthState : personal.healthState,
                 idCardNumber : personal.idCardNumber,
+                validFrom: personal.validFrom,
+                validTo: personal.validTo,
                 issuingAuthority: personal.issuingAuthority,
                 nativePlace: personal.nativePlace,
                 homeAddress : personal.homeAddress,
@@ -146,6 +183,23 @@ class PersonalInfo extends React.Component {
                 form.setFieldsValue({
                     nativePlace: area
                 });
+            }
+            if(!!res.result && !!res.result.sex){
+                if(res.result.sex == '男' || res.result.sex == '女'){
+                    form.setFieldsValue({
+                        gender: res.result.sex
+                    });
+                }
+            }
+            if(!!res.result && !!res.result.birth){
+                let birth = res.result.birth;
+                let birthStr = birth.substr(0, 4) + birth.substr(5, 2) + birth.substr(8, 2);
+                let birthMo = moment(birth, 'YYYYMMDD').utcOffset(8);
+                if(birthMo.isValid()){
+                    form.setFieldsValue({
+                        birthDate: birthMo
+                    });
+                }
             }
         }
         Toast.hide();
@@ -198,59 +252,6 @@ class PersonalInfo extends React.Component {
                 >
                 姓名
             </InputItem>
-            <FormItem>                
-                    <Picker 
-                        cols={1}
-                        {...getFieldProps('gender', {
-                        rules:[{
-                            required:true, message:'请选择性别！'
-                        }], initialValue : personal.gender ? [personal.gender] : ['男']
-                        })}
-                        data={[{label:'男',value:'男'},{label:'女',value:'女'}]}
-                        >
-                        <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>性别</List.Item>
-                    </Picker>
-            </FormItem>
-            <FormItem>
-                    <Picker 
-                        cols={1}
-                        name="folk"
-                        {...getFieldProps('data', {
-                            rules:[{
-                                required:true, message:'请选择民族！'
-                            }],
-                            initialValue : personal.folk ? [personal.folk] : ['汉族']
-                        })} 
-                        
-                        data={nationOptions}>
-                    <List.Item arrow="horizontal" style={{padding : 0}}>民族</List.Item>
-                    </Picker>
-            </FormItem>
-            
-            <FormItem
-                label="出生日期"
-                name='birthDate'
-                style={{textAlign:'left'}}
-                >
-                    <DatePicker mode="date"
-                    {...getFieldProps('birthDate', {
-                        rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
-                        initialValue : personal.date
-                    })} 
-                    maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期</List.Item></DatePicker>
-            </FormItem>
-            <FormItem>
-                    <Picker
-                        cols={1}
-                        name='healthState'
-                        {...getFieldProps('healthState', {
-                            rules: [{ required: true, message: '请选择健康状况!' }],
-                            initialValue : personal.healthState ? [personal.healthState] : ['良好']
-                        })}
-                        data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
-                        <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
-                    </Picker>
-            </FormItem>
             <InputItem
                 style={{color:'inherit'}}
                 label="身份证号码"
@@ -309,6 +310,77 @@ class PersonalInfo extends React.Component {
                 >
                 籍贯
             </InputItem>
+            <FormItem>
+                <DatePicker mode="date"
+                    name='validFrom'
+                    {...getFieldProps('validFrom', {
+                        rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
+                    })} 
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期起</List.Item>
+                </DatePicker>
+            </FormItem>
+            <FormItem>
+                <DatePicker mode="date"
+                    name='validTo'
+                    {...getFieldProps('validTo', {
+                        rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
+                    })} 
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期止</List.Item>
+                </DatePicker>
+            </FormItem>
+            <FormItem>                
+                    <Picker 
+                        cols={1}
+                        {...getFieldProps('gender', {
+                        rules:[{
+                            required:true, message:'请选择性别！'
+                        }], initialValue : personal.gender ? [personal.gender] : ['男']
+                        })}
+                        data={[{label:'男',value:'男'},{label:'女',value:'女'}]}
+                        >
+                        <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>性别</List.Item>
+                    </Picker>
+            </FormItem>
+            <FormItem>
+                    <Picker 
+                        cols={1}
+                        name="folk"
+                        {...getFieldProps('data', {
+                            rules:[{
+                                required:true, message:'请选择民族！'
+                            }],
+                            initialValue : personal.folk ? [personal.folk] : ['汉族']
+                        })} 
+                        
+                        data={nationOptions}>
+                    <List.Item arrow="horizontal" style={{padding : 0}}>民族</List.Item>
+                    </Picker>
+            </FormItem>
+            
+            <FormItem
+                label="出生日期"
+                name='birthDate'
+                style={{textAlign:'left'}}
+                >
+                    <DatePicker mode="date"
+                    {...getFieldProps('birthDate', {
+                        rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
+                        initialValue : personal.date || currentDate
+                    })} 
+                    maxDate={currentDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期</List.Item></DatePicker>
+            </FormItem>
+            <FormItem>
+                    <Picker
+                        cols={1}
+                        name='healthState'
+                        {...getFieldProps('healthState', {
+                            rules: [{ required: true, message: '请选择健康状况!' }],
+                            initialValue : personal.healthState ? [personal.healthState] : ['良好']
+                        })}
+                        data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
+                        <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
+                    </Picker>
+            </FormItem>
             <InputItem
                 name="homeAddress"
                 {...getFieldProps('homeAddress', {
@@ -367,8 +439,6 @@ class PersonalInfo extends React.Component {
                 {...getFieldProps('email', {
                     rules: [{
                         type: 'email', message: '请输入有效的邮箱!',
-                    }, {
-                        required: true, message: '请输入有效的邮箱!',
                     }],
                     initialValue : personal.email
                 })}
