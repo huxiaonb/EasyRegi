@@ -82,9 +82,7 @@ class EduExp extends React.Component {
             })
         }
     }
-    validateFDate(rule, value, callback){
-        let sDate = this
-    }
+ 
     render(){
          const { getFieldDecorator, getFieldValue,getFieldProps,getFieldError } = this.props.form;
          
@@ -203,8 +201,7 @@ class EduExp extends React.Component {
                             name='erangeTime'
                             {...getFieldProps('erangeTime', {
                                 rules: [
-                                        { type:'object', required: true, message: '请选择起始日期!' },
-                                        { validator: this.validateFDate.bind(this)}
+                                        { type:'object', required: true, message: '请选择起始日期!' }
                                     ],
                             })} 
                             maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
@@ -214,7 +211,7 @@ class EduExp extends React.Component {
                         <DatePicker mode="date"
                             name='erangeTime_end'
                             {...getFieldProps('erangeTime_end', {
-                                rules: [{ type:'object', required: true, message: '请选择结束日期!' },{ validator: this.validateSDate.bind(this)}],
+                                rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
                             })} 
                             maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
                         </DatePicker>
