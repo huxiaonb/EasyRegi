@@ -1,9 +1,10 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Form, Button, Input, Select, Row, Col,message,Cascader} from 'antd'
+import {Form, Button, Input, Select, Row, Col, message, Spin} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect';
-// import Form from 'antd/lib/form'
+// import AutoComplete from 'antd/lib/auto-complete'
+// import 'antd/lib/auto-complete/style/index.less';
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
 // import Select from 'antd/lib/select'
@@ -30,7 +31,13 @@ class Login extends React.Component{
 
     state = {
         registerFlag : false,
-        province:''
+        pData: [],
+        pValue: '',
+        cValue : '',
+        cData: [],
+        thirdValue : '',
+        thdData: [],
+        fetching: false,
     }
     loginTo(){
         let {form} = this.props;
@@ -77,8 +84,101 @@ class Login extends React.Component{
             registerFlag : !this.state.registerFlag
         })
     }
+   
+    
+    filterProvince(value){
+        let localData = [...this.state.persist.provinces];
+        
+        this.setState({
+            pValue :value.split('(')[0],
+            pData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
+        })
+    }
+    filterSecCity(value){
+        let localData = [...this.state.persist.citys];
+        
+        this.setState({
+            cValue : value.split('(')[0],
+            cData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
+        })
+        console.log(this.state.cData)
+    }
+    filterThdCity(value){
+        let localData = [...this.state.persist.areas];
+        
+        this.setState({
+            thirdValue : value.split('(')[0],
+            thdData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
+        })
+    }
+    
+    async getSecChildren(value){
+        this.setState({pValue:value.split('(')[0]});
+        let args = 'label='+ value.split('(')[0];
+        let r = await api.getNextGradeDistricts(args);
+        let data = await r.json();
+        if(data.success){
+            this.setState({
+                cData : data.childrens,
+                persist : {
+                    provinces : this.state.persist.provinces,
+                    citys : data.childrens
+                },
+                cValue : ''
+            })
+        }else if(data.errmsg){
+            message.error(data.errmsg); 
+        }else{
+            message.error('未知错误请联系管理员!')
+        }
+    }
+
+    async getThdChildren(value){
+        let {pValue} = this.state;
+        // let args = cValue ? 'label='+ value + '&&parentLabel=' + cValue : 'label='+ value;
+        this.setState({cValue:value.split('(')[0]});
+        let args = 'label='+ value.split('(')[0] + '&&parentLabel=' + pValue
+        console.log(args);
+        let r = await api.getNextGradeDistricts(args);
+        let data = await r.json();
+        if(data.success){
+            this.setState({
+                thdData : data.childrens,
+                persist : Object.assign(this.state.persist,{
+                    areas : data.childrens
+                }),
+                thirdValue : ''
+            });
+        }else if(data.errmsg){
+            message.error(data.errmsg);
+        }else{
+            message.error('未知错误请联系管理员!')
+        }
+    }
+
+    async componentWillMount(){
+        let r = await api.getAllProvinces();
+        let data = await r.json();
+        if(data.success){
+            this.setState({
+                persist : {
+                    provinces : data.provinces
+                },
+                pData : data.provinces
+            })
+        }else if(data.errmsg){
+            message.error(data.errmsg);
+        }else{
+            message.error('未知错误请联系管理员!')
+        }
+        
+    }
     
     render(){
+        const { fetching, pData, pValue, cValue, cData, thirdValue, thdData } = this.state;
+        // const pChildrens = pData.map(d => <Option key={`${d.value} + ${d.label}`}>{d.label}</Option>);
+        // const cChildrens = cData.map(d => <Option key={`${d.value} + ${d.label}`} >{d.label}</Option>);
+        // const tChildrens = thdData.map(d => <Option key={`${d.value} + ${d.label}`} >{d.label}</Option>);
         let {getFieldDecorator} = this.props.form;
         let {registerFlag} = this.state;
         const loginPage = (
@@ -251,13 +351,52 @@ class Login extends React.Component{
                         <FormItem
                             name='comp_addr'
                             label='公司地址'
-                            hasFeedback>
+                            
+                            >
                             {getFieldDecorator('comp_addr',{
                                 rules:[{
                                     type:'string',required:true,message:'请输入正确的公司地址!'
                                 }]
                             })(
-                                <Input className='login-text' placeholder='公司地址'/>
+                                <div>
+                                <span>省：</span>
+                                    <Select
+                                        mode="combobox"
+                                        filterOption={false}
+                                        value={this.state.pValue}
+                                        size='large'
+                                        placeholder="选择省份"
+                                        style={{width:'20%'}}
+                                        onChange={this.filterProvince.bind(this)}
+                                        onSelect={this.getSecChildren.bind(this)}
+                                        >
+                                        {pData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
+                                    </Select>
+                                    <span>市：</span>
+                                    <Select
+                                        mode="combobox"
+                                        value={this.state.cValue}
+                                        size='large'
+                                        placeholder="选择城市"
+                                        style={{width:'20%'}}                              
+                                        onSelect={this.getThdChildren.bind(this)}
+                                        onChange={this.filterSecCity.bind(this)}
+                                        >
+                                        {cData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
+                                    </Select>
+                                    <span>县/区：</span>
+                                    <Select
+                                        mode="combobox"
+                                        value={this.state.thirdValue}
+                                        size='large'
+                                        placeholder="选择县区" 
+                                        style={{width:'20%'}}                                 
+                                        onChange={this.filterThdCity.bind(this)}
+                                        >
+                                        {thdData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
+                                    </Select>
+                                    <Input className='login-text'   placeholder='具体地址'/>
+                                </div>
                             )}
                         </FormItem>
                         
