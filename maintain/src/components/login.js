@@ -1,8 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Form, Button, Input, Select, Row, Col, message, Spin} from 'antd'
+import {Form, Button, Input, Select, Row, Col, message} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect';
+import DistrictSelect from './districtSelect'
 // import AutoComplete from 'antd/lib/auto-complete'
 // import 'antd/lib/auto-complete/style/index.less';
 // import Input from 'antd/lib/input'
@@ -31,13 +32,6 @@ class Login extends React.Component{
 
     state = {
         registerFlag : false,
-        pData: [],
-        pValue: '北京市',
-        cValue : '市辖区',
-        cData: [],
-        thirdValue : '东城区',
-        thdData: [],
-        fetching: false,
     }
     loginTo(){
         let {form} = this.props;
@@ -50,22 +44,19 @@ class Login extends React.Component{
         })
         
     }
-    onChange(value){
-        this.setState({
-            province : value
-        })
-    }
+ 
     async register(){
         let {form} = this.props;
         form.validateFields(['comp_name', 'comp_alias', 'comp_pwd', 'comp_prop', 'comp_size', 'comp_phone', 'comp_contact_p', 'comp_email', 'comp_addr', 'comp_desc'],async (err, values)=>{
              if (!!err){
                  return;
              }
+             let {pValue, cValue, thirdValue} = this.refs.dSelect.state;
              let comp = Object.assign({},{
                 companyName: form.getFieldValue('comp_name'),
                 password : form.getFieldValue('comp_pwd'),
                 alias: form.getFieldValue('comp_alias'),
-                companyAddress: this.state.pValue + ' ' + this.state.cValue + ' ' + this.state.thirdValue + ' ' + form.getFieldValue('comp_addr'),
+                companyAddress: pValue + ' ' + cValue + ' ' + thirdValue + ' ' + form.getFieldValue('comp_addr'),
                 companyType: form.getFieldValue('comp_prop'),
                 companyScale: form.getFieldValue('comp_size'),
                 phoneNumber: form.getFieldValue('comp_phone'),
@@ -92,101 +83,9 @@ class Login extends React.Component{
     }
    
     
-    filterProvince(value){
-        if(!value){
-            value = ''
-        }
-        let localData = [...this.state.persist.provinces];
-        
-        this.setState({
-            pValue :value ? value.split('(')[0] : value,
-            pData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
-        })
-    }
-    filterSecCity(value){
-        let localData = [...this.state.persist.citys];
-        
-        this.setState({
-            cValue : value.split('(')[0],
-            cData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
-        })
-    }
-    filterThdCity(value){
-        let localData = [...this.state.persist.areas];
-        
-        this.setState({
-            thirdValue : value.split('(')[0],
-            thdData : localData.filter(p=>(!!~p.label.indexOf(value) || !!~p.value.indexOf(value)))
-        })
-    }
     
-    async getSecChildren(value){
-        this.setState({pValue:value.split('(')[0]});
-        let args = 'label='+ value.split('(')[0];
-        let r = await api.getNextGradeDistricts(args);
-        let data = await r.json();
-        if(data.success){
-            this.setState({
-                cData : data.childrens,
-                thdData :[],
-                persist : {
-                    provinces : this.state.persist.provinces,
-                    citys : data.childrens
-                },
-                cValue : '',
-                thirdValue : ''
-            })
-        }else if(data.errmsg){
-            message.error(data.errmsg); 
-        }else{
-            message.error('未知错误请联系管理员!')
-        }
-    }
-
-    async getThdChildren(value){
-        let {pValue} = this.state;
-        this.setState({cValue:value.split('(')[0]});
-        let args = 'label='+ value.split('(')[0] + '&&parentLabel=' + pValue
-        let r = await api.getNextGradeDistricts(args);
-        let data = await r.json();
-        if(data.success){
-            this.setState({
-                thdData : data.childrens,
-                persist : Object.assign(this.state.persist,{
-                    areas : data.childrens
-                }),
-                thirdValue : ''
-            });
-        }else if(data.errmsg){
-            message.error(data.errmsg);
-        }else{
-            message.error('未知错误请联系管理员!')
-        }
-    }
-
-    async componentWillMount(){
-        let r = await api.getAllProvinces();
-        let data = await r.json();
-        if(data.success){
-            this.setState({
-                persist : {
-                    provinces : data.provinces
-                },
-                pData : data.provinces
-            })
-        }else if(data.errmsg){
-            message.error(data.errmsg);
-        }else{
-            message.error('未知错误请联系管理员!')
-        }
-        
-    }
     
     render(){
-        const { fetching, pData, pValue, cValue, cData, thirdValue, thdData } = this.state;
-        // const pChildrens = pData.map(d => <Option key={`${d.value} + ${d.label}`}>{d.label}</Option>);
-        // const cChildrens = cData.map(d => <Option key={`${d.value} + ${d.label}`} >{d.label}</Option>);
-        // const tChildrens = thdData.map(d => <Option key={`${d.value} + ${d.label}`} >{d.label}</Option>);
         let {getFieldDecorator} = this.props.form;
         let {registerFlag} = this.state;
         const loginPage = (
@@ -367,50 +266,8 @@ class Login extends React.Component{
                                 }]
                             })(
                                 <div>
-                                <span >省：</span>
-                                    <Select
-                                        mode="combobox"
-                                        filterOption={false}
-                                        value={this.state.pValue}
-                                        size='large'
-                                        allowClear
-                                        placeholder="选择省份"
-                                        style={{width:'20%'}}
-                                        defaultActiveFirstOption={true}
-                                        onChange={this.filterProvince.bind(this)}
-                                        onSelect={this.getSecChildren.bind(this)}
-                                        >
-                                        {pData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
-                                    </Select>
-                                    <span style={{paddingLeft : '10px'}}>市：</span>
-                                    <Select
-                                        mode="combobox"
-                                        value={this.state.cValue}
-                                        size='large'
-                                        allowClear
-                                        placeholder="选择城市"
-                                        defaultActiveFirstOption={true}
-                                        style={{width:'20%'}}                             
-                                        onSelect={this.getThdChildren.bind(this)}
-                                        onChange={this.filterSecCity.bind(this)}
-                                        >
-                                        {cData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
-                                    </Select>
-                                    <span style={{paddingLeft : '10px'}}>县/区：</span>
-                                    <Select
-                                        mode="combobox"
-                                        value={this.state.thirdValue}
-                                        size='large'
-                                        placeholder="选择县区" 
-                                        allowClear
-                                        defaultActiveFirstOption={true}
-                                        style={{width:'20%'}}                                 
-                                        onChange={this.filterThdCity.bind(this)}
-                                        >
-                                        {thdData.map(d => <Option key={`${d.label}(${d.value})`}>{d.label}</Option>)}
-                                    </Select>
-                                    <div> 
-                                        <span>详细地址：</span><Input style={{marginTop:'10px',width:'70%'}} placeholder='请输入详细地址'/></div>
+                                    <DistrictSelect ref='dSelect'/>
+                                    <div><span>详细地址：</span><Input style={{marginTop:'10px',width:'70%'}} placeholder='请输入详细地址'/></div>
                                 </div>
                             )}
                         </FormItem>

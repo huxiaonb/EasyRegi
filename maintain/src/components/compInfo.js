@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import {Button, Input, DatePicker, Row, Col,Form,Select,message} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
+import DistrictSelect from './districtSelect'
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -35,10 +36,11 @@ class CompInfo extends React.Component{
     async editCompInfo(){
         if(this.state.editFlag){
             let {form} = this.props;
+            let {pValue, cValue, thirdValue} = this.refs.dSelect.state;
             let compInfo = Object.assign({},{
                 companyName: form.getFieldValue('comp_name'),
                 alias: form.getFieldValue('comp_alias'),
-                companyAddress: form.getFieldValue('comp_addr'),
+                companyAddress: pValue + ' ' + cValue + ' ' + thirdValue + ' ' +  form.getFieldValue('comp_addr'),
                 companyType: form.getFieldValue('comp_prop'),
                 companyScale: form.getFieldValue('comp_size'),
                 phoneNumber: form.getFieldValue('comp_phone'),
@@ -200,7 +202,10 @@ class CompInfo extends React.Component{
                                     type:'string',required:true,message:'请输入正确的公司地址!'
                                 }],initialValue:comp.companyAddress
                             })(
-                                <Input className='login-text' placeholder='公司地址'/>
+                                <div>
+                                    <DistrictSelect refs='c_dSelect'/>
+                                    <div><span>详细地址：</span><Input style={{marginTop:'10px',width:'70%'}} placeholder='请输入详细地址'/></div>
+                                </div>
                             )}
                         </FormItem>
                         
