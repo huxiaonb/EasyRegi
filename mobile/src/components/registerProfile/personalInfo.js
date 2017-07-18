@@ -13,6 +13,7 @@ import  '../less/index.less';
 // import DatePicker from 'antd/lib/date-picker'
 // import Card from 'antd/lib/card'
 import Upload from 'antd/lib/upload';
+import lapi from './lapi'
 // import Icon from 'antd/lib/icon';
 // import Modal from 'antd/lib/modal';
  
@@ -65,6 +66,8 @@ class PersonalInfo extends React.Component {
                  birthDate : form.getFieldValue('birthDate'),
                  healthState : form.getFieldValue('healthState'),
                  idCardNumber : form.getFieldValue('idCardNumber'),
+                 issuingAuthority: form.getFieldValue('issuingAuthority'),
+                 nativePlace: form.getFieldValue('nativePlace'),
                  homeAddress : form.getFieldValue('homeAddress'),
                  currentAddress : form.getFieldValue('currentAddress'),
                  mobile : form.getFieldValue('mobile'),
@@ -105,6 +108,8 @@ class PersonalInfo extends React.Component {
                 birthDate : personal.birthDate,
                 healthState : personal.healthState,
                 idCardNumber : personal.idCardNumber,
+                issuingAuthority: personal.issuingAuthority,
+                nativePlace: personal.nativePlace,
                 homeAddress : personal.homeAddress,
                 currentAddress : personal.currentAddress,
                 mobile : personal.mobile,
@@ -122,6 +127,28 @@ class PersonalInfo extends React.Component {
     upChange(info){
         let fileList = info.fileList;
         this.setState({fileList});
+    }
+
+    async getIdCardInfo() {
+        let {form} = this.props;
+        let idCardNumReg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
+        let idCardNumber = form.getFieldValue('idCardNumber');
+        if(!idCardNumReg.test(idCardNumber)){
+            Toast.info('请输入有效的身份证号码！', 1);
+            return;
+        }
+        Toast.loading('载入籍贯...', 5, ()=>{}, true);
+        let res = await lapi.getIdCardInfo(idCardNumber);
+        if(!!res && res.status == 0){
+            console.log(res.result);
+            if(!!res.result && !!res.result.area){
+                let area = res.result.area.replace(/\s/g, '');
+                form.setFieldsValue({
+                    nativePlace: area
+                });
+            }
+        }
+        Toast.hide();
     }
     beforeUpload(file) {
         const isLt2M = file.size / 1024 / 1024 < 5;
@@ -228,6 +255,7 @@ class PersonalInfo extends React.Component {
                 style={{color:'inherit'}}
                 label="身份证号码"
                 name="idCardNumber"
+                onBlur={()=>this.getIdCardInfo()}
                 {...getFieldProps('idCardNumber', {
                     rules:[{
                         type:'string', pattern:/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/, message:'请输入有效的身份证号码！'

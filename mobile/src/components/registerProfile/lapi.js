@@ -72,5 +72,12 @@ export default {
             url: '../weChat/getAllCompanyNames',
             type: 'GET'
         })
+    },
+    getIdCardInfo(idCardNum){
+        return _request({
+            url: 'http://api.jisuapi.com/idcard/query?appkey=6d8934f38525ce7e&idcard='+idCardNum, //342422199209201753
+            type: 'GET',
+            dataType: 'JSONP'
+        })
     }
 }
