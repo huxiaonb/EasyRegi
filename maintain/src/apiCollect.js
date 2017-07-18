@@ -221,6 +221,14 @@ export default{
              body:JSON.stringify(data)
         });
     },
+    getAllProvinces(){
+        let url = '../api/district/getAllProvinces'
+        return fetch(url);
+    },
+    getNextGradeDistricts(value){
+        let url = '../api/district/getChildrens?' + value;
+        return fetch(url);
+    },
     testSendEmail(){
         //获取当前公司所有职位信息
         let url = '../account/email/send/test'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
