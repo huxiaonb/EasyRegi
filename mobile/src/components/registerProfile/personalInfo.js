@@ -221,7 +221,7 @@ class PersonalInfo extends React.Component {
   }
     render(){
         const uploadButton = ( <Button>
-                            <Icon type="upload" /> Click to Upload
+                            <Icon type="upload" /> 上传照片
                         </Button>);
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let nationOptions = [],
@@ -315,7 +315,8 @@ class PersonalInfo extends React.Component {
                 <DatePicker mode="date"
                     name='validFrom'
                     {...getFieldProps('validFrom', {
-                        rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
+                        rules: [{ type:'object', required: true, message: '请选择有效期开始时间!' }],
+                        initialValue : personal.validFrom
                     })} 
                     maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期起</List.Item>
                 </DatePicker>
@@ -324,7 +325,8 @@ class PersonalInfo extends React.Component {
                 <DatePicker mode="date"
                     name='validTo'
                     {...getFieldProps('validTo', {
-                        rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
+                        rules: [{ type:'object', required: true, message: '请选择有效期结束时间!' }],
+                        initialValue : personal.validTo
                     })} 
                     maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期止</List.Item>
                 </DatePicker>

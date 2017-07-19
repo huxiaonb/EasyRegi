@@ -28,7 +28,8 @@ var educationHistorySchema = new Schema({
         '0' --- 毕业,
         '1' --- 肄业
     */ 
-    isGraduated: String
+    isGraduated: String,
+    degree: String
 });
 
 var registeredCompanySchema = new Schema({
@@ -78,6 +79,10 @@ var applicantSchema = new Schema({
     qqNumber: String,
     photoName: String,
     idCardPhotoName: String,
+    validFrom: Date,
+    validTo: Date,
+    issuingAuthority: String,
+    nativePlace: String,
     familyMembers: [familyMemberSchema],
     educationHistories: [educationHistorySchema],
     workExperiences: [workExperienceSchema],
