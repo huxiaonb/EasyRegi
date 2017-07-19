@@ -50,11 +50,12 @@ class WorkExp extends React.Component {
         const { form } = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
+        console.log(keys);
         if(keys.length === 5){
             return;
         }
          if(!uuid){
-            uuid = workExps.length ? fms : uuid++;
+            uuid = workExps.length ? workExps.length : uuid++;
         }
         uuid ++;
         const nextKeys = keys.concat(uuid);
@@ -102,7 +103,7 @@ class WorkExp extends React.Component {
 
         this.props.wkeys ? getFieldDecorator('keys', { initialValue: this.props.wkeys}) : getFieldDecorator('keys', { initialValue: []});
         //待测：解决刷新之后 再进入页面不能显示多条经历记录  可能导致其他的bug
-        uuid = this.props.wkeys ? this.props.wkeys.length : 0;
+        //uuid = this.props.wkeys ? this.props.wkeys.length : 0;
         const keys = getFieldValue('keys');
         const formItems = keys.map((key, index) => {
             return (

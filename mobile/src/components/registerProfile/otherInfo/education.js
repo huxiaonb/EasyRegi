@@ -51,11 +51,12 @@ class EduExp extends React.Component {
         const { form } = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
+        console.log(keys);
         if(keys.length === 5){
             return;
         }
          if(!uuid){
-            uuid = s ? edus.length : uuid++;
+            uuid = edus.length ? edus.length : uuid++;
         }
         uuid ++;
         const nextKeys = keys.concat(uuid);
@@ -105,7 +106,7 @@ class EduExp extends React.Component {
         let initialValue = [];
         
         this.props.ekeys ? getFieldDecorator('keys', { initialValue: this.props.ekeys }) : getFieldDecorator('keys', { initialValue: [] });
-        uuid = this.props.ekeys ? this.props.ekeys.length : 0; 
+        //uuid = this.props.ekeys ? this.props.ekeys.length : 0; 
         const keys = getFieldValue('keys');
         const formItems = keys.map((key, index) => {
             return (
