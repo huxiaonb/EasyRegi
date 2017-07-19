@@ -64,6 +64,7 @@ export default class OhterInfo extends React.Component {
                  date : [eduF.getFieldValue('erangeTime'), eduF.getFieldValue('erangeTime_end')],
                  major : eduF.getFieldValue('position'),
                  isGraduated : eduF.getFieldValue('grad'),
+                 degree: eduF.getFieldValue('degree')
              })];
              
              keys.map((key, index) => {
@@ -72,6 +73,7 @@ export default class OhterInfo extends React.Component {
                     date : [eduF.getFieldValue('erangeTime_'+ key), eduF.getFieldValue('erangeTime_end_'+ key)],
                     major : eduF.getFieldValue('position_'+ key),
                     isGraduated : eduF.getFieldValue('grad_'+ key),
+                    degree: eduF.getFieldValue('degree_' + key)
                  });
                  eduFs.push(fmObj);
              })

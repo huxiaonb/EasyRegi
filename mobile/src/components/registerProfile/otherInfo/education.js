@@ -28,6 +28,7 @@ import moment from 'moment';
 const FormItem = List.Item;
 const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const minDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const degreeOpt = [{value: '小学', label: '小学'},{value: '初中', label: '初中'},{value: '高中', label: '高中'},{value: '中专', label: '中专'},{value: '大专', label: '大专'},{value: '本科', label: '本科'},{value: '硕士', label: '硕士'},{value: '博士', label: '博士'}];
 
 let uuid = 0;
 class EduExp extends React.Component {
@@ -68,7 +69,8 @@ class EduExp extends React.Component {
                     ['erangeTime_' + idx] : wk.date[0],
                     ['erangeTime_end_' + idx] : wk.date[1],
                     ['position_' + idx] : wk.major,
-                    ['grad_' + idx] : wk.isGraduated
+                    ['grad_' + idx] : [wk.isGraduated],
+                    ['degree_' + idx]: [wk.degree]
                 })  
             }else{
                 form.setFieldsValue({
@@ -76,7 +78,8 @@ class EduExp extends React.Component {
                     erangeTime : wk.date[0],
                     erangeTime_end : wk.date[1],
                     position : wk.major,
-                    grad : wk.isGraduated
+                    grad : [wk.isGraduated],
+                    degree: [wk.degree]
                 })
             }
             })
@@ -119,7 +122,26 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        姓名
+                        学校
+                    </InputItem>
+                     <InputItem
+                        name={`position_${key}`}
+                        {...getFieldProps(`position_${key}`, {
+                            rules: [{
+                                required: true, 
+                                whitespace : true,
+                                maxLenght : 20,
+                                message: '请输入有效的专业！'
+                            }]
+                        })}
+                        clear
+                        error={!!getFieldError(`position_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`position_${key}`).join('、'));
+                        }}
+                        placeholder="请输入专业！"
+                        >
+                        专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -140,25 +162,19 @@ class EduExp extends React.Component {
                         </DatePicker>
                      </FormItem>
                     
-                    <InputItem
-                        name={`position_${key}`}
-                        {...getFieldProps(`position_${key}`, {
-                            rules: [{
-                                required: true, 
-                                whitespace : true,
-                                maxLenght : 10,
-                                message: '请输入有效的专业！'
+                   <FormItem>                
+                        <Picker 
+                            cols={1}
+                            {...getFieldProps(`degree_${key}`, {
+                            rules:[{
+                                required:true, message:'请选择学历！'
                             }]
-                        })}
-                        clear
-                        error={!!getFieldError(`position_${key}`)}
-                        onErrorClick={() => {
-                            Toast.info(getFieldError(`position_${key}`).join('、'));
-                        }}
-                        placeholder="请输入专业！"
-                        >
-                        专业
-                    </InputItem>
+                            })}
+                            data={degreeOpt}
+                            >
+                            <List.Item arrow="horizontal" name={`degree_${key}`} style={{padding : 0}}>学历</List.Item>
+                        </Picker>
+                    </FormItem>
                     <FormItem>                
                         <Picker 
                             cols={1}
@@ -194,7 +210,26 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        姓名
+                        学校
+                    </InputItem>
+                    <InputItem
+                        name="position"
+                        {...getFieldProps('position', {
+                            rules: [{
+                                required: true, 
+                                whitespace : true,
+                                maxLenght : 20,
+                                message: '请输入有效的专业！'
+                            }]
+                        })}
+                        clear
+                        error={!!getFieldError('position')}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError('position').join('、'));
+                        }}
+                        placeholder="请输入专业！"
+                        >
+                        专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -217,25 +252,19 @@ class EduExp extends React.Component {
                         </DatePicker>
                      </FormItem>
                     
-                    <InputItem
-                        name="position"
-                        {...getFieldProps('position', {
-                            rules: [{
-                                required: true, 
-                                whitespace : true,
-                                maxLenght : 10,
-                                message: '请输入有效的专业！'
+                    <FormItem>                
+                        <Picker 
+                            cols={1}
+                            {...getFieldProps('degree', {
+                            rules:[{
+                                required:true, message:'请选择学历！'
                             }]
-                        })}
-                        clear
-                        error={!!getFieldError('position')}
-                        onErrorClick={() => {
-                            Toast.info(getFieldError('position').join('、'));
-                        }}
-                        placeholder="请输入专业！"
-                        >
-                        专业
-                    </InputItem>
+                            })}
+                            data={degreeOpt}
+                            >
+                            <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>学历</List.Item>
+                        </Picker>
+                    </FormItem>
                     <FormItem>                
                         <Picker 
                             cols={1}

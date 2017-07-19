@@ -114,6 +114,7 @@ class Index extends React.Component {
           colledgeName : ed.colledgeName,
           major : ed.major,
           isGraduated : ed.isGraduated,
+          degree: ed.degree,
           startedAt : edate[0].toDate(),
           endedAt : edate[1].toDate()
         };

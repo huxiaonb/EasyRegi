@@ -68,7 +68,7 @@ class WorkExp extends React.Component {
                         ['rangeTime_' + idx] : wk.date[0],
                         ['rangeTime_end_' + idx] : wk.date[1],
                         ['position_' + idx] : wk.title,
-                        ['salary_' + idx] : wk.salaryRange
+                        ['salary_' + idx] : [wk.salaryRange]
                     })  
                 }else{
                     form.setFieldsValue({
@@ -76,7 +76,7 @@ class WorkExp extends React.Component {
                         rangeTime : wk.date[0],
                         rangeTime_end : wk.date[1],
                         position : wk.title,
-                        salary : wk.salaryRange
+                        salary : [wk.salaryRange]
                     })
                 }
             });
