@@ -46,11 +46,17 @@ class WorkExp extends React.Component {
     }
 
     add(){
-        uuid++;
-        if(uuid>5) return;
+        let {workExps} = this.props;
         const { form } = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
+        if(keys.length === 5){
+            return;
+        }
+         if(!uuid){
+            uuid = workExps.length ? fms : uuid++;
+        }
+        uuid ++;
         const nextKeys = keys.concat(uuid);
         // can use data-binding to set
         // important! notify form to detect changes

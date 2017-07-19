@@ -108,11 +108,19 @@ class FamilyInfo extends React.Component {
     }
 
     add(){
-        uuid++;
-        if(uuid>5) return;
+        let fms = this.context.profile.family.family.length;
+        
         const { form } = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
+        // console.log(keys);
+        if(keys.length === 5){
+            return;
+        }
+         if(!uuid){
+            uuid = fms ? fms : uuid++;
+        }
+        uuid ++;
         const nextKeys = keys.concat(uuid);
         // can use data-binding to set
         // important! notify form to detect changes
@@ -223,7 +231,7 @@ class FamilyInfo extends React.Component {
                         }}
                         placeholder="请输入联系手机">联系手机
                     </InputItem>
-                 <FormItem extra={<CheckboxItem {...getFieldProps('1', { initialValue: false, valuePropName: 'checked' })} />}>
+                 <FormItem extra={<CheckboxItem {...getFieldProps(`em_check_${key}`, { initialValue: false, valuePropName: 'checked' })} />}>
                     标记为紧急联系人
                  </FormItem>
                 </Card>
@@ -283,7 +291,7 @@ class FamilyInfo extends React.Component {
                         }}
                         placeholder="请输入联系手机">联系手机
                     </InputItem>
-                    <FormItem extra={<CheckboxItem {...getFieldProps('1', { initialValue: true, valuePropName: 'checked' })} />}>
+                    <FormItem extra={<CheckboxItem {...getFieldProps('em_check', { initialValue: true, valuePropName: 'checked' })} />}>
                         标记为紧急联系人
                     </FormItem>
                     </Card>
