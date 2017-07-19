@@ -28,7 +28,8 @@ var educationHistorySchema = new Schema({
         '0' --- 毕业,
         '1' --- 肄业
     */ 
-    isGraduated: String
+    isGraduated: String,
+    degree: String
 });
 
 var registeredCompanySchema = new Schema({
