@@ -74,7 +74,7 @@ class FamilyInfo extends React.Component {
              //set value to context
              let familyInfos = [Object.assign({},{
                  name : form.getFieldValue('name'),
-                 relationship : form.getFieldValue('relationship1'),
+                 relationship : form.getFieldValue('relationship'),
                  phoneNumber : form.getFieldValue('mphoneNumber'),
                  emergencyFlag : form.getFieldValue('em_check')
              })];
@@ -123,7 +123,7 @@ class FamilyInfo extends React.Component {
 
    
     componentDidMount(){
-        //set value
+        //set value fm.relationship.length ? fm.relationship : [fm.relationship]
         let {form} = this.props;
         let family = this.context.profile.family;
         let fms = family.family;
@@ -132,14 +132,14 @@ class FamilyInfo extends React.Component {
             if(idx){
                 form.setFieldsValue({
                     ['name_'+ idx]: fm.name,
-                    ['relationship_' + idx] : fm.relationship,
+                    ['relationship_' + idx] : [fm.relationship],
                     ['mphoneNumber_' + idx] : fm.phoneNumber,
                     ['em_check_' + idx] : fm.emergencyFlag
                 })
             }else{
                 form.setFieldsValue({
                     name : fm.name,
-                    relationship : fm.relationship,
+                    relationship : [fm.relationship],
                     mphoneNumber : fm.phoneNumber,
                     em_check : fm.emergencyFlag
                 })
@@ -178,7 +178,7 @@ class FamilyInfo extends React.Component {
                     <Card.Header title={noti} extra={<span title='删除此列'><Icon onClick={() => this.remove(key)} style={{cursor: 'pointer',transition: 'all .3s'}} type='cross'/></span>}>
                     </Card.Header>
                     <InputItem
-                        name="name"
+                        name={`name_${key}`}
                         {...getFieldProps(`name_${key}`, {
                             rules:[{
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
@@ -205,7 +205,7 @@ class FamilyInfo extends React.Component {
                             })}
                             data={relations}
                             >
-                            <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>关系</List.Item>
+                            <List.Item arrow="horizontal" name={`relationship_${key}`} style={{padding : 0}}>关系</List.Item>
                         </Picker>
                     </FormItem>
                     <InputItem
@@ -258,14 +258,14 @@ class FamilyInfo extends React.Component {
                     <FormItem>
                         <Picker 
                             cols={1}
-                            {...getFieldProps('relationship1', {
+                            {...getFieldProps('relationship', {
                                 rules:[{
                                     required:true, message:'请选择关系！'
                                 }],initialValue:['父母']
                             })}
                             data={relations}
                             >
-                            <List.Item arrow="horizontal" name="relationship1" style={{padding : 0}}>关系</List.Item>
+                            <List.Item arrow="horizontal" name='relationship' style={{padding : 0}}>关系</List.Item>
                         </Picker>
                     </FormItem>
                     <InputItem

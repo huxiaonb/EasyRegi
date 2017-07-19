@@ -110,6 +110,7 @@ class PersonalInfo extends React.Component {
                  tele : form.getFieldValue('tele'),
                  qqNumber : form.getFieldValue('qqNumber')
              })
+             console.log(personalInfo);
              this.context.updateProfile({personalInfo,flag:1});
              this.props.next();
         });
@@ -345,7 +346,7 @@ class PersonalInfo extends React.Component {
                     <Picker 
                         cols={1}
                         name="folk"
-                        {...getFieldProps('data', {
+                        {...getFieldProps('folk', {
                             rules:[{
                                 required:true, message:'请选择民族！'
                             }],
