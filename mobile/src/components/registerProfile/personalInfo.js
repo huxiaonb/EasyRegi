@@ -507,7 +507,7 @@ class PersonalInfo extends React.Component {
                 )}
              </FormItem>
         </List>
-         <Button type="primary" inline onClick={this.nextStep.bind(this)}>下一步</Button>
+         <Button type="primary" onClick={this.nextStep.bind(this)}>下一步</Button>
         </form>
         )}
 }

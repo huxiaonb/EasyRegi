@@ -163,7 +163,14 @@ class FamilyInfo extends React.Component {
         const noti = (
             <Badge dot>
                 <span title='新增的家庭成员' style={{color:'#108ee9',cursor:'pointer'}}>
-                    家庭成员
+                    新增的家庭成员
+                </span>
+            </Badge>
+        );
+        const notiNodot = (
+            <Badge dot>
+                <span title='家庭成员(最多6条)' style={{color:'#108ee9',cursor:'pointer'}}>
+                    家庭成员(最多6条)
                 </span>
             </Badge>
         )
@@ -240,9 +247,11 @@ class FamilyInfo extends React.Component {
         
         return(
             <div key='fam_info'>
-                <Card title="家庭成员(最多6条)">
+                <Card>
                     <form>
                     <Card>
+                    <Card.Header title={notiNodot} >
+                    </Card.Header>
                      <InputItem
                         name="name"
                         {...getFieldProps('name', {

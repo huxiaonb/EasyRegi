@@ -103,6 +103,11 @@ class EduExp extends React.Component {
                 </span>
             </Badge>
         )
+        const notiNodot = (
+                <span title='教育经历' style={{color:'#108ee9',cursor:'pointer'}}>
+                    教育经历
+                </span>
+        )
         let initialValue = [];
         
         this.props.ekeys ? getFieldDecorator('keys', { initialValue: this.props.ekeys }) : getFieldDecorator('keys', { initialValue: [] });
@@ -201,6 +206,8 @@ class EduExp extends React.Component {
                 <Card title="教育经历">
                     <form>
                     <Card>
+                    <Card.Header title={notiNodot} >
+                    </Card.Header>
                     <InputItem
                         name="title"
                         {...getFieldProps('title', {

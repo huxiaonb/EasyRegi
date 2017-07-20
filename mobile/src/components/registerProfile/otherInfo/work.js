@@ -100,6 +100,11 @@ class WorkExp extends React.Component {
                 </span>
             </Badge>
         )
+        const notiNodot = (
+                <span title='教育经历' style={{color:'#108ee9',cursor:'pointer'}}>
+                    工作经历
+                </span>
+        )
 
         this.props.wkeys ? getFieldDecorator('keys', { initialValue: this.props.wkeys}) : getFieldDecorator('keys', { initialValue: []});
         //待测：解决刷新之后 再进入页面不能显示多条经历记录  可能导致其他的bug
@@ -186,10 +191,10 @@ class WorkExp extends React.Component {
                 
                 /* 工作经历 */
                 <Card>
-                    <Card.Header title="工作经历">
-                    </Card.Header>
                     <form>
                     <Card>
+                    <Card.Header title={notiNodot} >
+                    </Card.Header>
                     <InputItem
                         name="title"
                         {...getFieldProps('title', {
