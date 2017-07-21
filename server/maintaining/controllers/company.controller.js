@@ -338,12 +338,18 @@ function registerCompany(req, res, next){
         email = _.get(req, ['body', 'email'], ''),
         pwd = _.get(req, ['body', 'password'], '');
     if(_.isEmpty(email) || _.isEmpty(pwd)){
-        res.status(500).send({success: false, errmsg: 'email and password are required'});
+        res.status(500).send({success: false, errmsg: '邮箱及密码是必填的'});
     } else {
-        Company.findOne({email: email}, function(err1, dbCompany){
+        var queryCriteria = {$or: []};
+        queryCriteria.$or.push({email: email});
+        var companyName = _.get(req, ['body', 'companyName'], '');
+        console.log(companyName)
+        if(!_.isEmpty(companyName))
+            queryCriteria.$or.push({companyName: companyName});
+        Company.findOne(queryCriteria, function(err1, dbCompany){
             if(err1) {
                 console.log('Error in finding company by email', email, err1);
-                res.status(500).send({success: false, errmsg: 'Error in find company by company email'});
+                res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
             } else if(_.isEmpty(dbCompany)){
                 console.log('no comany found, system will create new account for company');
                 var companyEntity = new Company(companyItem);
@@ -352,7 +358,7 @@ function registerCompany(req, res, next){
                 Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
                     if(error) {
                         console.log('Error in saving company', error)
-                        res.status(500).send({success: false, errmsg: 'Error in saving company'});
+                        res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
                     } else {
                         Company.findOne({email: email}, function(err2, data){
                             crypto.randomBytes(20, function(err3, buf){
@@ -376,7 +382,7 @@ function registerCompany(req, res, next){
                                 sendVerificationEmail(emailOpt, function(err4, emailResult){
                                     if(err4) {
                                         console.log('Error in sending verification email', err4);
-                                        res.status(500).send({success: false, errmsg: 'Error in sending verification email'});
+                                        res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
                                     } else {
                                         Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
                                             if(err5) {
@@ -395,7 +401,10 @@ function registerCompany(req, res, next){
                 });
             } else {
                 console.log('Company already exists');
-                res.status(500).send({success: false, errmsg: 'email has been registered'});
+                if(dbCompany.email == email)
+                    res.status(500).send({success: false, errmsg: '邮箱已经被注册'});
+                else 
+                    res.status(500).send({success: false, errmsg: '公司名称已存在'});
             }
         });
 
