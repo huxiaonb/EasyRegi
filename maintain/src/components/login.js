@@ -91,7 +91,7 @@ class Login extends React.Component{
         const loginPage = (
             <div className='login-background'>
                 <div className='loginForm'>
-                    <h1 className='login-title'>入职易后台管理</h1>
+                    <h1 className='login-title' style={{color:'#ffffff'}}>入职易员工招募平台</h1>
                     
                         <FormItem
                             name='login_acc'
