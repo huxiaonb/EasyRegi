@@ -10,3 +10,28 @@
 .user-right{
     float:right !important;
 }
+.nav-text{
+    text-align: left;
+    font-size: 1rem;
+    margin-left: 25px;
+}
+@-webkit-keyframes rotation{
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(360deg);}
+}
+.index-logo{
+    width : 40px;
+    height : 40px;
+    margin : 20px auto;
+    border-radius : 20px;
+    background-repeat:no-repeat;
+    background-size:100% 100%;
+    -moz-background-size:100% 100%;
+    background-image: url(./assets/images/logo.jpg);
+    -webkit-transform: rotate(360deg);
+    animation: rotation 3s linear infinite;
+    -moz-animation: rotation 3s linear infinite;
+    -webkit-animation: rotation 3s linear infinite;
+    -o-animation: rotation 3s linear infinite;
+    
+}

@@ -90,16 +90,18 @@ class Index extends React.Component {
       (<div>
         <Layout className='main-container'>
            <Sider>
-              <div style={{fontSize:'24px',color:'white',margin:'20px 0'}}>入职易</div>
+           
+              <div className='index-logo' />
+ 
               <Menu theme='dark' mode='inline'>
-                <Menu.Item key="1">
-                  <Link to='/comp' className="nav-text">公司信息</Link>
+                <Menu.Item key="1" style={{marginTop: '10px'}}>
+                  <Link to='/comp' className="nav-text"><Icon type="info-circle-o" />公司信息</Link>
                 </Menu.Item>
-                <Menu.Item key="2">
-                  <Link to='/applicant' className="nav-text">入职员工</Link>
+                <Menu.Item key="2" style={{marginTop: '10px'}}>
+                  <Link to='/applicant' className="nav-text"><Icon type="solution" />入职员工</Link>
                 </Menu.Item>
-                <Menu.Item key="3">
-                  <Link to='/position' className="nav-text">在招职位</Link>
+                <Menu.Item key="3" style={{marginTop: '10px'}}>
+                  <Link to='/position' className="nav-text"><Icon type="file" />在招职位</Link>
                 </Menu.Item>
               </Menu>
             </Sider>

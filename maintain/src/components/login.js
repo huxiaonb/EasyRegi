@@ -90,9 +90,10 @@ class Login extends React.Component{
         let {registerFlag} = this.state;
         const loginPage = (
             <div className='login-background'>
+            
                 <div className='loginForm'>
+                    <div className='login-logo' />
                     <h1 className='login-title' style={{color:'#ffffff'}}>入职易员工招募平台</h1>
-                    
                         <FormItem
                             name='login_acc'
                             hasFeedback>
