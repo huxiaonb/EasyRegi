@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 
 import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace} from 'antd-mobile'
-import district from 'antd-mobile-demo-data'
+
 
 import lapi from './registerProfile/lapi'
 import './less/index.less'

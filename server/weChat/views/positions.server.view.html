@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="description" content="入职易">
+    <meta name="keywords" content="wps, security, document">
+    <title>
+         入职易
+    </title>
+    <!-- Bootstrap core CSS 
+    <link href="./css/framework7.material.colors.min.css" rel="stylesheet">
+    <link href="./css/framework7.material.min.css" rel="stylesheet">-->
+    <script type="text/javascript" src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
+    <script src="../dist/mobile/antm-viewport.min.js">
+    </script>
+    <link href="../dist/mobile/index.css?12345" rel="stylesheet">
+    <script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"></script>
+</head>
+
+
+<body>
+
+    <div id='location'>
+        
+    </div>
+
+</body>
+
+    </script>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./lib/underscore-min.js"></script>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="../dist/mobile/index.js?12345"></script>
+    <script type="text/javascript">
+        if(!window.Promise) {
+            console.log('no promise')
+            document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
+        }
+        $(_.once(function(){
+            var geolocation = new qq.maps.Geolocation("HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ", "location");
+            geolocation.getLocation(function(position){
+                var location = JSON.stringify(position)
+                Lego('#location').nearByPositions(position);
+            },function(){
+                Lego('#location').nearByPositions(false);
+            });
+            
+        }))
+    </script>
+</html>
+

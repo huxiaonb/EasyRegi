@@ -133,6 +133,10 @@ exports.maintainn = function(req, res) {
   res.render('server/weChat/views/index');
 }
 
+exports.positions = function(req, res) {
+  res.render('server/weChat/views/positions');
+}
+
 
 exports.getOpenIdAndAuthAccessToken = function(req, res, next){
   // return function(req, res, next){
