@@ -7,7 +7,7 @@ import webpack from 'webpack'
 import nodemon from 'gulp-nodemon'
 import config  from './config/config'
 import webpackConfig from './webpack.config.babel'
-import webpackMobileConfig from './mobile/webpack.config'
+import webpackMobileConfig from './mobile/webpack.config.babel'
 
 
 
@@ -22,7 +22,7 @@ gulp.task('webpack-watch', () => {
     });
 })
 gulp.task('webpack-build', () => {
-    webpack(webpackConfig).run((err, stats) => {
+    webpack([webpackConfig,webpackMobileConfig]).run((err, stats) => {
         console.log(stats.toString({
             colors: true,
             chunks: false

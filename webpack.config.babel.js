@@ -74,7 +74,7 @@ const config = {
 }
 
 if(process.env.NODE_ENV === 'production'){
-        plugins.push(new webpack.optimize.UglifyJsPlugin({
+        config.plugins.push(new webpack.optimize.UglifyJsPlugin({
             mangle: {
                 except: ['$super', '$', 'exports', 'require', 'import', 'export']
             },

@@ -3,10 +3,10 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const pxtorem = require('postcss-pxtorem');
+const isPro = process.env.NODE_ENV === "production"
 
 
-
-module.exports = {
+const config = {
   
 
   entry: { "index": path.resolve(__dirname, './src/entry') },
@@ -56,7 +56,16 @@ module.exports = {
     pxtorem({ rootValue: 100, propWhiteList: [] })
   ],
   
+ 
   plugins: [
+    // new webpack.optimize.UglifyJsPlugin({
+    //         mangle: {
+    //             except: ['$super', '$', 'exports', 'require', 'import', 'export']
+    //         },
+    //         compress: {
+    //             warnings: false
+    //         }
+    //     }),
     // new webpack.optimize.CommonsChunkPlugin('shared.js'),
     // new webpack.optimize.CommonsChunkPlugin({
     //   // minChunks: 2,
@@ -64,5 +73,17 @@ module.exports = {
     //   filename: 'shared.js'
     // }),
     new ExtractTextPlugin('[name].css', { allChunks: true }),
-  ]
+  ],
+  
 }
+  if(isPro){
+        config.plugins.push(new webpack.optimize.UglifyJsPlugin({
+            mangle: {
+                except: ['$super', '$', 'exports', 'require', 'import', 'export']
+            },
+            compress: {
+                warnings: false
+            }
+        }))
+  }
+  export default config;
