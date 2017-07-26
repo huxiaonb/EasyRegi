@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast, Badge, Checkbox } from 'antd-mobile'
 import { createForm } from 'rc-form';
 import moment from 'moment';
+import  '../../less/index.less';
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -76,8 +77,8 @@ class EduExp extends React.Component {
                     ['erangeTime_' + idx] : wk.date[0],
                     ['erangeTime_end_' + idx] : wk.date[1],
                     ['position_' + idx] : wk.major,
-                    ['grad_' + idx] : [wk.isGraduated],
-                    ['degree_' + idx]: [wk.degree]
+                    ['grad_' + idx] : _.isArray(wk.isGraduated) ? wk.isGraduated : [wk.isGraduated],
+                    ['degree_' + idx]: _.isArray(wk.degree) ? wk.degree : [wk.degree]
                 })  
             }else{
                 form.setFieldsValue({
@@ -85,8 +86,8 @@ class EduExp extends React.Component {
                     erangeTime : wk.date[0],
                     erangeTime_end : wk.date[1],
                     position : wk.major,
-                    grad : [wk.isGraduated],
-                    degree: [wk.degree]
+                    grad : _.isArray(wk.isGraduated) ? wk.isGraduated : [wk.isGraduated],
+                    degree: _.isArray(wk.degree) ? wk.degree : [wk.degree]
                 })
             }
             })
@@ -134,7 +135,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        学校
+                        <span className='custom-required'>*</span>学校
                     </InputItem>
                      <InputItem
                         name={`position_${key}`}
@@ -153,7 +154,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        专业
+                        <span className='custom-required'>*</span>专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -224,7 +225,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        学校
+                        <span className='custom-required'>*</span>学校
                     </InputItem>
                     <InputItem
                         name="position"
@@ -243,7 +244,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        专业
+                        <span className='custom-required'>*</span>专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"

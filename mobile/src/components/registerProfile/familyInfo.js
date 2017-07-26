@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { createForm } from 'rc-form';
+import _ from 'underscore'
 
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast, Badge, Checkbox } from 'antd-mobile'
 // import Form from 'antd/lib/form'
@@ -23,7 +24,7 @@ import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast, Badge, Chec
 // import 'antd/lib/card/style/index.less';
 // import 'antd/lib/badge/style/index.less';
 // import 'antd/lib/checkbox/style/index.less';
-
+import  '../less/index.less';
 
 
 const FormItem = List.Item;
@@ -42,7 +43,7 @@ class FamilyInfo extends React.Component {
         form.validateFields(async (err, values)=>{
              if (!!err){
                  this.props.prev();
-             }  
+             }
              //set value to context
              let familyInfos = [Object.assign({},{
                  name : form.getFieldValue('name'),
@@ -140,14 +141,14 @@ class FamilyInfo extends React.Component {
             if(idx){
                 form.setFieldsValue({
                     ['name_'+ idx]: fm.name,
-                    ['relationship_' + idx] : [fm.relationship],
+                    ['relationship_' + idx] : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
                     ['mphoneNumber_' + idx] : fm.phoneNumber,
                     ['em_check_' + idx] : fm.emergencyFlag
                 })
             }else{
                 form.setFieldsValue({
                     name : fm.name,
-                    relationship : [fm.relationship],
+                    relationship : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
                     mphoneNumber : fm.phoneNumber,
                     em_check : fm.emergencyFlag
                 })
@@ -208,7 +209,7 @@ class FamilyInfo extends React.Component {
                         }}
                         placeholder="请输入姓名"
                         >
-                        姓名
+                        <span className='custom-required'>*</span>姓名
                     </InputItem>
                     <FormItem>
                         <Picker 
@@ -216,7 +217,7 @@ class FamilyInfo extends React.Component {
                             {...getFieldProps(`relationship_${key}`, {
                             rules:[{
                                 required:true, message:'请选择关系！'
-                            }],initialValue:['父母']
+                            }]
                             })}
                             data={relations}
                             >
@@ -236,7 +237,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError(`mphoneNumber_${key}`).join('、'));
                         }}
-                        placeholder="请输入联系手机">联系手机
+                        placeholder="请输入联系手机"><span className='custom-required'>*</span>联系手机
                     </InputItem>
                  <FormItem extra={<CheckboxItem {...getFieldProps(`em_check_${key}`, { initialValue: false, valuePropName: 'checked' })} />}>
                     标记为紧急联系人
@@ -268,7 +269,7 @@ class FamilyInfo extends React.Component {
                         }}
                         placeholder="请输入姓名"
                         >
-                        姓名
+                        <span className='custom-required'>*</span>姓名
                     </InputItem>
                     
                    
@@ -298,7 +299,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('mphoneNumber').join('、'));
                         }}
-                        placeholder="请输入联系手机">联系手机
+                        placeholder="请输入联系手机"><span className='custom-required'>*</span>联系手机
                     </InputItem>
                     <FormItem extra={<CheckboxItem {...getFieldProps('em_check', { initialValue: true, valuePropName: 'checked' })} />}>
                         标记为紧急联系人

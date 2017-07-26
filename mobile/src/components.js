@@ -3,6 +3,7 @@
 //import Profile from './components/profile'
 import Index from './components/registerProfile/index'
 import Company from './components/company'
+import Positions from './components/positions'
 
 // 尽量别直接用全局变量 $
 const $ = jQuery
@@ -22,9 +23,9 @@ class LegoComponent{
     selectCompany(...args){
         return Company(this.$el, ...args)
     }
-    // registerProfile(...args){
-    //     return RegisterProfile(this.$el, ...args)
-    // }
+    nearByPositions(...args){
+        return Positions(this.$el, ...args)
+    }
 }
 
 const Lego = selector => {

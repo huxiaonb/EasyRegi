@@ -135,7 +135,7 @@ class PersonalInfo extends React.Component {
         if(!personal.name){
             personal = pers;
         }
-        console.log('pe',personal);
+        //console.log('pe',personal);
         if(personal.name){
             form.setFieldsValue({
                 name : personal.name,
@@ -236,12 +236,12 @@ class PersonalInfo extends React.Component {
         <form key='per-info' style={{textAlign:'center',fontFamily:'PingFang SC,Helvetica Neue,Hiragino Sans GB,Helvetica,Microsoft YaHei,Arial'}}>
         <List >
             <InputItem
-                name="name"
+                
                 {...getFieldProps('name', {
                     rules:[{
                         type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                     },{
-                        required:true,message:'请输入有效的姓名！'
+                        required:true, message:'请输入有效的姓名！'
                     }],initialValue : personal.name
                 })}
                 clear
@@ -251,11 +251,10 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入姓名"
                 >
-                姓名
+                <span className='custom-required'>*</span>姓名
             </InputItem>
             <InputItem
                 style={{color:'inherit'}}
-                label="身份证号码"
                 name="idCardNumber"
                 onBlur={()=>this.getIdCardInfo()}
                 {...getFieldProps('idCardNumber', {
@@ -273,7 +272,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入身份证号码"
                 >
-                身份证号
+                <span className='custom-required'>*</span>身份证号
             </InputItem>
              <InputItem
                 name="issuingAuthority"
@@ -291,7 +290,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入发证机关"
                 >
-                发证机关
+                <span className='custom-required'>*</span>发证机关
             </InputItem>
             <InputItem
                 name="nativePlace"
@@ -309,7 +308,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入籍贯"
                 >
-                籍贯
+                <span className='custom-required'>*</span>籍贯
             </InputItem>
             <FormItem>
                 <DatePicker mode="date"
@@ -401,7 +400,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入家庭住址"
                 >
-                家庭住址
+                <span className='custom-required'>*</span>家庭住址
             </InputItem>
            <InputItem
                 name="currentAddress"
@@ -415,7 +414,7 @@ class PersonalInfo extends React.Component {
                     Toast.info(getFieldError('currentAddress').join('、'));
                 }}
                 placeholder="请输入现住址">
-                现住址
+                <span className='custom-required'>*</span>现住址
             </InputItem>
             
             <InputItem
@@ -435,7 +434,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入联系手机"
                >
-               联系手机          
+               <span className='custom-required'>*</span>联系手机          
              </InputItem>
              <InputItem
                 name='email'
@@ -452,7 +451,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入邮箱"
                 >
-                邮箱
+                <span className='custom-required'>*</span>邮箱
             </InputItem>
             <InputItem
                 name="tele"

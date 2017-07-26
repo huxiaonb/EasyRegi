@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { createForm } from 'rc-form';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast, Badge, Checkbox } from 'antd-mobile'
 import moment from 'moment';
+import  '../../less/index.less';
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -75,7 +76,7 @@ class WorkExp extends React.Component {
                         ['rangeTime_' + idx] : wk.date[0],
                         ['rangeTime_end_' + idx] : wk.date[1],
                         ['position_' + idx] : wk.title,
-                        ['salary_' + idx] : [wk.salaryRange]
+                        ['salary_' + idx] : _.isArray(wk.salaryRange) ? wk.salaryRange : [wk.salaryRange]
                     })  
                 }else{
                     form.setFieldsValue({
@@ -83,7 +84,7 @@ class WorkExp extends React.Component {
                         rangeTime : wk.date[0],
                         rangeTime_end : wk.date[1],
                         position : wk.title,
-                        salary : [wk.salaryRange]
+                        salary : _.isArray(wk.salaryRange) ? wk.salaryRange : [wk.salaryRange]
                     })
                 }
             });
@@ -131,7 +132,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入公司名称！"
                         >
-                        公司名称
+                        <span className='custom-required'>*</span>公司名称
                     </InputItem>
                      
                     <FormItem>
@@ -169,7 +170,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入职位！"
                         >
-                        职位
+                        <span className='custom-required'>*</span>职位
                     </InputItem>
                     
                     <FormItem>                
@@ -211,7 +212,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入公司名称！"
                         >
-                        公司名称
+                        <span className='custom-required'>*</span>公司名称
                     </InputItem>
                      
                     <FormItem>
@@ -249,7 +250,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入职位！"
                         >
-                        职位
+                        <span className='custom-required'>*</span>职位
                     </InputItem>
                     
                     <FormItem>                
