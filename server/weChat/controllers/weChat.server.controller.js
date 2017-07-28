@@ -140,13 +140,14 @@ exports.positions = function(req, res) {
   res.render('server/weChat/views/positions');
 }
 exports.createUnifiedOrder = function(req, res) {
-
+//1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
+//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
   var opts = {
       appid: 'wx54e94ab2ab199342',
       body : 'givememoney',
       mch_id: '1481782312',
       nonce_str: util.generateNonceString(),
-      notify_url: 'http://www.mfca.com.cn/registerCompany',
+      notify_url: 'http://www.mfca.com.cn/',
       openid : _.get(req, ['session', 'openId'], ''),
       out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
       product_id: 'AA1234567890',
