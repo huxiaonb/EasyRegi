@@ -140,17 +140,19 @@ exports.positions = function(req, res) {
   res.render('server/weChat/views/positions');
 }
 exports.createUnifiedOrder = function(req, res) {
+
   var opts = {
       appid: 'wx54e94ab2ab199342',
       body : 'givememoney',
       mch_id: '1481782312',
       nonce_str: util.generateNonceString(),
       notify_url: 'http://www.mfca.com.cn/',
+      openid : _.get(req, ['session', 'openId'], ''),
       out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
       product_id: 'AA1234567890',
       spbill_create_ip : '39.108.136.90',
       total_fee : 1,
-      trade_type: 'NATIVE',
+      trade_type: 'JSAPI',
   }
   opts.sign = util.sign(opts);
   console.log(util.buildXML(opts));
