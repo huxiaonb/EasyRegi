@@ -147,7 +147,7 @@ exports.createUnifiedOrder = function(req, res) {
       body : 'givememoney',
       mch_id: '1481782312',
       nonce_str: util.generateNonceString(),
-      notify_url: 'http://www.mfca.com.cn/',
+      notify_url: 'http://www.mfca.com.cn/registerCompany',
       openid : _.get(req, ['session', 'openId'], ''),
       out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
       product_id: 'AA1234567890',
