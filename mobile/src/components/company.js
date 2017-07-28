@@ -30,20 +30,22 @@ class Company extends React.Component{
         relationships: [{value: 'parents', label: '父母'}, {value: 'couple', label: '夫妻'}, {value: 'bros', label: '兄弟'}, {value: 'sis', label: '姐妹'}, {value: 'other', label: '其他亲属'}]
     }
 
-        
+  
     async subm(){
         let res = await lapi.pay();
         if(res){
+            
             if(res.return_code === 'SUCCESS'){
+                alert(JSON.stringify(res));
                 console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
                 WeixinJSBridge.invoke(
                     'getBrandWCPayRequest', {
                         "appId":res.appid,     //公众号名称，由商户传入     
-                        "timeStamp":Date.now().toString(),         //时间戳，自1970年以来的秒数     
+                        "timeStamp":res.timeStamp,         //时间戳，自1970年以来的秒数     
                         "nonceStr":res.nonce_str, //随机串     
                         "package":"prepay_id=" + res.prepay_id,     
                         "signType":"MD5",         //微信签名方式：     
-                        "paySign":res.sign //微信签名 
+                        "paySign":res.paySign //微信签名 
                     },
                     function(res){     
                         if(res.err_msg == "get_brand_wcpay_request:ok" ) {
