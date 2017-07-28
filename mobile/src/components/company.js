@@ -402,9 +402,8 @@ class Company extends React.Component{
                         <Button type='primary' inline size="large" disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
                     </div>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    入职易 PRESENTS ©2017
-                    <WhiteSpace size="lg" />
+                <div className='ant-layout-footer' style={{ textAlign: 'center' }}>
+                    M & G PRESENTS ©2017  (づ￣ 3￣)づ 
                 </div>
             </div>
         )
