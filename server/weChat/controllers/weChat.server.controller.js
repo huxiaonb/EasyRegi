@@ -8,6 +8,9 @@ var _ = require('lodash');
 var request = require('request');
 var wechatUtil = require('../utils/wechat.util');
 var Applicant = mongoose.model('Applicant');
+var util = require('./util');
+var parseString = require('xml2js').parseString;
+
 var fs = require('fs'),
     path = require('path');
 
@@ -135,6 +138,50 @@ exports.maintainn = function(req, res) {
 
 exports.positions = function(req, res) {
   res.render('server/weChat/views/positions');
+}
+exports.createUnifiedOrder = function(req, res) {
+  var opts = {
+      appid: 'wx54e94ab2ab199342',
+      body : 'givememoney',
+      mch_id: '1481782312',
+      nonce_str: util.generateNonceString(),
+      notify_url: 'http://www.mfca.com.cn/',
+      out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
+      product_id: 'AA1234567890',
+      spbill_create_ip : '39.108.136.90',
+      total_fee : 1,
+      trade_type: 'NATIVE',
+  }
+  opts.sign = util.sign(opts);
+  console.log(util.buildXML(opts));
+  console.log(opts);
+  request({
+		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+		method: 'POST',
+		body: util.buildXML(opts),
+	}, function(err, response, body){
+      console.log('-----------1-------------');
+      console.log(err);
+      console.log('-----------2-------------');
+      //console.log(response);
+      console.log('-----------3-------------');
+      console.log(body);
+      console.log('-----------4-------------');
+      parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
+        if(err){
+          console.log(err);
+          res.send(err).end()
+        }else if(result.return_code === 'SUCCESS'){
+          console.log(result);
+          res.json(result);
+        }
+      });
+		  
+      // console.log(fn)
+      // if(fn.return_code === 'SUCCESS'){
+      //   res.json(fn);
+      // }
+	});
 }
 
 
@@ -293,23 +340,23 @@ exports.renderRegisterCompanyPage = function(req, res){
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
       companyId = _.get(req, ['body', 'companyId', '0'], '');
-      console.log(companyId);
+      //console.log(companyId);
   var current = new Date();
   if(_.isEmpty(openId)){
-    console.log('openId does not exist, cannot submit register company');
+    //console.log('openId does not exist, cannot submit register company');
     res.end();
   } else if(_.isEmpty(companyId)){
-    console.log('companyId does not exist, cannot submit register company');
+    //console.log('companyId does not exist, cannot submit register company');
     res.end();
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
-        console.log('Applicant does not exist, cannot register company');
+        //console.log('Applicant does not exist, cannot register company');
         res.end();
       } else {
-        console.log('applicant exitst, ready to select company');
+        //console.log('applicant exitst, ready to select company');
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
           if(!_.isEmpty(companies)){
@@ -334,17 +381,17 @@ exports.submitRegisterCompany = function(req, res){
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {
-                console.log('Error in updating applicant', error);
+                //console.log('Error in updating applicant', error);
                 res.end();
               } else {
-                console.log(persistedObj);
+                //console.log(persistedObj);
                 res.end();
               }
             })
 
 
           } else {
-            console.log('cannot find company with company id', companyId);
+            //console.log('cannot find company with company id', companyId);
             res.end();
           }
         });

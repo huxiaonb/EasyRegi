@@ -79,5 +79,12 @@ export default {
             type: 'GET',
             dataType: 'JSONP'
         })
+    },
+    pay(){
+        return _request({
+            url:'../weChat/pay',
+            type: 'POST',
+        })
+        
     }
 }

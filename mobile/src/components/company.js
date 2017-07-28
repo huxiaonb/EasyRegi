@@ -29,7 +29,30 @@ class Company extends React.Component{
         salaryRangePickerItem: [{value: '0', label: '2000以下'}, {value: '1', label: '2000~3000'}, {value: '2', label: '3000~4000'}, {value: '3', label: '4000~5000'}, {value: '4', label: '5000~10000'}, {value: '5', label: '10000以上'}],
         relationships: [{value: 'parents', label: '父母'}, {value: 'couple', label: '夫妻'}, {value: 'bros', label: '兄弟'}, {value: 'sis', label: '姐妹'}, {value: 'other', label: '其他亲属'}]
     }
+
+        
     async subm(){
+        let res = await lapi.pay();
+        if(res){
+            if(res.return_code === 'SUCCESS'){
+                console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
+                WeixinJSBridge.invoke(
+                    'getBrandWCPayRequest', {
+                        "appId":res.appid,     //公众号名称，由商户传入     
+                        "timeStamp":Date.now().toString(),         //时间戳，自1970年以来的秒数     
+                        "nonceStr":res.nonce_str, //随机串     
+                        "package":"prepay_id=" + res.prepay_id,     
+                        "signType":"MD5",         //微信签名方式：     
+                        "paySign":res.sign //微信签名 
+                    },
+                    function(res){     
+                        if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                            console.log('成功啦！')
+                        }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+                    }
+                ); 
+            }
+        }
         var data = {
             openId: openId,
             companyId: this.state.selectCompId
