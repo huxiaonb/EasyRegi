@@ -640,6 +640,7 @@ function createPositionForCompany(req, res, next){
                 } else {
                     var positionItem = {
                         name: _.get(positionObj, ['name'], ''),
+                        companyId: companyId,
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
                         totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
                         salary: _.get(positionObj, ['salary'], ''),

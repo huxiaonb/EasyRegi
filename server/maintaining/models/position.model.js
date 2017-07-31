@@ -15,6 +15,7 @@ var PositionSchema = new Schema({
         default: '',
         trim: true
     },
+    companyId: String,
     phoneNumber: String,
     totalRecruiters: {
         type: String,

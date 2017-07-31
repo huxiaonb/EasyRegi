@@ -79,5 +79,11 @@ export default {
             type: 'GET',
             dataType: 'JSONP'
         })
+    },
+    findNearbyPositions(addr){
+        return _request({
+            url: '../weChat/position/findNearbyPositions/' + addr,
+            type: 'GET',
+        })
     }
 }

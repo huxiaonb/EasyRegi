@@ -8,6 +8,7 @@ var _ = require('lodash');
 var request = require('request');
 var wechatUtil = require('../utils/wechat.util');
 var Applicant = mongoose.model('Applicant');
+var Position = mongoose.model('Position');
 var fs = require('fs'),
     path = require('path');
 
@@ -145,10 +146,7 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     var wechatCode = _.get(req, ['query', 'code'], '');
     console.log(wechatCode);
     var openId = _.get(req, ['session', 'openId'], '');
-    if(!_.isEmpty(openId)){
-        console.log('openId exists');
-        return next();
-    } else if(_.isEmpty(wechatCode)){
+    if(_.isEmpty(wechatCode)){
         req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
         //redirect to register page or next page as submit also need check this
         //return next();
@@ -160,10 +158,10 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
             if(error) {
                 return next();
             } else {
-                if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
+                // if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
                     req.session.openId = _.get(result, ['openId'], '');
                     req.session.accessToken = _.get(result, ['accessToken'], '');
-                }
+                // }
                 console.log(req.session.openId, req.session.accessToken);
                 return next();
             }
@@ -419,4 +417,50 @@ function getAllCompanyNames(req, res, next){
       }
     });
 
+}
+
+exports.findNearbyPositions = function(req, res, next){
+  var addr = _.get(req, ['params', 'addressReg'], '');
+  if(_.isEmpty(addr)){
+    Position.find({}, function(err, dbPositions){
+      if(err) {
+        console.log('Error in getting positions', err);
+        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+      } else {
+        res.json({success: true, positions: dbPositions});
+      }
+    });
+  } else {
+    Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
+      if(err1) {
+        console.log('Error in getting company by address reg', err1);
+        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+      } else if(_.isEmpty(dbCompanies)) {
+        res.json({success: true, positions: []});
+      } else {
+        console.log(JSON.stringify(dbCompanies));
+        var ids = [];
+        _.forEach(dbCompanies, function(cop){
+          if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
+            ids.push(cop._id);
+        });
+        console.log(ids);
+        Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
+          if(err2) {
+            console.log('Error in finding positions per id', err2);
+            res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+          } else {
+            var positionGroup = _.groupBy(dbPositions, 'companyId');
+            var sortedPositions = [];
+            for(var key in positionGroup){
+              sortedPositions = _.concat(sortedPositions, positionGroup[key]);
+            }
+            res.json({success: true, positions: sortedPositions});
+          }
+        });
+      }
+    });
+    
+  }
+  
 }

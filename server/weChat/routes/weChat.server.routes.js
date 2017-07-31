@@ -25,4 +25,5 @@ module.exports = function (app) {
   app.route('/weChat/getAllCompanyNames').get(weChatController.getAllCompanyNames);
   app.route('/maintain').get(weChatController.maintainn);
   app.route('/positions').get(weChatController.positions);
+  app.route('/weChat/position/findNearbyPositions/:addressReg').get(weChatController.findNearbyPositions)
 };
