@@ -3,10 +3,17 @@
 var request = require('request'),
     _ = require('lodash'),
     async = require('async');
+    
 var config = require('../../../config/config');
+var md5 = require('MD5');
+var xml2js = require('xml2js');
 
 exports.getAccessToken = getAccessToken;
 exports.getOpenIdAndAuthAccessTokenByCode = getOpenIdAndAuthAccessTokenByCode;
+//wechat pay util
+exports.sign = sign;
+exports.buildXML = buildXML;
+exports.generateNonceString = generateNonceString;
 
 console.log('appId:', config.wechat.appId, '====appSecret:', config.wechat.appSecret)
 function getAccessToken(){
@@ -57,3 +64,28 @@ function getOpenIdAndAuthAccessTokenByCode(code, callback){
         });
     }
 }
+
+
+//wechat pay util
+function sign(param){
+	var querystring = Object.keys(param).filter(function(key){
+		return param[key] !== undefined && param[key] !== '';
+	}).sort().map(function(key){
+		return key + '=' + param[key];
+	}).join("&") + "&key=0460396E987005E331054DA275E5FC67";
+	console.log(querystring);
+	return md5(querystring).toUpperCase();
+};
+function buildXML(json){
+	var builder = new xml2js.Builder();
+	return builder.buildObject(json);
+};
+function generateNonceString(length){
+	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	var maxPos = chars.length;
+	var noceStr = "";
+	for (var i = 0; i < (length || 32); i++) {
+		noceStr += chars.charAt(Math.floor(Math.random() * maxPos));
+	}
+	return noceStr;
+};

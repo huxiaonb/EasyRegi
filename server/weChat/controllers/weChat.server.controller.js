@@ -8,7 +8,7 @@ var _ = require('lodash');
 var request = require('request');
 var wechatUtil = require('../utils/wechat.util');
 var Applicant = mongoose.model('Applicant');
-var util = require('./util');
+
 var parseString = require('xml2js').parseString;
 
 var fs = require('fs'),
@@ -144,9 +144,9 @@ exports.createUnifiedOrder = function(req, res) {
 //2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
   var opts = {
       appid: 'wx54e94ab2ab199342',
-      body : 'givememoney',
+      body : '办理入职手续',
       mch_id: '1481782312',
-      nonce_str: util.generateNonceString(),
+      nonce_str: wechatUtil.generateNonceString(),
       notify_url: 'http://www.mfca.com.cn/registerCompany',
       openid : _.get(req, ['session', 'openId'], ''),
       out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
@@ -155,27 +155,27 @@ exports.createUnifiedOrder = function(req, res) {
       total_fee : 1,
       trade_type: 'JSAPI',
   }
-  opts.sign = util.sign(opts);
-  console.log(util.buildXML(opts));
-  console.log(opts);
+  opts.sign = wechatUtil.sign(opts);
+  //console.log(wechatUtil.buildXML(opts));
+  //console.log(opts);
   request({
 		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
 		method: 'POST',
-		body: util.buildXML(opts),
+		body: wechatUtil.buildXML(opts),
 	}, function(err, response, body){
-      console.log('-----------1-------------');
-      console.log(err);
-      console.log('-----------2-------------');
+      // console.log('-----------1-------------');
+      // console.log(err);
+      // console.log('-----------2-------------');
       //console.log(response);
-      console.log('-----------3-------------');
-      console.log(body);
-      console.log('-----------4-------------');
+      // console.log('-----------3-------------');
+      // console.log(body);
+      // console.log('-----------4-------------');
       parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
         if(err){
           console.log(err);
           res.send(err).end()
         }else if(result.return_code === 'SUCCESS'){
-          console.log(result);
+          //console.log(result);
           let objtoSign = {
             appId: result. appid,
             nonceStr:result.nonce_str,
@@ -183,7 +183,7 @@ exports.createUnifiedOrder = function(req, res) {
             signType:'MD5',
             timeStamp:Date.now().toString().substr(0,10)
           }
-          result.paySign = util.sign(objtoSign);
+          result.paySign = wechatUtil.sign(objtoSign);
           result.timeStamp = objtoSign.timeStamp;
           res.json(result);
         }
