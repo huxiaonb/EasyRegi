@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace} from 'antd-mobile'
+import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace, Result, Icon} from 'antd-mobile'
 
 
 import lapi from './registerProfile/lapi'
@@ -15,6 +15,7 @@ const openId = $('#openId').text();
 
 class Company extends React.Component{
     state={
+        payFlag : false,
         bCheck : false,
         mCheck : false,
         selectCompId: '',
@@ -49,6 +50,9 @@ class Company extends React.Component{
                     },
                     function(res){     
                         if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                            this.setState({
+                                payFlag : true
+                            })
                             //console.log('成功啦！')
                         }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                     }
@@ -130,6 +134,15 @@ class Company extends React.Component{
 
     }
     render(){ 
+        let resultPage = (
+            <div className="result-example">
+                <Result style={{height:'500px',marginTop:'30%'}}
+                    img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
+                    title="付款成功"
+                    message="简历已提交"
+                />                
+            </div>
+            );
         let {bCheck, mCheck, testFamilyMembers, testWorkExperience, testEducation, testThreeTypesRelations, testEmergencyContact, salaryRangePickerItem, relationships} = this.state;
         var familyMembersListItems = [], workExperiencesListItems = [], educationListItem = [];
         const familyMemberNum = testFamilyMembers.length;
@@ -296,7 +309,10 @@ class Company extends React.Component{
         });
 
         return(
+
             <div>
+            {this.state.payFlag ? resultPage :
+                <div>                    
                 <div style={{ height:'64px', lineHeight:'64px', padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'50px'}} >提交入职资料</div>
                 <div style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: 'transparent', minHeight: 360 ,textAlign:'center'}}>
@@ -403,10 +419,13 @@ class Company extends React.Component{
                         <WhiteSpace size="lg" />
                         <Button type='primary' inline size="large" disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
                     </div>
+                    
                 </div>
+            
                 <div className='ant-layout-footer' style={{ textAlign: 'center' }}>
                     M & G PRESENTS ©2017  (づ￣ 3￣)づ 
                 </div>
+                </div>}
             </div>
         )
     }
