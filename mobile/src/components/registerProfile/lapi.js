@@ -86,5 +86,11 @@ export default {
             type: 'POST',
         })
         
+    },
+    findNearbyPositions(addr){
+        return _request({
+            url: '../weChat/position/findNearbyPositions/' + addr,
+            type: 'GET',
+        })
     }
 }

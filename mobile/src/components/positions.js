@@ -11,13 +11,29 @@ const Brief = Item.Brief;
 
 class Positions extends React.Component{
     state = {
-        geolocation : null
+        geolocation : null,
+        nearbyPositions : []
     }
-    componentWillMount(){
+    async componentWillMount(){
         let info = this.props.args;
-        
+        let addrArr = [];
+        if(info != null && info != undefined){
+            if(info.province != null && info.province != undefined && info.province != '')
+                addrArr.push(info.province);
+            if(info.city != null && info.city != undefined && info.city != '')
+                addrArr.push(info.city);
+            if(info.district != null && info.district != undefined && info.district != '')
+                addrArr.push(info.district);
+        }
+        let addr = addrArr.join(' '),
+            re = [];
+        if(addr != '')
+            re = await lapi.findNearbyPositions(addr);
+        console.log(re);
+        console.log(typeof re);
         this.setState({
             geolocation : info,
+            nearbyPositions: re
         });
         //get position List
     }

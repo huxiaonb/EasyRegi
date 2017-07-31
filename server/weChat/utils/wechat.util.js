@@ -57,7 +57,7 @@ function getOpenIdAndAuthAccessTokenByCode(code, callback){
                 }
                 return callback(null, result);
             } else {
-                var errmsg = {errmsg: _.get(result, ['errmsg'], ''), error: error, statusCode: _.get(response, ['statusCode'], 0)};
+                var errmsg = {errmsg: _.get(result, ['errmsg'], ''), error: error, statusCode: _.get(response, ['statusCode'], 0), body: body};
                 console.log('cannot obtain access token as:', JSON.stringify(errmsg));
                 return callback(JSON.stringify(errmsg), null);
             }

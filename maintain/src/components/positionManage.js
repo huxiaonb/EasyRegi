@@ -357,7 +357,7 @@ class PositionManage extends React.Component{
                                     type:'array',required:true, message:'请选择有效的福利！'
                                 }]
                             })(
-                                <Select mode='multiple' placeholder='请选择'>
+                                <Select mode='multiple' placeholder='请选择...'>
                                     <Option value='五险一金'>五险一金</Option>
                                     <Option value='带薪年假'>带薪年假</Option>
                                     <Option value='年度旅游'>年度旅游</Option>
