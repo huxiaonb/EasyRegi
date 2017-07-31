@@ -80,6 +80,13 @@ export default {
             dataType: 'JSONP'
         })
     },
+    pay(){
+        return _request({
+            url:'../weChat/pay',
+            type: 'POST',
+        })
+        
+    },
     findNearbyPositions(addr){
         return _request({
             url: '../weChat/position/findNearbyPositions/' + addr,

@@ -301,7 +301,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_name',{
                                 rules:[{
-                                    type:'string',required:true,maxLength:15
+                                    type:'string',required:true,maxLength:15,message:'请输入有效的职位名！'
                                 }]
                                 
                             })(
@@ -315,7 +315,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_phone',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true, message:'请输入有效的联系电话！'
                                 }]
                             })(
                                 <Input />
@@ -328,7 +328,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_total',{
                                 rules:[{
-                                    type:'string',required:true,maxLength:3
+                                    type:'string',required:true,maxLength:3, message:'请输入有效的招聘人数！'
                                 }]
                             })(
                                 <Input />
@@ -341,7 +341,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_salary',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true, message:'请输入有效的薪资！'
                                 }]
                             })(
                                 <Input />
@@ -354,7 +354,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_welfare',{
                                 rules:[{
-                                    type:'array',required:true
+                                    type:'array',required:true, message:'请选择有效的福利！'
                                 }]
                             })(
                                 <Select mode='multiple' placeholder='请选择...'>
@@ -372,7 +372,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_require',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true, message:'请输入有效的职位要求！'
                                 }]
                             })(
                                 <Input />
@@ -385,7 +385,7 @@ class PositionManage extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('p_desc',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true, message:'请输入有效的职位描述！'
                                 }]
                             })(
                                 <Input type='textarea' style={{resize:"none"}}/>

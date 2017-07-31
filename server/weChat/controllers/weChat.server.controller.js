@@ -9,6 +9,8 @@ var request = require('request');
 var wechatUtil = require('../utils/wechat.util');
 var Applicant = mongoose.model('Applicant');
 var Position = mongoose.model('Position');
+var parseString = require('xml2js').parseString;
+
 var fs = require('fs'),
     path = require('path');
 
@@ -136,6 +138,62 @@ exports.maintainn = function(req, res) {
 
 exports.positions = function(req, res) {
   res.render('server/weChat/views/positions');
+}
+exports.createUnifiedOrder = function(req, res) {
+//1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
+//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
+  var opts = {
+      appid: 'wx54e94ab2ab199342',
+      body : '办理入职手续',
+      mch_id: '1481782312',
+      nonce_str: wechatUtil.generateNonceString(),
+      notify_url: 'http://www.mfca.com.cn/registerCompany',
+      openid : _.get(req, ['session', 'openId'], ''),
+      out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
+      product_id: 'AA1234567890',
+      spbill_create_ip : '39.108.136.90',
+      total_fee : 1,
+      trade_type: 'JSAPI',
+  }
+  opts.sign = wechatUtil.sign(opts);
+  //console.log(wechatUtil.buildXML(opts));
+  //console.log(opts);
+  request({
+		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+		method: 'POST',
+		body: wechatUtil.buildXML(opts),
+	}, function(err, response, body){
+      // console.log('-----------1-------------');
+      // console.log(err);
+      // console.log('-----------2-------------');
+      //console.log(response);
+      // console.log('-----------3-------------');
+      // console.log(body);
+      // console.log('-----------4-------------');
+      parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
+        if(err){
+          console.log(err);
+          res.send(err).end()
+        }else if(result.return_code === 'SUCCESS'){
+          //console.log(result);
+          let objtoSign = {
+            appId: result. appid,
+            nonceStr:result.nonce_str,
+            package:"prepay_id=" + result.prepay_id, 
+            signType:'MD5',
+            timeStamp:Date.now().toString().substr(0,10)
+          }
+          result.paySign = wechatUtil.sign(objtoSign);
+          result.timeStamp = objtoSign.timeStamp;
+          res.json(result);
+        }
+      });
+		  
+      // console.log(fn)
+      // if(fn.return_code === 'SUCCESS'){
+      //   res.json(fn);
+      // }
+	});
 }
 
 
@@ -291,23 +349,23 @@ exports.renderRegisterCompanyPage = function(req, res){
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
       companyId = _.get(req, ['body', 'companyId', '0'], '');
-      console.log(companyId);
+      //console.log(companyId);
   var current = new Date();
   if(_.isEmpty(openId)){
-    console.log('openId does not exist, cannot submit register company');
+    //console.log('openId does not exist, cannot submit register company');
     res.end();
   } else if(_.isEmpty(companyId)){
-    console.log('companyId does not exist, cannot submit register company');
+    //console.log('companyId does not exist, cannot submit register company');
     res.end();
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
-        console.log('Applicant does not exist, cannot register company');
+        //console.log('Applicant does not exist, cannot register company');
         res.end();
       } else {
-        console.log('applicant exitst, ready to select company');
+        //console.log('applicant exitst, ready to select company');
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
           if(!_.isEmpty(companies)){
@@ -332,17 +390,17 @@ exports.submitRegisterCompany = function(req, res){
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {
-                console.log('Error in updating applicant', error);
+                //console.log('Error in updating applicant', error);
                 res.end();
               } else {
-                console.log(persistedObj);
+                //console.log(persistedObj);
                 res.end();
               }
             })
 
 
           } else {
-            console.log('cannot find company with company id', companyId);
+            //console.log('cannot find company with company id', companyId);
             res.end();
           }
         });
