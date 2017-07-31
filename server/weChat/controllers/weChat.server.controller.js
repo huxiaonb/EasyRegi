@@ -450,9 +450,7 @@ exports.submitRegisterForm = function(req, res){
 }
 
 function getAllCompanyNames(req, res, next){
-    console.log('getAllCompanyNames');
     Company.find({}, function(error, companies){
-      console.log(companies);
       if(error) {
         console.error('Error in finding company names', error);
         res.end();
