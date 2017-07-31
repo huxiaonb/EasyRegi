@@ -204,7 +204,10 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     var wechatCode = _.get(req, ['query', 'code'], '');
     console.log(wechatCode);
     var openId = _.get(req, ['session', 'openId'], '');
-    if(_.isEmpty(wechatCode)){
+    if(!_.isEmpty(openId)){
+        console.log('openId exists');
+        return next();
+    } else if(_.isEmpty(wechatCode)){
         req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
         //redirect to register page or next page as submit also need check this
         //return next();
@@ -216,10 +219,10 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
             if(error) {
                 return next();
             } else {
-                // if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
+                if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
                     req.session.openId = _.get(result, ['openId'], '');
                     req.session.accessToken = _.get(result, ['accessToken'], '');
-                // }
+                }
                 console.log(req.session.openId, req.session.accessToken);
                 return next();
             }
