@@ -52,7 +52,7 @@ class Company extends React.Component{
                     function(res){
                         //alert(JSON.stringify(res));   
                         if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                            alert('1');
+                            
                             that.setState({
                                 payFlag : true
                             })
