@@ -316,7 +316,7 @@ class Company extends React.Component{
             <div>
             {this.state.payFlag ? resultPage :
                 <div>                    
-                <div style={{ height:'64px', lineHeight:'64px', padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'50px'}} >提交入职资料</div>
+                {/*<div style={{ height:'64px', lineHeight:'64px', padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'50px'}} >提交入职资料</div>*/}
                 <div style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: 'transparent', minHeight: 360 ,textAlign:'center'}}>
                         <Accordion defaultActiveKey="0" className="personalInfoAccordion" onChange={this.personalInfoAccordionChange}>

@@ -313,7 +313,7 @@ class FamilyInfo extends React.Component {
                 </Card>
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>
-                    <Button type="primary" onClick={this.nextStep.bind(this)}>下一步</Button>
+                    <Button type="primary" style={{marginTop:'15px'}} onClick={this.nextStep.bind(this)}>下一步</Button>
                 </div>
                 </div>
         )

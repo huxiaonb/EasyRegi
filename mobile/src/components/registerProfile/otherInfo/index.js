@@ -136,7 +136,7 @@ export default class OhterInfo extends React.Component {
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>
-                    <Button type="primary" onClick={this.sumitAll.bind(this)}>确认提交</Button>
+                    <Button type="primary" style={{marginTop:'15px'}} onClick={this.sumitAll.bind(this)}>确认提交</Button>
                 </div>
             </div>
         )

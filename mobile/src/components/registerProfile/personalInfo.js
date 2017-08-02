@@ -506,7 +506,7 @@ class PersonalInfo extends React.Component {
                 )}
              </FormItem>
         </List>
-         <Button type="primary" style={{marginTop:'15px'}} onClick={this.nextStep.bind(this)}>下一步</Button>
+         <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.nextStep.bind(this)}>下一步</Button>
         </form>
         )}
 }
