@@ -34,6 +34,7 @@ class Company extends React.Component{
   
     async subm(){
         let res = await lapi.pay();
+        let that = this;
         if(res){
             
             if(res.return_code === 'SUCCESS'){
@@ -49,12 +50,10 @@ class Company extends React.Component{
                         "paySign":res.paySign //微信签名 
                     },
                     function(res){
-                        alert('123');
-                        alert(res);
-                        alert(res.err_msg);
-                        alert(JSON.stringify(res));   
+                        //alert(JSON.stringify(res));   
                         if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                            this.setState({
+                            alert('1');
+                            that.setState({
                                 payFlag : true
                             })
                             //console.log('成功啦！')
