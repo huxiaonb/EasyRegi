@@ -92,5 +92,11 @@ export default {
             url: '../weChat/position/findNearbyPositions/' + addr,
             type: 'GET',
         })
+    },
+    findAllPositions(){
+        return _request({
+            url: '../weChat/position/findAllPositions',
+            type: 'GET',
+        })
     }
 }

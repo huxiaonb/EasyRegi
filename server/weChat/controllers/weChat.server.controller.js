@@ -480,6 +480,7 @@ function getAllCompanyNames(req, res, next){
 
 exports.findNearbyPositions = function(req, res, next){
   var addr = _.get(req, ['params', 'addressReg'], '');
+  console.log(addr);
   if(_.isEmpty(addr)){
     Position.find({}, function(err, dbPositions){
       if(err) {
@@ -495,6 +496,7 @@ exports.findNearbyPositions = function(req, res, next){
         console.log('Error in getting company by address reg', err1);
         res.status(500).send({success: false, errmsg: '获取职位信息失败'});
       } else if(_.isEmpty(dbCompanies)) {
+        console.log('no companies found in that area');
         res.json({success: true, positions: []});
       } else {
         console.log(JSON.stringify(dbCompanies));
@@ -522,4 +524,45 @@ exports.findNearbyPositions = function(req, res, next){
     
   }
   
+}
+
+exports.findAllPositions = function(req, res, next){
+  Position.find({}, function(err, dbPositions){
+    if(err) {
+      console.log('Error in finding all postions', err);
+      res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+    } else {
+      Company.find({}, function(err1, dbCompanies){
+        if(err1) {
+          console.log('Error in finding all companies', err);
+          res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+        } else {
+          if(_.isEmpty(dbPositions)){
+            res.json({success: true, positions: []});
+          } else {
+            var resultPositions = [];
+            _.forEach(dbPositions, function(position){
+              var companyId = _.get(position, ['companyId'], '');
+              var cmps = _.filter(dbCompanies, function(cmp){
+                return cmp._id == companyId;
+              });
+              if(!_.isEmpty(cmps)){
+                var clonePosition = {
+                  _id: _.get(position, ['_id'], ''),
+                  name:　_.get(position, ['name'], ''),
+                  companyName: _.get(cmps, ['0', 'companyName'], ''),
+                  totalRecruiters: _.get(position, ['totalRecruiters'], ''),
+                  salary: _.get(position, ['salary'], ''),
+                  positionDesc: _.get(position, ['positionDesc'], '')
+                };
+                resultPositions.push(clonePosition);
+              }
+            });
+            console.log(JSON.stringify(resultPositions));
+            res.json({success: true, positions: resultPositions});
+          }
+        }
+      });
+    }
+  })
 }
