@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 
 import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace, Result, Icon} from 'antd-mobile'
-
+import Loading from './Loading';
 
 import lapi from './registerProfile/lapi'
 import './less/index.less'
@@ -15,6 +15,7 @@ const openId = $('#openId').text();
 
 class Company extends React.Component{
     state={
+        loading : false,
         payFlag : false,
         bCheck : false,
         mCheck : false,
@@ -33,6 +34,7 @@ class Company extends React.Component{
 
   
     async subm(){
+        this.setState({loading:true})
         let res = await lapi.pay();
         let that = this;
         if(res){
@@ -49,24 +51,28 @@ class Company extends React.Component{
                         "signType":"MD5",         //微信签名方式：     
                         "paySign":res.paySign //微信签名 
                     },
-                    function(res){
-                        //alert(JSON.stringify(res));   
-                        if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                            
+                    async function(res){
+                        
+                            //alert(JSON.stringify(res));   
+                            if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                var data = {
+                                openId: openId,
+                                companyId: this.state.selectCompId
+                            }
+                            let r = await lapi.submitSelectComp(data);
+                        
                             that.setState({
-                                payFlag : true
+                                payFlag : true,
+                                loading : false
                             })
                             //console.log('成功啦！')
                         }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+                        
                     }
                 ); 
             }
         }
-        var data = {
-            openId: openId,
-            companyId: this.state.selectCompId
-        }
-        let r = await lapi.submitSelectComp(data);
+        
     }
     handleChange(value){
         console.log(value)
@@ -310,9 +316,12 @@ class Company extends React.Component{
                 </List>);
                 educationListItem.push(educationItem);
         });
-
+        if(this.state.loading){
+            return(<div>
+                <Loading />
+            </div>);
+        }
         return(
-
             <div>
             {this.state.payFlag ? resultPage :
                 <div>                    

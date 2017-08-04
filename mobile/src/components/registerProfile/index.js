@@ -4,10 +4,8 @@ import PropTypes from 'prop-types';
 
 import {Steps,Button,Toast,Icon} from 'antd-mobile'
 import moment from 'moment';
+import Loading from '../Loading';
 import '../less/index.less'
-
-
-
 
 
 import PersonalInfo from './personalInfo';
@@ -49,6 +47,8 @@ class Index extends React.Component {
   }
 
   state = {
+      loading : false,
+      successFlag : false,
       current: 0,
       info:{
         personal:{},
@@ -82,6 +82,7 @@ class Index extends React.Component {
     this.setState({ current });
   }
   async handleSubmit(){
+    this.setState({loading:true});
     //callApi && if dataObj have date value need change will copy a Object
     let{workExps,edus} = this.state.info.otherInfo;
     if(workExps.length && edus.length){
@@ -135,8 +136,13 @@ class Index extends React.Component {
       let re = await lapi.getApplicant(appi.wechatOpenId);
       let r = re.length ? await lapi.updateApplicant(re[0]._id ,appi) : await lapi.createApplicant(appi)
       console.log(r);
+      if(r){
+        this.setState({successFlag : true,loading:false});
+      }else{
+        this.setState({loading:false});
+      }
     }
-    Toast.success('Processing complete!');
+    
   }
 
   async componentWillMount(){
@@ -202,6 +208,7 @@ class Index extends React.Component {
   render() {
     const { current } = this.state;
     let { personal, family, otherInfo } = this.state.info;
+
     const myStep = (
       <div style={{textAlign:'left'}}>
         <Steps current={current} direction="horizontal" style={{marginBottom:'50px'}}>
@@ -215,6 +222,22 @@ class Index extends React.Component {
       
       </div>
     );
+    if(this.state.successFlag){
+      return(
+            <div className="result-example">
+                <Result style={{height:'500px',marginTop:'30%'}}
+                    img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
+                    title="操作成功"
+                    message="简历已保存"
+                />                
+            </div>
+            );
+    }
+    if(this.state.loading){
+            return(<div>
+                <Loading />
+            </div>);
+        }
     return(
       <div className='ant-layout'>
           {/*<div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >编辑个人简历</div>*/}
