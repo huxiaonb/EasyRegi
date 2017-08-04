@@ -14,6 +14,12 @@ class Positions extends React.Component{
         geolocation : {},
         nearbyPositions : []
     }
+    componentWillReceiveProps(nextProps){
+        alert(JSON.stringify(nextProps));
+        this.setState({
+            geolocation : nextProps.args
+        });
+    }
     async componentWillMount(){
         console.log('componentWillMount')
         let info = this.props.args;
