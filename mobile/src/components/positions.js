@@ -28,12 +28,26 @@ class Positions extends React.Component{
         addr = addrArr.join(' ');
         return addr;
     }
-    componentWillReceiveProps(nextProps){
+    async componentWillReceiveProps(nextProps){
         alert(JSON.stringify(nextProps));
-        this.setState({
-            geolocation : nextProps.args,
-            isLocationExist: true
-        });
+        if(!!nextProps){
+            this.setState({
+                geolocation : nextProps.args,
+                isLocationExist: true
+            });
+        }
+        let info = nextProps.args;
+        let addr = this.constructAddrByLocation(info);
+        let re = {};
+        if(addr != '')
+            re = await lapi.findNearbyPositions(addr);
+            // re = await lapi.findAllPositions();
+        console.log(re);
+        if(re != null && re != undefined && re.positions != null && re.positions != undefined){
+            this.setState({
+                nearbyPositions: re.positions
+            });
+        }
     }
     async componentWillMount(){
         console.log('componentWillMount')
@@ -42,8 +56,8 @@ class Positions extends React.Component{
         let addr = this.constructAddrByLocation(info);
         let re = {};
         if(addr != '')
-            re = await lapi.findAllPositions();
-            // re = await lapi.findNearbyPositions(addr);
+            re = await lapi.findNearbyPositions(addr);
+            // re = await lapi.findAllPositions();
         console.log(re);
         if(info){
             this.setState({
@@ -75,7 +89,7 @@ class Positions extends React.Component{
             nearbyPositions.map((ele, idx)=>{
                 let headerName = ele.name;
                 const positionPanelItem = (
-                    <Accordion.Panel header={headerName} key={`position_${ele._id}`} style={{color:'blue'}}>
+                    <Accordion.Panel header={headerName} key={`position_${ele._id}`}>
                         <List>
                             <InputItem
                             name="companyName"
