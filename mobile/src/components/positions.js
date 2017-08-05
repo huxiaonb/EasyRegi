@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem} from 'antd-mobile';
 import lapi from './registerProfile/lapi'
 import './less/index.less'
 
@@ -12,42 +12,61 @@ const Brief = Item.Brief;
 class Positions extends React.Component{
     state = {
         geolocation : {},
-        nearbyPositions : []
+        nearbyPositions : [],
+        isLocationExist: false
+    }
+    constructAddrByLocation(info){
+        let addrArr = [], addr = '';
+        if(info != null && info != undefined){
+            if(info.province != null && info.province != undefined && info.province != '')
+                addrArr.push(info.province);
+            if(info.city != null && info.city != undefined && info.city != '')
+                addrArr.push(info.city);
+            if(info.district != null && info.district != undefined && info.district != '')
+                addrArr.push(info.district);
+        }
+        addr = addrArr.join(' ');
+        return addr;
     }
     componentWillReceiveProps(nextProps){
         alert(JSON.stringify(nextProps));
         this.setState({
-            geolocation : nextProps.args
+            geolocation : nextProps.args,
+            isLocationExist: true
         });
     }
     async componentWillMount(){
         console.log('componentWillMount')
         let info = this.props.args;
-        // let addrArr = [];
-        // if(info != null && info != undefined){
-        //     if(info.province != null && info.province != undefined && info.province != '')
-        //         addrArr.push(info.province);
-        //     if(info.city != null && info.city != undefined && info.city != '')
-        //         addrArr.push(info.city);
-        //     if(info.district != null && info.district != undefined && info.district != '')
-        //         addrArr.push(info.district);
-        // }
-        // let addr = addrArr.join(' '),
-        //     re = [];
-        // if(addr != '')
-            let re = await lapi.findAllPositions();
+        console.log(info);
+        let addr = this.constructAddrByLocation(info);
+        let re = {};
+        if(addr != '')
+            re = await lapi.findAllPositions();
             // re = await lapi.findNearbyPositions(addr);
         console.log(re);
-        console.log(typeof re);
-        this.setState({
-            geolocation : info,
-            nearbyPositions: re.positions
-        });
+        if(info){
+            this.setState({
+                geolocation : info,
+                isLocationExist: true
+            });
+        }
+        if(re != null && re != undefined && re.positions != null && re.positions != undefined){
+            this.setState({
+                nearbyPositions: re.positions
+            });
+        }
         //get position List
     }
     render(){
-        let {geolocation, nearbyPositions} = this.state;
+        let {geolocation, nearbyPositions, isLocationExist} = this.state;
         // let location = JSON.stringify(geolocation)
+        const loadingIcon = (
+            <Icon type="loading" size="md" color="blue"/>
+            
+        ), checkIcon = (
+            <Icon type="check-circle-o" size="md" color="blue" />
+        )
         let addr = '';
         if(geolocation != null && geolocation != undefined)
             addr =  geolocation.nation + ',' + geolocation.province + ',' + geolocation.city + ',' +  geolocation.district + ',' + geolocation.addr;
@@ -56,7 +75,7 @@ class Positions extends React.Component{
             nearbyPositions.map((ele, idx)=>{
                 let headerName = ele.name;
                 const positionPanelItem = (
-                    <Accordion.Panel header={headerName} key={`position_${ele._id}`}>
+                    <Accordion.Panel header={headerName} key={`position_${ele._id}`} style={{color:'blue'}}>
                         <List>
                             <InputItem
                             name="companyName"
@@ -74,10 +93,18 @@ class Positions extends React.Component{
                             value={ele.totalRecruiters}
                             disabled>招聘人数</InputItem>
                             <InputItem
-                            name="positionDesc"
+                            name="phoneNumber"
                             placeholder=""
-                            value={ele.positionDesc}
-                            disabled>岗位描述</InputItem>
+                            value={ele.phoneNumber}
+                            disabled>联系电话</InputItem>
+                            <TextareaItem
+                                name="positionDesc"
+                                value={ele.positionDesc}
+                                placeholder=""
+                                title="岗位描述"
+                                rows={5}
+                                disabled
+                            />
                         </List>
                     </Accordion.Panel>
                 );
@@ -89,6 +116,9 @@ class Positions extends React.Component{
                 <div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >附近的职位</div>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
+                        <div>
+                        {isLocationExist? (checkIcon):(loadingIcon)}
+                        </div>
                         <Accordion accordion>
                             <Accordion.Panel header={addr} className="">地址：{addr}</Accordion.Panel>
                         </Accordion>

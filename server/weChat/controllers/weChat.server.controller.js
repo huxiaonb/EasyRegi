@@ -208,7 +208,7 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
         console.log('openId exists');
         return next();
     } else if(_.isEmpty(wechatCode)){
-        // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
         //redirect to register page or next page as submit also need check this
         //return next();
         console.log('wechat code does not exist');
@@ -553,7 +553,8 @@ exports.findAllPositions = function(req, res, next){
                   companyName: _.get(cmps, ['0', 'companyName'], ''),
                   totalRecruiters: _.get(position, ['totalRecruiters'], ''),
                   salary: _.get(position, ['salary'], ''),
-                  positionDesc: _.get(position, ['positionDesc'], '')
+                  positionDesc: _.get(position, ['positionDesc'], ''),
+                  phoneNumber: _.get(position, ['phoneNumber'], '')
                 };
                 resultPositions.push(clonePosition);
               }
