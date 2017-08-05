@@ -17,15 +17,15 @@ export default class DistrictSelect extends React.Component{
             areas : []
         }
     }
-    async getInitialData(){
+    async getInitialData(arr){
         let r = await api.getAllProvinces();
         let data = await r.json();
         if(data.success){
-            let args = 'label='+ '北京市';
+            let args = 'label='+ arr[0];
             let r = await api.getNextGradeDistricts(args);
             let sdata = await r.json();
             if(sdata.success){
-                let args = 'label='+ '市辖区' + '&&parentLabel=' + '北京市';
+                let args = 'label='+ arr[1] + '&&parentLabel=' + arr[0];
                 let r = await api.getNextGradeDistricts(args);
                 let tdata = await r.json();
                 if(tdata.success){
@@ -128,10 +128,30 @@ export default class DistrictSelect extends React.Component{
     }
 
     async componentWillMount(){
-        await this.getInitialData()
+        let {initValue} = this.props;
+        if(initValue.length){
+            switch(initValue.length){
+                case 1 :
+                this.setState({pValue : initValue[0],cValue : '', thirdValue : ''});
+                break;
+                case 2 : 
+                this.setState({pValue : initValue[0],cValue : initValue[1],thirdValue : ''});
+                break;
+                case 3 : this.setState({pValue : initValue[0],cValue : initValue[1], thirdValue : initValue[2]});
+                break;
+                default :
+                break;
+            }
+            
+            await this.getInitialData(initValue);
+        }else{
+            await this.getInitialData(['北京市','市辖区','东城区'])
+        }
+        
     }
     render(){
         const { pData, pValue, cValue, cData, thirdValue, thdData } = this.state;
+        
         return(
             <div>
                 <span >省：</span>

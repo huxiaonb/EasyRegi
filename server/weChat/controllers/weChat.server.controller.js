@@ -132,7 +132,7 @@ exports.register = function(req, res) {
   res.render('server/weChat/views/register', {openId: _.get(req, ['session', 'openId'], '')});
 }
 
-exports.maintainn = function(req, res) {
+exports.maintain = function(req, res) {
   res.render('server/weChat/views/index');
 }
 

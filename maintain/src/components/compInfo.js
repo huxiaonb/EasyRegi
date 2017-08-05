@@ -26,21 +26,34 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 class CompInfo extends React.Component{
     static contextTypes = {
-        comp: PropTypes.object
+        comp: PropTypes.object,
+        getCompanyInfo : PropTypes.func
     }
     state = {
         editFlag:false,
+        dsArr : [],
+        detailAddr : '',
         positionNumber : 0,
         applicantNumber : 0
     }
     async editCompInfo(){
         if(this.state.editFlag){
+            let {detailAddr} = this.state;
             let {form} = this.props;
+            form.validateFieldsAndScroll(async (err, values)=>{
+             if (!!err){
+                 return;
+             }
             let {pValue, cValue, thirdValue} = this.refs.dSelect.state;
+            let dsValue = [];
+            pValue ? dsValue.push(pValue) : '';
+            cValue ? dsValue.push(cValue) : '';
+            thirdValue ? dsValue.push(thirdValue) : '';
+            
             let compInfo = Object.assign({},{
                 companyName: form.getFieldValue('comp_name'),
                 alias: form.getFieldValue('comp_alias'),
-                companyAddress: pValue + ' ' + cValue + ' ' + thirdValue + ' ' +  form.getFieldValue('comp_addr'),
+                companyAddress: dsValue.join(',') +  detailAddr,
                 companyType: form.getFieldValue('comp_prop'),
                 companyScale: form.getFieldValue('comp_size'),
                 phoneNumber: form.getFieldValue('comp_phone'),
@@ -49,10 +62,17 @@ class CompInfo extends React.Component{
                 description: form.getFieldValue('comp_desc'),
             });
             let r = await api.updateComp(compInfo);
-            message.success('更新成功');
-            this.setState({
-                editFlag : !this.state.editFlag
-            })
+            if(r.status === 200){
+                message.success('更新成功');
+                this.context.getCompanyInfo();
+                this.setState({
+                    dsArr : dsValue,
+                    editFlag : !this.state.editFlag
+                })
+            }
+        })
+            
+            
         }else{
             this.setState({
                 editFlag : !this.state.editFlag
@@ -61,20 +81,28 @@ class CompInfo extends React.Component{
     }
     async componentWillMount(){
         try{
+            let tArr = [...this.context.comp.companyAddress.split(',')];
+            let dAddr = tArr.pop();
             let res = await api.getBasicInfo(this.context.comp._id)
             let data = await res.json();
             this.setState({
                 positionNumber : data.positionNumber,
-                applicantNumber : data.applicantNumber
+                applicantNumber : data.applicantNumber,
+                detailAddr : dAddr,
+                dsArr : tArr
             })
         }catch(e){
             console.log(e)
         }
     }
+    detailChange(e){
+        this.setState({
+            detailAddr :　e.target.value
+        })
+    }
     render(){
         let {getFieldDecorator} = this.props.form;
         let {comp} = this.context;
-
         let infoSection=this.state.editFlag?(
             <div className='inner'>
                     <Form>
@@ -86,7 +114,7 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_name',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,message:'请输入有效的公司全称'
                                 }],initialValue:comp.companyName
                             })(
                                 <Input className='login-text' placeholder='公司全称'/>
@@ -99,7 +127,7 @@ class CompInfo extends React.Component{
                             hasFeedback
                             labelCol={{ span: 3 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            {getFieldDecorator('comp_name',{
+                            {getFieldDecorator('comp_alias',{
                                 rules:[{
                                     type:'string'
                                 }],initialValue:comp.alias
@@ -155,7 +183,7 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_contact_p',{
                                 rules:[{
-                                    type:'string',required:true
+                                    type:'string',required:true,message:'请输入有效的联系人'
                                 }],initialValue:comp.contactPersonName
                             })(
                                 <Input className='login-text' placeholder='联系人'/>
@@ -170,10 +198,10 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_phone',{
                                 rules:[{
-                                    required:true,message:'请输入联系电话！'
+                                    required:true,message:'请输入有效的联系电话！'
                                 }],initialValue:comp.phoneNumber
                             })(
-                                <Input className='login-text' type='number' placeholder='联系电话' type='password'/>
+                                <Input className='login-text' type='number' placeholder='联系电话' />
                             )}
                         </FormItem>
                         
@@ -199,12 +227,12 @@ class CompInfo extends React.Component{
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('comp_addr',{
                                 rules:[{
-                                    type:'string',required:true,message:'请输入正确的公司地址!'
-                                }],initialValue:comp.companyAddress
+                                    type:'string',/*required:true,message:'请输入正确的公司地址!'*/
+                                }]
                             })(
                                 <div>
-                                    <DistrictSelect refs='c_dSelect'/>
-                                    <div><span>详细地址：</span><Input style={{marginTop:'10px',width:'70%'}} placeholder='请输入详细地址'/></div>
+                                    <DistrictSelect ref='dSelect' initValue={this.state.dsArr}/>
+                                    <div><span>详细地址：</span><Input value={this.state.detailAddr} onChange={this.detailChange.bind(this)} style={{marginTop:'10px',width:'70%'}} placeholder='请输入详细地址'/></div>
                                 </div>
                             )}
                         </FormItem>

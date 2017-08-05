@@ -4,6 +4,7 @@ import {Form, Button, Input, Select, Row, Col, message} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect';
 import DistrictSelect from './districtSelect'
+import Loading from './Loading'
 // import AutoComplete from 'antd/lib/auto-complete'
 // import 'antd/lib/auto-complete/style/index.less';
 // import Input from 'antd/lib/input'
@@ -31,6 +32,7 @@ class Login extends React.Component{
     }
 
     state = {
+        loading : false,
         registerFlag : false,
     }
     loginTo(){
@@ -46,6 +48,7 @@ class Login extends React.Component{
     }
  
     async register(){
+        
         let {form} = this.props;
         form.validateFields(['comp_name', 'comp_alias', 'comp_pwd', 'comp_prop', 'comp_size', 'comp_phone', 'comp_contact_p', 'comp_email', 'comp_addr', 'comp_desc'],async (err, values)=>{
              if (!!err){
@@ -65,13 +68,17 @@ class Login extends React.Component{
                 description: form.getFieldValue('comp_desc'),
             });
             //console.log(comp);
+            this.setState({loading:true});
             let r = await api.createComp(comp);
             let data = await r.json();
             if(data.success && data.redirect){
+                this.setState({loading:false});
                 window.location.href = '../../register/active';
             }else if(data.errmsg){
+                this.setState({loading:false});
                 message.error(data.errmsg)
             }else{
+                this.setState({loading:false});
                 message.error('未知错误请联系管理员！');
             }
         })
@@ -88,6 +95,11 @@ class Login extends React.Component{
     render(){
         let {getFieldDecorator} = this.props.form;
         let {registerFlag} = this.state;
+        if(this.state.loading){
+            return(<div>
+                <Loading />
+            </div>);
+        }
         const loginPage = (
             <div className='login-background'>
             

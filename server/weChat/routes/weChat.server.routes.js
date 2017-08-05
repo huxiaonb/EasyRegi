@@ -23,7 +23,7 @@ module.exports = function (app) {
   app.route('/registerCompany').get(weChatController.renderRegisterCompanyPage);
   app.route('/weChat/applicant/submitRegisterCompany').post(weChatController.submitRegisterCompany);
   app.route('/weChat/getAllCompanyNames').get(weChatController.getAllCompanyNames);
-  app.route('/maintain').get(weChatController.maintainn);
+  app.route('/maintain').get(weChatController.maintain);
   app.route('/positions').get(weChatController.positions);
   app.route('/weChat/pay').post(weChatController.createUnifiedOrder);
   app.route('/weChat/position/findNearbyPositions/:addressReg').get(weChatController.findNearbyPositions);

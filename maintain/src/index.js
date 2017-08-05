@@ -31,13 +31,15 @@ import api from './apiCollect'
 class Index extends React.Component {
   static childContextTypes = {
         comp: PropTypes.object,
-        login: PropTypes.func
+        login: PropTypes.func,
+        getCompanyInfo : PropTypes.func
     }
 
   getChildContext(){
       return {
           comp: this.state.companyInfo,
-          login : this.login.bind(this)
+          login : this.login.bind(this),
+          getCompanyInfo : this.getCompInfo.bind(this)
       }
   }
   state = {
@@ -73,7 +75,7 @@ class Index extends React.Component {
       }
     }
   }
-  async componentWillMount(){
+  async getCompInfo(){
     let res = await api.getCompanyInfo({});
     let data = await res.json();
     if(data.success && data.isLogin){
@@ -82,6 +84,10 @@ class Index extends React.Component {
         login: true
       })
     }
+  }
+ 
+  componentWillMount(){
+    this.getCompInfo();
   }
   render() {
     let {companyInfo} = this.state;
