@@ -144,8 +144,8 @@ class Positions extends React.Component{
                         </Accordion>
                     </div>
                 </div>
-                <div className='ant-layout-footer' style={{ textAlign: 'center' }}>
-                    M & G PRESENTS ©2017  (づ￣ 3￣)づ 
+                <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>
+                    Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号-3 
                 </div>
             </div>
         )
