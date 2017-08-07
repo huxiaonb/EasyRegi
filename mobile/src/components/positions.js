@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem,Toast} from 'antd-mobile';
 import lapi from './registerProfile/lapi'
 import './less/index.less'
 
@@ -11,6 +11,7 @@ const Brief = Item.Brief;
 
 class Positions extends React.Component{
     state = {
+        locationFlag : false,
         geolocation : {},
         nearbyPositions : [],
         isLocationExist: false
@@ -29,7 +30,7 @@ class Positions extends React.Component{
         return addr;
     }
     async componentWillReceiveProps(nextProps){
-        alert(JSON.stringify(nextProps));
+        //alert(JSON.stringify(nextProps));
         if(!!nextProps){
             this.setState({
                 geolocation : nextProps.args,
@@ -50,15 +51,25 @@ class Positions extends React.Component{
         }
     }
     async componentWillMount(){
-        console.log('componentWillMount')
+        //console.log('componentWillMount')
         let info = this.props.args;
+        //未成功获取位置信息
+        if(!info){
+            this.setState({
+                locationFlag : true
+            });
+            return;
+        }
         console.log(info);
-        let addr = this.constructAddrByLocation(info);
         let re = {};
-        if(addr != '')
+        let addr = this.constructAddrByLocation(info);;
+        if(addr != ''){
+            Toast.loading('Loading...', 0);
             re = await lapi.findNearbyPositions(addr);
+        }
+            
             // re = await lapi.findAllPositions();
-        console.log(re);
+        //console.log(re);
         if(info){
             this.setState({
                 geolocation : info,
@@ -67,20 +78,22 @@ class Positions extends React.Component{
         }
         if(re != null && re != undefined && re.positions != null && re.positions != undefined){
             this.setState({
-                nearbyPositions: re.positions
+                nearbyPositions: re.positions,
+                locationFlag :　false,
             });
+             Toast.hide();
         }
         //get position List
     }
     render(){
-        let {geolocation, nearbyPositions, isLocationExist} = this.state;
+        let {geolocation, nearbyPositions, isLocationExist,loactionFlag} = this.state;
         // let location = JSON.stringify(geolocation)
-        const loadingIcon = (
-            <Icon type="loading" size="md" color="blue"/>
-            
-        ), checkIcon = (
-            <Icon type="check-circle-o" size="md" color="blue" />
-        )
+        if(loactionFlag){
+            return (<div>
+                未能获取附近职位
+            </div>)
+        }
+
         let addr = '';
         if(geolocation != null && geolocation != undefined)
             addr =  geolocation.nation + ',' + geolocation.province + ',' + geolocation.city + ',' +  geolocation.district + ',' + geolocation.addr;
@@ -131,11 +144,9 @@ class Positions extends React.Component{
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
                         <div>
-                        {isLocationExist? (checkIcon):(loadingIcon)}
+                        <span>当前位置：{addr.split(',').pop()}</span>
                         </div>
-                        <Accordion accordion>
-                            <Accordion.Panel header={addr} className="">地址：{addr}</Accordion.Panel>
-                        </Accordion>
+                        
                         {/*<Accordion>
                             <Accordion.Panel header="对象" className="">api返回对象：{location}</Accordion.Panel>
                         </Accordion>*/}

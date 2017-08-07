@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace, Result, Icon} from 'antd-mobile'
-import Loading from './Loading';
+import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace, Result, Icon, Toast} from 'antd-mobile'
+
 
 import lapi from './registerProfile/lapi'
 import './less/index.less'
@@ -15,7 +15,6 @@ const openId = $('#openId').text();
 
 class Company extends React.Component{
     state={
-        loading : false,
         payFlag : false,
         bCheck : false,
         mCheck : false,
@@ -34,7 +33,8 @@ class Company extends React.Component{
 
   
     async subm(){
-        this.setState({loading:true})
+        Toast.loading('Loading...', 0);
+        
         let res = await lapi.pay();
         let that = this;
         if(res){
@@ -63,9 +63,11 @@ class Company extends React.Component{
                         
                             that.setState({
                                 payFlag : true,
-                                loading : false
-                            })
+                            });
+                            Toast.hide();
                             //console.log('成功啦！')
+                        }else{
+                            Toast.hide();
                         }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                         
                     }
@@ -316,11 +318,7 @@ class Company extends React.Component{
                 </List>);
                 educationListItem.push(educationItem);
         });
-        if(this.state.loading){
-            return(<div>
-                <Loading />
-            </div>);
-        }
+
         return(
             <div>
             {this.state.payFlag ? resultPage :

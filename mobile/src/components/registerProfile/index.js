@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import {Steps,Button,Toast,Icon} from 'antd-mobile'
 import moment from 'moment';
-import Loading from '../Loading';
 import '../less/index.less'
 
 
@@ -47,7 +46,6 @@ class Index extends React.Component {
   }
 
   state = {
-      loading : false,
       successFlag : false,
       current: 0,
       info:{
@@ -82,7 +80,7 @@ class Index extends React.Component {
     this.setState({ current });
   }
   async handleSubmit(){
-    this.setState({loading:true});
+    Toast.loading('Loading...', 0);
     //callApi && if dataObj have date value need change will copy a Object
     let{workExps,edus} = this.state.info.otherInfo;
     if(workExps.length && edus.length){
@@ -137,9 +135,10 @@ class Index extends React.Component {
       let r = re.length ? await lapi.updateApplicant(re[0]._id ,appi) : await lapi.createApplicant(appi)
       console.log(r);
       if(r){
-        this.setState({successFlag : true,loading:false});
+        this.setState({successFlag : true});
+        Toast.hide();
       }else{
-        this.setState({loading:false});
+        Toast.hide();
       }
     }
     
@@ -233,11 +232,6 @@ class Index extends React.Component {
             </div>
             );
     }
-    if(this.state.loading){
-            return(<div>
-                <Loading />
-            </div>);
-        }
     return(
       <div className='ant-layout'>
           {/*<div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >编辑个人简历</div>*/}
