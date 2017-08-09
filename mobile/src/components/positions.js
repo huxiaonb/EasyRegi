@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem,Toast} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
 import lapi from './registerProfile/lapi'
 import './less/index.less'
 
@@ -30,67 +30,78 @@ class Positions extends React.Component{
         return addr;
     }
     async componentWillReceiveProps(nextProps){
-        //alert(JSON.stringify(nextProps));
-        if(!!nextProps){
+        let info = !!nextProps ?　nextProps.args : '';　
+        if(!info || info.addr === ''){
+            this.setState({
+                locationFlag : true
+            });
+        }else if(!!nextProps){
             this.setState({
                 geolocation : nextProps.args,
                 isLocationExist: true
             });
-        }
-        let info = nextProps.args;
-        let addr = this.constructAddrByLocation(info);
-        let re = {};
-        if(addr != '')
-            re = await lapi.findNearbyPositions(addr);
-            // re = await lapi.findAllPositions();
-        console.log(re);
-        if(re != null && re != undefined && re.positions != null && re.positions != undefined){
-            this.setState({
-                nearbyPositions: re.positions
-            });
+            let addr = this.constructAddrByLocation(info);
+            let re = {};
+            if(addr != '')
+                re = await lapi.findNearbyPositions(addr);
+                // re = await lapi.findAllPositions();
+            console.log(re);
+            if(re != null && re != undefined && re.positions != null && re.positions != undefined){
+                this.setState({
+                    nearbyPositions: re.positions
+                });
+            }
         }
     }
     async componentWillMount(){
         //console.log('componentWillMount')
+        //alert('2');
         let info = this.props.args;
         //未成功获取位置信息
-        if(!info){
+        //alert(JSON.stringify(this.props.args));
+        if(!info ){
+            //alert('4');
             this.setState({
                 locationFlag : true
             });
-            return;
+        }else{
+            //alert('3');
+            let re = {};
+            let addr = this.constructAddrByLocation(info);;
+            if(addr != ''){
+                Toast.loading('Loading...', 0);
+                re = await lapi.findNearbyPositions(addr);
+            }
+                
+                // re = await lapi.findAllPositions();
+            //console.log(re);
+            if(info){
+                this.setState({
+                    geolocation : info,
+                    isLocationExist: true
+                });
+            }
+            if(re != null && re != undefined && re.positions != null && re.positions != undefined){
+                this.setState({
+                    nearbyPositions: re.positions,
+                    locationFlag :　false,
+                });
+                Toast.hide();
+            }
         }
-        console.log(info);
-        let re = {};
-        let addr = this.constructAddrByLocation(info);;
-        if(addr != ''){
-            Toast.loading('Loading...', 0);
-            re = await lapi.findNearbyPositions(addr);
-        }
-            
-            // re = await lapi.findAllPositions();
-        //console.log(re);
-        if(info){
-            this.setState({
-                geolocation : info,
-                isLocationExist: true
-            });
-        }
-        if(re != null && re != undefined && re.positions != null && re.positions != undefined){
-            this.setState({
-                nearbyPositions: re.positions,
-                locationFlag :　false,
-            });
-             Toast.hide();
-        }
+        
         //get position List
     }
     render(){
-        let {geolocation, nearbyPositions, isLocationExist,loactionFlag} = this.state;
+        let {geolocation, nearbyPositions, isLocationExist,locationFlag} = this.state;
         // let location = JSON.stringify(geolocation)
-        if(loactionFlag){
-            return (<div>
-                未能获取附近职位
+        if(locationFlag){
+            return (
+            <div className="result-example">
+                <Result style={{height:'500px',marginTop:'30%'}}
+                    img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
+                    message="未能获取到位置信息，无法显示周边招聘信息"
+                />                
             </div>)
         }
 
@@ -143,7 +154,7 @@ class Positions extends React.Component{
                 <div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >附近的职位</div>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
-                        <div>
+                        <div className='curr-geo'>
                         <span>当前位置：{addr.split(',').pop()}</span>
                         </div>
                         
