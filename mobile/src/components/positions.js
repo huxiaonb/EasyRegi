@@ -63,7 +63,7 @@ class Positions extends React.Component{
         let info = this.props.args;
         //未成功获取位置信息
         //alert(JSON.stringify(this.props.args));
-        if(!info ){
+        if(!info || info.addr === ''){
             //alert('4');
             this.setState({
                 locationFlag : true
