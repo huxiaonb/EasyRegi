@@ -169,7 +169,6 @@ class Positions extends React.Component{
         
         return(
             <div className='ant-layout'>
-                <div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >附近的职位</div>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
                         <div className='curr-geo'>
