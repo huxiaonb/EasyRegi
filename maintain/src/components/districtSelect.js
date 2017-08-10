@@ -129,7 +129,7 @@ export default class DistrictSelect extends React.Component{
 
     async componentWillMount(){
         let {initValue} = this.props;
-        if(initValue.length){
+        if(initValue){
             switch(initValue.length){
                 case 1 :
                 this.setState({pValue : initValue[0],cValue : '', thirdValue : ''});

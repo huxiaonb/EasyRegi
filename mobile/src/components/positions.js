@@ -11,9 +11,11 @@ const Brief = Item.Brief;
 
 class Positions extends React.Component{
     state = {
+        noMoreP : false,
         locationFlag : false,
         geolocation : {},
         nearbyPositions : [],
+        positionPanelLists : [],
         isLocationExist: false
     }
     constructAddrByLocation(info){
@@ -26,7 +28,7 @@ class Positions extends React.Component{
             if(info.district != null && info.district != undefined && info.district != '')
                 addrArr.push(info.district);
         }
-        addr = addrArr.join(' ');
+        addr = addrArr.join(',');
         return addr;
     }
     async componentWillReceiveProps(nextProps){
@@ -42,14 +44,16 @@ class Positions extends React.Component{
             });
             let addr = this.constructAddrByLocation(info);
             let re = {};
-            if(addr != '')
-                re = await lapi.findNearbyPositions(addr);
+            if(addr != ''){
+                Toast.loading('Loading...', 0);
+                re = await lapi.findNearbyPositions(addr);}
                 // re = await lapi.findAllPositions();
-            console.log(re);
             if(re != null && re != undefined && re.positions != null && re.positions != undefined){
                 this.setState({
-                    nearbyPositions: re.positions
+                    nearbyPositions: re.positions,
                 });
+                this.loadMore();
+                Toast.hide();
             }
         }
     }
@@ -86,31 +90,22 @@ class Positions extends React.Component{
                     nearbyPositions: re.positions,
                     locationFlag :　false,
                 });
+                this.loadMore();
                 Toast.hide();
             }
         }
         
         //get position List
     }
-    render(){
-        let {geolocation, nearbyPositions, isLocationExist,locationFlag} = this.state;
-        // let location = JSON.stringify(geolocation)
-        if(locationFlag){
-            return (
-            <div className="result-example">
-                <Result style={{height:'500px',marginTop:'30%'}}
-                    img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
-                    message="未能获取到位置信息，无法显示周边招聘信息"
-                />                
-            </div>)
+    loadMore(){
+        let {nearbyPositions} = this.state;
+        let waitShowList = nearbyPositions.slice(-5);
+        if(waitShowList && waitShowList.length < 5){
+            this.setState({noMoreP : true})
         }
-
-        let addr = '';
-        if(geolocation != null && geolocation != undefined)
-            addr =  geolocation.nation + ',' + geolocation.province + ',' + geolocation.city + ',' +  geolocation.district + ',' + geolocation.addr;
-        let positionPanelLists = [];
-        if(nearbyPositions != null && nearbyPositions != undefined) {
-            nearbyPositions.map((ele, idx)=>{
+        let pArr = [...this.state.positionPanelLists];
+        if(waitShowList != null && waitShowList != undefined) {
+            waitShowList.map((ele, idx)=>{
                 let headerName = ele.name;
                 const positionPanelItem = (
                     <Accordion.Panel header={headerName} key={`position_${ele._id}`}>
@@ -146,9 +141,32 @@ class Positions extends React.Component{
                         </List>
                     </Accordion.Panel>
                 );
-                positionPanelLists.push(positionPanelItem);
+                pArr.push(positionPanelItem);
             });
         }
+        this.setState({
+            nearbyPositions : nearbyPositions.slice(0,-5),
+            positionPanelLists : pArr
+        });
+    }
+    render(){
+        let {geolocation, nearbyPositions, isLocationExist,locationFlag, waitShowList, positionPanelLists, noMoreP} = this.state;
+        // let location = JSON.stringify(geolocation)
+        if(locationFlag){
+            return (
+            <div className="result-example">
+                <Result style={{height:'500px',marginTop:'30%'}}
+                    img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
+                    message="未能获取到位置信息，无法显示周边招聘信息"
+                />                
+            </div>)
+        }
+
+        let addr = '';
+        if(geolocation != null && geolocation != undefined)
+            addr =  geolocation.nation + ',' + geolocation.province + ',' + geolocation.city + ',' +  geolocation.district + ',' + geolocation.addr;
+        ;
+        
         return(
             <div className='ant-layout'>
                 <div className='ant-layout-header' style={{ padding: 0, textAlign:'center', background: '#108ee9',color: '#ffffff', fontSize:'24px'}} >附近的职位</div>
@@ -164,6 +182,10 @@ class Positions extends React.Component{
                         <Accordion>
                             {positionPanelLists}
                         </Accordion>
+                        {noMoreP ? <div style={{marginTop:'10px',textAlign:'center',opacity:0.5,fontSize:'18px'}}>
+                            <span style={{}}>已列出所有附件职位</span>
+                        </div> :
+                        <div style={{marginTop:'10px'}}><Button type='primary' onClick={this.loadMore.bind(this)}>加载更多</Button></div>}
                     </div>
                 </div>
                 <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>
