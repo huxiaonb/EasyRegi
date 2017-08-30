@@ -25,8 +25,8 @@ class Positions extends React.Component{
                 addrArr.push(info.province);
             if(info.city != null && info.city != undefined && info.city != '')
                 addrArr.push(info.city);
-            if(info.district != null && info.district != undefined && info.district != '')
-                addrArr.push(info.district);
+            // if(info.district != null && info.district != undefined && info.district != '')
+            //     addrArr.push(info.district);
         }
         addr = addrArr.join(',');
         return addr;
@@ -182,7 +182,7 @@ class Positions extends React.Component{
                             {positionPanelLists}
                         </Accordion>
                         {noMoreP ? <div style={{marginTop:'10px',textAlign:'center',opacity:0.5,fontSize:'18px'}}>
-                            <span style={{}}>已列出所有附件职位</span>
+                            <span style={{}}>已列出所有附近职位</span>
                         </div> :
                         <div style={{marginTop:'10px'}}><Button type='primary' onClick={this.loadMore.bind(this)}>加载更多</Button></div>}
                     </div>

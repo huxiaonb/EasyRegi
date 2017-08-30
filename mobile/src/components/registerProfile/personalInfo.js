@@ -317,7 +317,7 @@ class PersonalInfo extends React.Component {
                         rules: [{ type:'object', required: true, message: '请选择有效期开始时间!' }],
                         initialValue : personal.validFrom
                     })} 
-                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期起</List.Item>
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期起</List.Item>
                 </DatePicker>
             </FormItem>
             <FormItem>
@@ -327,7 +327,7 @@ class PersonalInfo extends React.Component {
                         rules: [{ type:'object', required: true, message: '请选择有效期结束时间!' }],
                         initialValue : personal.validTo
                     })} 
-                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>有效期止</List.Item>
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期止</List.Item>
                 </DatePicker>
             </FormItem>
             <FormItem>                
@@ -451,7 +451,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入邮箱"
                 >
-                <span className='custom-required'>*</span>邮箱
+                邮箱
             </InputItem>
             <InputItem
                 name="tele"
