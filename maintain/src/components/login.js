@@ -125,7 +125,7 @@ class Login extends React.Component{
                                     required:true,message:'请输入密码！'
                                 }]
                             })(
-                                <Input className='login-text' placeholder='请输入密码' type='password'/>
+                                <Input className='login-text' placeholder='请输入密码' type='password' onPressEnter={this.loginTo.bind(this)}/>
                             )}
                         </FormItem>
                     
