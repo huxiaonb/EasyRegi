@@ -53,7 +53,7 @@ class CompInfo extends React.Component{
             let compInfo = Object.assign({},{
                 companyName: form.getFieldValue('comp_name'),
                 alias: form.getFieldValue('comp_alias'),
-                companyAddress: dsValue.join(',') +  detailAddr,
+                companyAddress: dsValue.join(',') + ',' + detailAddr,
                 companyType: form.getFieldValue('comp_prop'),
                 companyScale: form.getFieldValue('comp_size'),
                 phoneNumber: form.getFieldValue('comp_phone'),
