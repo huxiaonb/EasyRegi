@@ -1,0 +1,67 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+//import { Upload, Icon, Modal } from 'antd';
+import {Toast} from 'antd-mobile';
+import Upload from 'antd/lib/upload';
+import Icon from 'antd/lib/icon';
+import Modal from 'antd/lib/modal';
+import './less/image.less'
+import 'antd/lib/style/index.less';
+import 'antd/lib/grid/style/index.less';
+import 'antd/lib/upload/style/index.less';
+import 'antd/lib/modal/style/index.less';
+
+export default class ImagePicker extends React.Component {
+  state = {
+    previewVisible: false,
+    previewImage: '',
+    fileList: [],
+  };
+
+  handleCancel = () => this.setState({ previewVisible: false })
+
+  handlePreview = (file) => {
+    this.setState({
+      previewImage: file.url || file.thumbUrl,
+      previewVisible: true,
+    });
+  }
+  beforeUpload(file) {
+        const isLt2M = file.size / 1024 / 1024 < 5
+        if (!isLt2M) {
+            Toast.info('Image must smaller than 5MB!');
+        }
+        return !!isLt2M;
+    }
+
+  handleChange = ({ fileList }) => this.setState({ fileList })
+
+  render() {
+    const {openId} = this.props;
+    const { previewVisible, previewImage, fileList } = this.state;
+    const uploadButton = (
+      <div>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    );
+    return (
+      <div className="clearfix">
+        <Upload
+          action={`../weChat/applicant/personalInfo/submit/` + openId}
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={this.handlePreview}
+          onChange={this.handleChange}
+          beforeUpload={this.beforeUpload}
+        >
+          {fileList.length >= 4 ? null : uploadButton}
+        </Upload>
+        <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
+          <img alt="example" style={{ width: '100%' }} src={previewImage} />
+        </Modal>
+      </div>
+    );
+  }
+}
+

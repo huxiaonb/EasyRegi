@@ -216,7 +216,7 @@ class Index extends React.Component {
         <div className="steps-content">
           {steps[this.state.current].content=='0' && <PersonalInfo personal={personal} next={this.next.bind(this)}/>}
           {steps[this.state.current].content=='1' && <FamilyInfo family={family} prev={this.prev.bind(this)} next={this.next.bind(this)}/>}
-          {steps[this.state.current].content=='2' && <OtherInfo  otherInfo={otherInfo} prev={this.prev.bind(this)} handleSubmit={this.handleSubmit.bind(this)} />}
+          {steps[this.state.current].content=='2' && <OtherInfo  openId={openId} otherInfo={otherInfo} prev={this.prev.bind(this)} handleSubmit={this.handleSubmit.bind(this)} />}
         </div>
       
       </div>

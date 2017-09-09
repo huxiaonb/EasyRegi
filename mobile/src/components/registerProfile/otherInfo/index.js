@@ -3,12 +3,13 @@ import ReactDOM from 'react-dom';
 
 import PropTypes from 'prop-types';
 
-import {Button, Toast} from 'antd-mobile'
+import {Button, Toast, Card, Badge} from 'antd-mobile'
 
 
 
 import WorkExp from './work';
 import EduExp from './education'
+import ImagePicker from '../../ImagePicker';
 
 export default class OhterInfo extends React.Component {
     static contextTypes = {
@@ -129,11 +130,24 @@ export default class OhterInfo extends React.Component {
     }*/
     render(){
         let { workExps,edus,wkeys,ekeys } = this.context.profile.otherInfo;
-        console.log(ekeys,wkeys);
+        const noti = (
+            
+            <Badge dot>
+                <span title='请分别上传 免冠照片 身份证正反面照片' style={{color:'#108ee9',cursor:'pointer'}}>
+                    上传证件照
+                </span>
+            </Badge>
+         
+        )
         return (
             <div key='exp_cntr'>
                 <WorkExp workExps={workExps} wkeys={wkeys} ref='workF' />
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
+                <Card>
+                <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti}>
+                    </Card.Header>
+                    <ImagePicker openId={this.props.openId}/>
+                    </Card>
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>
                     <Button type="primary" style={{marginTop:'15px'}} onClick={this.sumitAll.bind(this)}>确认提交</Button>

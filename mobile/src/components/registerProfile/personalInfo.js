@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast} from 'antd-mobile'
 import { createForm } from 'rc-form';
 import moment from 'moment';
+import ImagePicker from '../ImagePicker';
 import  '../less/index.less';
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
@@ -51,8 +52,6 @@ class PersonalInfo extends React.Component {
     state={
         healthFlag : false,
         previewVisible: false,
-        previewImage: '',
-        fileList:[],
         healthState:['良好'],
         folk:['汉族'],
         gender:['男']
@@ -162,10 +161,7 @@ class PersonalInfo extends React.Component {
         this.setFormValue();
     }
 
-    upChange(info){
-        let fileList = info.fileList;
-        this.setState({fileList});
-    }
+    
 
     async getIdCardInfo() {
         let {form} = this.props;
@@ -205,27 +201,14 @@ class PersonalInfo extends React.Component {
         }
         Toast.hide();
     }
-    beforeUpload(file) {
-        const isLt2M = file.size / 1024 / 1024 < 5;
-        if (!isLt2M) {
-            message.error('Image must smaller than 5MB!');
-        }
-        return !!isLt2M;
-    }
-    normFile = (e) => {
-        console.log('Upload event:', e);
-        if (Array.isArray(e)) {
-        return e;
-        }
-        return e && e.fileList;
-  }
+    
     render(){
         const uploadButton = ( <Button>
                             <Icon type="upload" /> 上传照片
                         </Button>);
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let nationOptions = [],
-            {healthFlag,fileList} = this.state;
+            {healthFlag} = this.state;
         for (let key in nations) {
             nationOptions.push({label:nations[key],value:nations[key]})
         }
@@ -487,24 +470,7 @@ class PersonalInfo extends React.Component {
                >
                QQ             
              </InputItem>
-             <FormItem
-                label='上传图片'
-                name='upload'>
-                {getFieldDecorator('upload',{
-                    valuePropName: 'fileList',
-                    getValueFromEvent: this.normFile,
-                })(
-                     <Upload
-                        action={`../weChat/applicant/personalInfo/submit/` + openId}
-                        name= 'file' 
-                        beforeUpload={this.beforeUpload.bind(this)}
-                        onChange={this.upChange.bind(this)}    
-                        >
-                        {fileList.length >= 1 ? null : uploadButton}
-                       
-                    </Upload>
-                )}
-             </FormItem>
+             
         </List>
          <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.nextStep.bind(this)}>下一步</Button>
         </form>
