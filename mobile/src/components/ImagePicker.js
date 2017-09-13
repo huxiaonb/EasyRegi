@@ -41,21 +41,23 @@ export default class ImagePicker extends React.Component {
     const { previewVisible, previewImage, fileList } = this.state;
     const uploadButton = (
       <div>
-        <Icon type="plus" />
-        <div className="ant-upload-text">Upload</div>
+        <Icon style={{fontSize:'120px'}} type="plus" />
+        <div className="ant-upload-text">{this.props.labelName}</div>
       </div>
     );
     return (
       <div className="clearfix">
+      
         <Upload
-          action={`../weChat/applicant/personalInfo/submit/` + openId}
+          action={`../weChat/applicant/personalInfo/submit/` + openId + Math.random()*1000}
           listType="picture-card"
+          className="upload-span"
           fileList={fileList}
           onPreview={this.handlePreview}
           onChange={this.handleChange}
           beforeUpload={this.beforeUpload}
         >
-          {fileList.length >= 4 ? null : uploadButton}
+          {fileList.length >= 1 ? null : uploadButton}
         </Upload>
         <Modal visible={previewVisible} footer={null} onCancel={this.handleCancel}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />

@@ -130,11 +130,38 @@ export default class OhterInfo extends React.Component {
     }*/
     render(){
         let { workExps,edus,wkeys,ekeys } = this.context.profile.otherInfo;
-        const noti = (
+        const noti1 = (
             
             <Badge dot>
-                <span title='请分别上传 免冠照片 身份证正反面照片' style={{color:'#108ee9',cursor:'pointer'}}>
-                    上传证件照
+                <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
+                    请上传免冠照
+                </span>
+            </Badge>
+         
+        );
+        const noti2 = (
+            
+            <Badge dot>
+                <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
+                    请上传身份证正面照
+                </span>
+            </Badge>
+         
+        )
+        const noti3 = (
+            
+            <Badge dot>
+                <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
+                    请上传身份证反面照
+                </span>
+            </Badge>
+         
+        )
+        const noti4 = (
+            
+            <Badge dot>
+                <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
+                    请上传其他照片
                 </span>
             </Badge>
          
@@ -144,10 +171,21 @@ export default class OhterInfo extends React.Component {
                 <WorkExp workExps={workExps} wkeys={wkeys} ref='workF' />
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
                 <Card>
-                <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti}>
-                    </Card.Header>
-                    <ImagePicker openId={this.props.openId}/>
-                    </Card>
+                    <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti1}></Card.Header>
+                    <ImagePicker openId={this.props.openId} labelName='免冠照'/>
+                </Card>
+                <Card>
+                    <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti2}></Card.Header>
+                    <ImagePicker openId={this.props.openId} labelName='身份证正面'/>
+                </Card>
+                <Card>
+                    <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti3}></Card.Header>
+                    <ImagePicker openId={this.props.openId} labelName='身份证反面'/>
+                 </Card>
+                <Card>
+                    <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti4}></Card.Header>
+                    <ImagePicker openId={this.props.openId} labelName='其他照片'/>
+                </Card>
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>
                     <Button type="primary" style={{marginTop:'15px'}} onClick={this.sumitAll.bind(this)}>确认提交</Button>
