@@ -2,11 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import {Steps,Button,Toast,Icon} from 'antd-mobile'
+import {Steps,Toast,Icon} from 'antd-mobile'
 import moment from 'moment';
 import '../less/index.less'
 
-import CustomResult from '../result'
 import PersonalInfo from './personalInfo';
 import FamilyInfo from './familyInfo';
 import OtherInfo from './otherInfo/index';
@@ -224,7 +223,7 @@ class Index extends React.Component {
     if(this.state.successFlag){
       return(
             <div className="result-example">
-                <CustomResult style={{height:'500px',marginTop:'30%'}}
+                <Result style={{height:'500px',marginTop:'30%'}}
                     img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
                     title="操作成功"
                     message="简历已保存"
