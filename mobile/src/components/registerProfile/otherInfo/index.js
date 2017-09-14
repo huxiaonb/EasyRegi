@@ -10,18 +10,45 @@ import {Button, Toast, Card, Badge} from 'antd-mobile'
 import WorkExp from './work';
 import EduExp from './education'
 import ImagePicker from '../../ImagePicker';
+import lapi from '../lapi'
 
 export default class OhterInfo extends React.Component {
     static contextTypes = {
         profile: PropTypes.object,
         updateProfile: PropTypes.func
     }
+    state = {
+        fileList : []
+    }
     
-    prevStep(){
+    prevStep(){        
         this.saveForTempory(0);
         this.props.prev();
     }
+
+    presave(file, kw){
+        if(kw === 'add'){
+            this.setState({
+                fileList : [...this.state.fileList, ...[file]]
+            })
+        }else if(kw === 'del'){
+            let fArr = this.state.fileList;
+            fArr.filter((a,idx)=>{
+                if(a.uid === file.uid){
+                    fArr.splice(idx, 1);
+                }
+            })
+            this.setState({
+                fileList : fArr
+            })
+        }
+        
+    }
     sumitAll(){
+        const openId = this.props.openId;
+        this.state.fileList.map(f=>{
+            lapi.uploadFile(f, openId);
+        });
         this.saveForTempory(0);
         if(this.context.profile.otherInfo.workExps.length && this.context.profile.otherInfo.edus.length){
             this.props.handleSubmit();
@@ -172,19 +199,19 @@ export default class OhterInfo extends React.Component {
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti1}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='免冠照'/>
+                    <ImagePicker openId={this.props.openId} labelName='免冠照' presave={this.presave.bind(this)}/>
                 </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti2}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='身份证正面'/>
+                    <ImagePicker openId={this.props.openId} labelName='身份证正面' presave={this.presave.bind(this)}/>
                 </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti3}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='身份证反面'/>
+                    <ImagePicker openId={this.props.openId} labelName='身份证反面' presave={this.presave.bind(this)}/>
                  </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti4}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='其他照片'/>
+                    <ImagePicker openId={this.props.openId} labelName='其他照片' presave={this.presave.bind(this)}/>
                 </Card>
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>

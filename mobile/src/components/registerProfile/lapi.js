@@ -98,5 +98,14 @@ export default {
             url: '../weChat/position/findAllPositions',
             type: 'GET',
         })
+    },
+    uploadFile(file, openId){
+        const formData = new FormData();
+        formData.append('files[]', file);
+        return _request({
+            url:'../weChat/applicant/personalInfo/submit/' + openId,
+            type: 'POST',
+            data: formData,
+        })
     }
 }

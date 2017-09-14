@@ -6,7 +6,7 @@ import {Steps,Button,Toast,Icon} from 'antd-mobile'
 import moment from 'moment';
 import '../less/index.less'
 
-
+import CustomResult from '../result'
 import PersonalInfo from './personalInfo';
 import FamilyInfo from './familyInfo';
 import OtherInfo from './otherInfo/index';
@@ -224,7 +224,7 @@ class Index extends React.Component {
     if(this.state.successFlag){
       return(
             <div className="result-example">
-                <Result style={{height:'500px',marginTop:'30%'}}
+                <CustomResult style={{height:'500px',marginTop:'30%'}}
                     img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
                     title="操作成功"
                     message="简历已保存"

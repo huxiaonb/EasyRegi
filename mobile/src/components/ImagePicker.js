@@ -26,15 +26,24 @@ export default class ImagePicker extends React.Component {
       previewVisible: true,
     });
   }
+  handleRemove(file){
+    this.props.presave(file,'del');
+    this.setState({
+      fileList : []
+    })
+  }
   beforeUpload(file) {
         const isLt2M = file.size / 1024 / 1024 < 5
         if (!isLt2M) {
             Toast.info('Image must smaller than 5MB!');
+            return false;
+        }else{
+            this.props.presave(file,'add');
         }
-        return !!isLt2M;
+        return false;
     }
 
-  handleChange = ({ fileList }) => this.setState({ fileList })
+   handleChange = ({ fileList }) => this.setState({ fileList })
 
   render() {
     const {openId} = this.props;
@@ -49,13 +58,14 @@ export default class ImagePicker extends React.Component {
       <div className="clearfix">
       
         <Upload
-          action={`../weChat/applicant/personalInfo/submit/` + openId + Math.random()*1000}
+          action={null}
           listType="picture-card"
           className="upload-span"
           fileList={fileList}
-          onPreview={this.handlePreview}
-          onChange={this.handleChange}
-          beforeUpload={this.beforeUpload}
+          onChange={this.handleChange.bind(this)}
+          onPreview={this.handlePreview.bind(this)}
+          onRemove={this.handleRemove.bind(this)}
+          beforeUpload={this.beforeUpload.bind(this)}
         >
           {fileList.length >= 1 ? null : uploadButton}
         </Upload>
