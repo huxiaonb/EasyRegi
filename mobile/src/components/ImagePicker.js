@@ -32,18 +32,37 @@ export default class ImagePicker extends React.Component {
       fileList : []
     })
   }
+
+  getBase64(img, callback) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(img, reader.result));
+    reader.readAsDataURL(img);
+  }
+
   beforeUpload(file) {
         const isLt2M = file.size / 1024 / 1024 < 5
+        let _this = this;
         if (!isLt2M) {
             Toast.info('Image must smaller than 5MB!');
             return false;
         }else{
-            this.props.presave(file,'add');
+            let url = this.getBase64(file, (file,imageUrl) => {
+              _this.setState({
+                fileList : [{
+                  uid : file.uid,
+                  name : file.name,
+                  status : 'done',
+                  url : imageUrl
+                }]
+              });
+              this.props.presave(file,'add');
+            });
         }
-        //return false;
+        return false;
     }
 
-   handleChange = ({ fileList }) => this.setState({ fileList })
+   //handleChange = ({ fileList }) => this.setState({ fileList })
+   
 
   render() {
     const {openId} = this.props;
@@ -58,11 +77,9 @@ export default class ImagePicker extends React.Component {
       <div className="clearfix">
       
         <Upload
-          action={null}
           listType="picture-card"
           className="upload-span"
           fileList={fileList}
-          onChange={this.handleChange.bind(this)}
           onPreview={this.handlePreview.bind(this)}
           onRemove={this.handleRemove.bind(this)}
           beforeUpload={this.beforeUpload.bind(this)}
