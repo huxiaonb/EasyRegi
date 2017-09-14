@@ -40,7 +40,7 @@ export default class ImagePicker extends React.Component {
         }else{
             this.props.presave(file,'add');
         }
-        return false;
+        //return false;
     }
 
    handleChange = ({ fileList }) => this.setState({ fileList })
