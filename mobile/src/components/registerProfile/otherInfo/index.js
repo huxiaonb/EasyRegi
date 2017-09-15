@@ -26,10 +26,10 @@ export default class OhterInfo extends React.Component {
         this.props.prev();
     }
 
-    presave(file, kw){
+    presave(file, kw, type){
         if(kw === 'add'){
             this.setState({
-                fileList : [...this.state.fileList, ...[file]]
+                fileList : [...this.state.fileList, ...[{file, type}]]
             })
         }else if(kw === 'del'){
             let fArr = this.state.fileList;
@@ -199,19 +199,19 @@ export default class OhterInfo extends React.Component {
                 <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti1}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='免冠照' presave={this.presave.bind(this)}/>
+                    <ImagePicker openId={this.props.openId} type='photo' labelName='免冠照' presave={this.presave.bind(this)}/>
                 </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti2}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='身份证正面' presave={this.presave.bind(this)}/>
+                    <ImagePicker openId={this.props.openId} type='idfront' labelName='身份证正面' presave={this.presave.bind(this)}/>
                 </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti3}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='身份证反面' presave={this.presave.bind(this)}/>
+                    <ImagePicker openId={this.props.openId} type='idback' labelName='身份证反面' presave={this.presave.bind(this)}/>
                  </Card>
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti4}></Card.Header>
-                    <ImagePicker openId={this.props.openId} labelName='其他照片' presave={this.presave.bind(this)}/>
+                    <ImagePicker openId={this.props.openId} type='other' labelName='其他照片' presave={this.presave.bind(this)}/>
                 </Card>
                 <div style={{textAlign:'center', marginTop:'15px'}}>
                     <Button style={{ marginRight: 8 }} onClick={this.prevStep.bind(this)}>上一步</Button>

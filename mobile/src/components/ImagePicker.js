@@ -40,6 +40,7 @@ export default class ImagePicker extends React.Component {
   }
 
   beforeUpload(file) {
+        const {type} = this.props;
         const isLt2M = file.size / 1024 / 1024 < 5
         let _this = this;
         if (!isLt2M) {
@@ -55,7 +56,7 @@ export default class ImagePicker extends React.Component {
                   url : imageUrl
                 }]
               });
-              this.props.presave(file,'add');
+              this.props.presave(file,'add', type);
             });
         }
         return false;

@@ -99,11 +99,11 @@ export default {
             type: 'GET',
         })
     },
-    uploadFile(file, openId){
+    uploadFile(f, openId){
         const formData = new FormData();
-        formData.append('files[]', file);
+        formData.append('files[]', f.file);
         return _request({
-            url:'../weChat/applicant/personalInfo/submit?id=' + openId, //&type=photo (idfront/idback/other)
+            url:'../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,
             type: 'POST',
             data: formData,
         })
