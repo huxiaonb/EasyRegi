@@ -299,37 +299,60 @@ function updateCompanyInfo(req, res, next){
             description: _.get(companyItem, ['description'], ''),
             positions: _.get(companyItem, ['positions'], []),
         };
-        Company.update({email: email}, {$set: companyEntity}, {upsert: false}, function(err1, updateResult){
-            if(err1) {
-                console.log('Error in updating company', email, err1);
-                res.status(500).send({success: false, errmsg: 'Error in updating company'});
-            } else {
-                Company.findOne({email: email}, function(err2, dbCompany){
-                    if(err2){
-                        console.log('Error in finding company', email, err1);
-                        res.status(500).send({success: false, errmsg: 'Error in finding company'});
-                    } else if(_.isEmpty(dbCompany)){
-                        console.log('company for %s does not exists', email);
-                        res.status(500).send({success: false, errmsg: 'company does not exists'});
-                    } else {
-                        dbCompany.password = '';
-                        var clonedCompany = {
-                            _id: dbCompany._id,
-                            companyName: dbCompany.companyName,
-                            alias: dbCompany.alias,
-                            companyAddress: dbCompany.companyAddress,
-                            companyScale: dbCompany.companyScale,
-                            companyType: dbCompany.companyType,
-                            phoneNumber: dbCompany.phoneNumber,
-                            contactPersonName: dbCompany.contactPersonName,
-                            email: dbCompany.email,
-                            description: dbCompany.description,
-                            positions: dbCompany.positions
-                        };
-                        res.status(200).send({success: true, errmsg: '', company: clonedCompany});
-                    }
-                });
+        var qqLocationApi = _.get(config, ['qqapi', 'geocoderApi'], '')
+            apiKey = _.get(config, ['qqmapKey'], ''),
+            addrStr = _.get(companyItem, ['companyAddress'], ''),
+            completeAddr = addrStr.replace(/,/g, '');
+        locationUrl = qqLocationApi + '?address=' + encodeURI(completeAddr) + '&key=' + apiKey;
+
+        request.get({
+            url: locationUrl,
+            json: true
+        }, function(error, response, locationResult) {
+            console.log(locationResult);
+
+            if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(locationResult, ['status']) == 0) {
+                var addrArr = addrStr.split(','),
+                    province = _.get(locationResult, ['result', 'address_components', 'province'], ''),
+                    latLng = _.get(locationResult, ['result', 'location'], {});
+                if (addrArr.length > 0 && addrArr[0] == province && !_.isEmpty(latLng)) {
+                    companyEntity.lat = latLng.lat;
+                    companyEntity.lng = latLng.lng;
+                }
             }
+            console.log(companyEntity);
+            Company.update({email: email}, {$set: companyEntity}, {upsert: false}, function(err1, updateResult){
+                if(err1) {
+                    console.log('Error in updating company', email, err1);
+                    res.status(500).send({success: false, errmsg: 'Error in updating company'});
+                } else {
+                    Company.findOne({email: email}, function(err2, dbCompany){
+                        if(err2){
+                            console.log('Error in finding company', email, err1);
+                            res.status(500).send({success: false, errmsg: 'Error in finding company'});
+                        } else if(_.isEmpty(dbCompany)){
+                            console.log('company for %s does not exists', email);
+                            res.status(500).send({success: false, errmsg: 'company does not exists'});
+                        } else {
+                            dbCompany.password = '';
+                            var clonedCompany = {
+                                _id: dbCompany._id,
+                                companyName: dbCompany.companyName,
+                                alias: dbCompany.alias,
+                                companyAddress: dbCompany.companyAddress,
+                                companyScale: dbCompany.companyScale,
+                                companyType: dbCompany.companyType,
+                                phoneNumber: dbCompany.phoneNumber,
+                                contactPersonName: dbCompany.contactPersonName,
+                                email: dbCompany.email,
+                                description: dbCompany.description,
+                                positions: dbCompany.positions
+                            };
+                            res.status(200).send({success: true, errmsg: '', company: clonedCompany});
+                        }
+                    });
+                }
+            });
         });
     }
 }
@@ -359,7 +382,7 @@ function registerCompany(req, res, next){
                 var qqLocationApi = _.get(config, ['qqapi', 'geocoderApi'], '')
                     apiKey = _.get(config, ['qqmapKey'], ''),
                     addrStr = _.get(companyItem, ['companyAddress'], ''),
-                    completeAddr = addrStr.replace(/\s/g, '');
+                    completeAddr = addrStr.replace(/,/g, '');
                     locationUrl = qqLocationApi + '?address=' + encodeURI(completeAddr) + '&key=' + apiKey;
 
                 request.get({
@@ -367,7 +390,7 @@ function registerCompany(req, res, next){
                     json: true
                 }, function(error, response, locationResult){
                     if(!error && _.get(response, ['statusCode'], 0) === 200 && _.get(locationResult, ['status']) == 0){
-                        var addrArr = addrStr.split(' '),
+                        var addrArr = addrStr.split(','),
                             province = _.get(locationResult, ['result', 'address_components', 'province'], ''),
                             latLng = _.get(locationResult, ['result', 'location'], {});
                         if(addrArr.length > 0 && addrArr[0] == province && !_.isEmpty(latLng)){

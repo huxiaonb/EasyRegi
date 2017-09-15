@@ -1,4 +1,5 @@
 'use strict';
+var config = require('../../../config/config');
 var mongoose = require('mongoose');
 var CompanyInfoSegment = mongoose.model('CompanyInfoSegment');
 var CompanyTemplate = mongoose.model('CompanyTemplate');
@@ -494,7 +495,23 @@ function getAllCompanyNames(req, res, next){
 }
 
 exports.findNearbyPositions = function(req, res, next){
-  var addr = _.get(req, ['params', 'addressReg'], '');
+  // var addr = _.get(req, ['params', 'addressReg'], '');
+  var locationInfo = _.get(req, ['body']);
+  let addrArr = [], addr = '', latLngStr = '';
+  if(locationInfo != null && locationInfo != undefined){
+      if(locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
+          addrArr.push(locationInfo.province);
+      if(locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
+          addrArr.push(locationInfo.city);
+      // if(info.district != null && info.district != undefined && info.district != '')
+      //     addrArr.push(info.district);
+      if(locationInfo.lat != undefined && locationInfo.lng != undefined){
+        latLngStr = locationInfo.lat + ',' + locationInfo.lng;
+      }
+  }
+  addr = addrArr.join(',');
+  console.log(locationInfo);
+  console.log(latLngStr);
   console.log(addr);
   if(_.isEmpty(addr)){
     Position.find({}, function(err, dbPositions){
@@ -514,31 +531,131 @@ exports.findNearbyPositions = function(req, res, next){
         console.log('no companies found in that area');
         res.json({success: true, positions: []});
       } else {
-        console.log(JSON.stringify(dbCompanies));
+        // console.log(JSON.stringify(dbCompanies));
         var ids = [];
+        var latLngArr = [];
         _.forEach(dbCompanies, function(cop){
           if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
             ids.push(cop._id);
+            console.log(cop._id);
+          if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
+            latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
+          }
         });
         console.log(ids);
-        Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
-          if(err2) {
-            console.log('Error in finding positions per id', err2);
-            res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-          } else {
-            var positionGroup = _.groupBy(dbPositions, 'companyId');
-            var sortedPositions = [];
-            for(var key in positionGroup){
-              sortedPositions = _.concat(sortedPositions, positionGroup[key]);
-            }
-            res.json({success: true, positions: sortedPositions});
-          }
+        console.log(latLngArr);
+        getDistanceBetweenUserAndCompanies(latLngStr, latLngArr, function(err3, latLngDistances){
+          Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
+              if(err2) {
+                  console.log('Error in finding positions per id', err2);
+                  res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+              } else {
+                  if(!_.isEmpty(dbPositions)){
+                      var positionGroup = _.groupBy(dbPositions, 'companyId');
+                      var sortedPositions = [],
+                          unsortPositions = [];
+                      _.forEach(latLngArr, function(latLntString, index){
+                        var arr = latLntString.split(',');
+                        var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
+                        // console.log(arr[0], arr[1], index, cop);
+                        if(!_.isEmpty(cop)){
+                            var copPositions = positionGroup[cop._id];
+                            var tempPositions = [];
+                            _.forEach(copPositions, function(posi){
+                                let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index].distance, duration : latLngDistances[index].duration});
+                                tempPositions.push(clonePosi);
+                                // console.log(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
+                            });
+                            sortedPositions = _.concat(sortedPositions, tempPositions);
+                        }
+                      });
+                      _.forEach(dbCompanies, function(cop){
+                        var copPositions = positionGroup[cop._id];
+                        var tempPositions = [];
+                        if(!_.isEmpty(cop.lat) && !_.isEmpty(cop.lng)){
+                          var str = cop.lat + ',' + cop.lng;
+                          if(_.indexOf(latLngArr, str) == -1){
+                            _.forEach(copPositions, function(posi){
+                                let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                                tempPositions.push(clonePosi);
+                            });
+                            unsortPositions = _.concat(unsortPositions, tempPositions);
+                          }
+                        } else {
+                          _.forEach(copPositions, function(posi){
+                              let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                              tempPositions.push(clonePosi);
+                          });
+                          unsortPositions = _.concat(unsortPositions, tempPositions);
+                        }
+
+                      });
+                      /*for(var key in positionGroup){
+                          var copPositions = positionGroup[key];
+                          var matchedCop = {};
+                          _.forEach(dbCompanies, function(cop){
+                            if(key == cop._id){
+                              matchedCop = cop;
+                              return false;
+                            }
+                          });
+                          console.log(matchedCop);
+                          if(!_.isEmpty(matchedCop)) {
+                            var copLatLngStr = _.get(matchedCop, ['lat'], '') + ',' + _.get(matchedCop, ['lng'], '');
+                            var matchedDistanceObj = latLngDistanceMap[copLatLngStr];
+                            if(!_.isEmpty(matchedDistanceObj)){
+                              _.forEach(copPositions, function(posi){
+                                posi.companyName = matchedCop.companyName;
+                                posi.distance = matchedDistanceObj.distance;
+                                posi.duration = matchedDistanceObj.duration;
+                              });
+                              sortedPositions = _.concat(sortedPositions, copPositions);
+                            } else {
+                              _.forEach(copPositions, function(posi){
+                                  posi.companyName = matchedCop.companyName;
+                              });
+                              unsortPositions = _.concat(unsortPositions, copPositions);
+                            }
+                          }
+                      }*/
+
+                      sortedPositions.sort(function(b, c){
+                        return b.distance > c.distance;
+                      });
+                      sortedPositions = _.concat(sortedPositions, unsortPositions);
+                      console.log(sortedPositions.length);
+                      res.json({success: true, positions: sortedPositions});
+                  } else {
+                      res.json({success: true, positions: []});
+                  }
+              }
+          });
         });
       }
     });
     
   }
   
+}
+
+function getDistanceBetweenUserAndCompanies(latLng, companyLatLngArr, callback){
+  var distanceApi = config.qqapi.distanceApi,
+      apikey = config.qqmapKey,
+      distanceUrl = distanceApi + '?mode=driving&from=' + latLng + '&to=' + companyLatLngArr.join(';') + '&key=' + apikey,
+      elements = [];
+    console.log(distanceUrl);
+    request.get({
+        url: distanceUrl,
+        json: true
+    }, function(error, response, distanceResult) {
+        console.log(JSON.stringify(distanceResult));
+        if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(distanceResult, ['status']) == 0) {
+          elements = _.get(distanceResult, ['result', 'elements'], []);
+        } else {
+          console.log('Error in getting distance', error, _.get(response, ['statusCode'], 0), _.get(distanceResult, ['status']));
+        }
+        return callback(null, elements);
+    });
 }
 
 exports.findAllPositions = function(req, res, next){

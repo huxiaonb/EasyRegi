@@ -46,8 +46,10 @@ class Positions extends React.Component{
             let re = {};
             if(addr != ''){
                 Toast.loading('Loading...', 0);
-                re = await lapi.findNearbyPositions(addr);}
+                re = await lapi.findNearbyPositions(info);
+            }
                 // re = await lapi.findAllPositions();
+            alert(JSON.stringify(re));
             if(re != null && re != undefined && re.positions != null && re.positions != undefined){
                 this.setState({
                     nearbyPositions: re.positions,
@@ -62,17 +64,23 @@ class Positions extends React.Component{
         //alert('2');
         let info = this.props.args;
         //未成功获取位置信息
-        //alert(JSON.stringify(this.props.args));
+        alert(JSON.stringify(this.props.args));
         if(!info || info.addr === ''){
             //alert('4');
             this.setState({
                 locationFlag : true
             });
         }else{
-            
-            Toast.loading('Loading...', 0);
-            let re = await lapi.findNearbyPositions(info);
-            
+            //alert('3');
+            let re = {};
+            let addr = this.constructAddrByLocation(info);
+            if(addr != ''){
+                Toast.loading('Loading...', 0);
+                re = await lapi.findNearbyPositions(info);
+            }
+
+                // re = await lapi.findAllPositions();
+            alert(JSON.stringify(re));
             if(info){
                 this.setState({
                     geolocation : info,
@@ -86,6 +94,7 @@ class Positions extends React.Component{
                 });
                 this.loadMore();
                 Toast.hide();
+
             }
         }
         
@@ -97,16 +106,16 @@ class Positions extends React.Component{
         if(waitShowList && waitShowList.length < 5){
             this.setState({noMoreP : true})
         }
-        
+
         let pArr = [...this.state.positionPanelLists];
         if(waitShowList != null && waitShowList != undefined) {
             waitShowList.map((ele, idx)=>{
                 //let headerName = ele.name;
                 let accHeader = (
                     <div>
-                        <h2>{ele.companyName} 招聘 {ele.name}</h2>
+                        <h3>{ele.companyName} 招聘 {ele.name}</h3>
                         <div>
-                            <span>距离 ：{ele.distance}公里</span><span>招聘人数： {ele.totalRecruiters}</span><span>学历：xxx</span><span>年龄 ： xxx</span>
+                            <span>距离 ：{ele.distance/1000}公里</span><span>招聘人数： {ele.totalRecruiters}</span><span>学历：xxx</span><span>年龄 ： xxx</span>
                         </div>
                     </div>
                 );
@@ -153,7 +162,7 @@ class Positions extends React.Component{
         });
     }
     render(){
-        
+
         let {geolocation, nearbyPositions, isLocationExist,locationFlag, waitShowList, positionPanelLists, noMoreP} = this.state;
         // let location = JSON.stringify(geolocation)
         if(locationFlag){
@@ -162,7 +171,7 @@ class Positions extends React.Component{
                 <Result style={{height:'500px',marginTop:'30%'}}
                         img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
                         message="未能获取到位置信息，无法显示周边招聘信息"
-                    />                   
+                    />
             </div>)
         }
 

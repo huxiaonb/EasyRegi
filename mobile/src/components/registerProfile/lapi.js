@@ -89,10 +89,10 @@ export default {
     },
     findNearbyPositions(info){
         return _request({
-            url: '../weChat/position/findNearbyPositions/',
+            url: '../weChat/position/findNearbyPositions',
             type: 'POST',
             data : info
-        })
+        });
     },
     findAllPositions(){
         return _request({
