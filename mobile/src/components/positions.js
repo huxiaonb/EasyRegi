@@ -159,9 +159,10 @@ class Positions extends React.Component{
         if(locationFlag){
             return (
             <div className="result-example">
-            <Accordion>
-                <Accordion.Panel header={accHeader} ><h3>这里显示内容</h3></Accordion.Panel>
-            </Accordion>                    
+                <Result style={{height:'500px',marginTop:'30%'}}
+                        img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
+                        message="未能获取到位置信息，无法显示周边招聘信息"
+                    />                   
             </div>)
         }
 
