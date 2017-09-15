@@ -375,5 +375,21 @@ describe('company', function(){
                 done();
             })
         });
+
+        it.only('call qq map api', function(done){
+            this.timeout(10000);
+            var location = encodeURI('广东省珠海市香洲区梅华东路272号');
+            var qqUrl = 'http://apis.map.qq.com/ws/geocoder/v1/?address='+ location +'&key=HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ';
+            request.get({
+                url: qqUrl,
+                json: true
+            }, function(error, response, locationResult) {
+                console.log(locationResult);
+                if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(locationResult, ['status']) == 0) {
+                    console.log('successfully invoking qq api to get location');
+                }
+                done()
+            });
+        })
     });
 });

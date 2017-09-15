@@ -33,6 +33,8 @@ var CompanySchema = new Schema({
     },
     alias: String,
     companyAddress: String,
+    lat: String, //纬度
+    lng: String, //经度
     companyType: String,
     companyScale: String,
     phoneNumber: String,

@@ -40,6 +40,7 @@ function renderPreviewPage(req, res, next){
                     folk: _.get(dbApplicant, ['folk'], ''),
                     birthDate: formatDate,
                     healthState: _.get(dbApplicant, ['healthState'], ''),
+                    marriageState: _.get(dbApplicant, ['marriageState'], ''),
                     idCardNumber: _.get(dbApplicant, ['idCardNumber'], ''),
                     homeAddress: _.get(dbApplicant, ['homeAddress'], ''),
                     currentAddress: _.get(dbApplicant, ['currentAddress'], ''),
@@ -117,6 +118,9 @@ function exportApplicants(req, res, next){
                     }, {
                         caption: '健康状况',
                         type: 'string'
+                    },{
+                        caption: '婚姻状况',
+                        type: 'string'
                     }, {
                         caption: '身份证号码',
                         type: 'string',
@@ -161,6 +165,7 @@ function exportApplicants(req, res, next){
                             appRow.push(_.get(app, ['birthDate'], ''));
                         }
                         appRow.push(_.get(app, ['healthState'], ''));
+                        appRow.push(_.get(app, ['marriageState'], ''));
                         appRow.push(_.get(app, ['idCardNumber'], ''));
                         appRow.push(_.get(app, ['homeAddress'], ''));
                         appRow.push(_.get(app, ['currentAddress'], ''));
