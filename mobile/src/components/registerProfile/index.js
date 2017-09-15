@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import {Steps,Toast,Icon} from 'antd-mobile'
+import {Steps,Toast,Icon,Result} from 'antd-mobile'
 import moment from 'moment';
 import '../less/index.less'
 
