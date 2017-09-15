@@ -1,7 +1,8 @@
 var _ = require('lodash'),
     async = require('async'),
     moment = require('moment'),
-    crypto = require('crypto');
+    crypto = require('crypto'),
+    request = require('request');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
@@ -343,7 +344,7 @@ function registerCompany(req, res, next){
         var queryCriteria = {$or: []};
         queryCriteria.$or.push({email: email});
         var companyName = _.get(req, ['body', 'companyName'], '');
-        console.log(companyName)
+        // console.log(companyName)
         if(!_.isEmpty(companyName))
             queryCriteria.$or.push({companyName: companyName});
         Company.findOne(queryCriteria, function(err1, dbCompany){
@@ -353,51 +354,72 @@ function registerCompany(req, res, next){
             } else if(_.isEmpty(dbCompany)){
                 console.log('no comany found, system will create new account for company');
                 var companyEntity = new Company(companyItem);
-                console.log(companyEntity);
+                // console.log(companyEntity);
                 companyItem.active = false;
-                Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
-                    if(error) {
-                        console.log('Error in saving company', error)
-                        res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
-                    } else {
-                        Company.findOne({email: email}, function(err2, data){
-                            crypto.randomBytes(20, function(err3, buf){
-                                var activeToken = data._id + buf.toString('hex'),
-                                verificationInfo = {
-                                    activeToken: activeToken,
-                                    active: false,
-                                    activeTokenExpires: Date.now() + 24 * 3600 * 1000
-                                },
-                                // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
-                                // verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
-                                verificationLink = 'http://www.mfca.com.cn/account/verification?account=' + email + '&activeToken=' + activeToken;
-                                var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
-                                var emailOpt = {
-                                    from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
-                                    subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
-                                    to: email
-                                };
-                                var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, email).replace(/\[Verification_Link\]/ig, verificationLink);
-                                emailOpt.html = verificationEmailContent;
-                                sendVerificationEmail(emailOpt, function(err4, emailResult){
-                                    if(err4) {
-                                        console.log('Error in sending verification email', err4);
-                                        res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
-                                    } else {
-                                        Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
-                                            if(err5) {
-                                                console.log('Error in update verification info', err5);
-                                            } else 
-                                                console.log('update verification info');
-                                                res.status(200).send({success: true, errmsg: '', redirect: true});
-                                        });
-                                    }
-                                })
+                var qqLocationApi = _.get(config, ['qqapi', 'geocoderApi'], '')
+                    apiKey = _.get(config, ['qqmapKey'], ''),
+                    addrStr = _.get(companyItem, ['companyAddress'], ''),
+                    completeAddr = addrStr.replace(/\s/g, '');
+                    locationUrl = qqLocationApi + '?address=' + encodeURI(completeAddr) + '&key=' + apiKey;
 
-                            });
-                        });
-                        
+                request.get({
+                    url: locationUrl,
+                    json: true
+                }, function(error, response, locationResult){
+                    if(!error && _.get(response, ['statusCode'], 0) === 200 && _.get(locationResult, ['status']) == 0){
+                        var addrArr = addrStr.split(' '),
+                            province = _.get(locationResult, ['result', 'address_components', 'province'], ''),
+                            latLng = _.get(locationResult, ['result', 'location'], {});
+                        if(addrArr.length > 0 && addrArr[0] == province && !_.isEmpty(latLng)){
+                            companyItem.lat = latLng.lat;
+                            companyItem.lng = latLng.lng;
+                        }
                     }
+                    console.log(JSON.stringify(companyItem));
+                    Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
+                        if(error) {
+                            console.log('Error in saving company', error)
+                            res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
+                        } else {
+                            Company.findOne({email: email}, function(err2, data){
+                                crypto.randomBytes(20, function(err3, buf){
+                                    var activeToken = data._id + buf.toString('hex'),
+                                    verificationInfo = {
+                                        activeToken: activeToken,
+                                        active: false,
+                                        activeTokenExpires: Date.now() + 24 * 3600 * 1000
+                                    },
+                                    // verificationLink = 'http://localhost:3000/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                    // verificationLink = 'http://maaaace.nat200.top/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                    verificationLink = 'http://www.mfca.com.cn/account/verification?account=' + email + '&activeToken=' + activeToken;
+                                    var verificationHtmlTemplate = _.get(config, ['emailConfig', 'verificationHtmlTemplate'], '');
+                                    var emailOpt = {
+                                        from: _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
+                                        subject: _.get(config, ['emailConfig', 'verificationSubject'], ''),
+                                        to: email
+                                    };
+                                    var verificationEmailContent = verificationHtmlTemplate.replace(/\[Registered_Email\]/i, email).replace(/\[Verification_Link\]/ig, verificationLink);
+                                    emailOpt.html = verificationEmailContent;
+                                    sendVerificationEmail(emailOpt, function(err4, emailResult){
+                                        if(err4) {
+                                            console.log('Error in sending verification email', err4);
+                                            res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
+                                        } else {
+                                            Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
+                                                if(err5) {
+                                                    console.log('Error in update verification info', err5);
+                                                } else
+                                                    console.log('update verification info');
+                                                    res.status(200).send({success: true, errmsg: '', redirect: true});
+                                            });
+                                        }
+                                    })
+
+                                });
+                            });
+
+                        }
+                    });
                 });
             } else {
                 console.log('Company already exists');
