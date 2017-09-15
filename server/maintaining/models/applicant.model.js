@@ -89,7 +89,8 @@ var applicantSchema = new Schema({
     educationHistories: [educationHistorySchema],
     workExperiences: [workExperienceSchema],
     appliedPositions: [appliedPositionSchema],
-    registeredCompanies: [registeredCompanySchema]
+    registeredCompanies: [registeredCompanySchema],
+    marriageState: String
 },{
     collection: 'applicants',
     timestamps: true

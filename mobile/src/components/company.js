@@ -117,6 +117,7 @@ class Company extends React.Component{
                     folk: info.folk,
                     birthDate: moment(info.birthDate),
                     healthState: info.healthState,
+                    marriageState: info.marriageState,
                     idCardNumber: info.idCardNumber,
                     homeAddress: info.homeAddress,
                     currentAddress : info.currentAddress,
@@ -359,6 +360,12 @@ class Company extends React.Component{
                                     value={this.state.personalInfo.healthState}
                                     disabled
                                     >健康状况</InputItem>
+                                    <InputItem
+                                        name="marriageState"
+                                        placeholder=""
+                                        value={this.state.personalInfo.marriageState}
+                                        disabled
+                                    >婚姻状况</InputItem>
                                     <InputItem
                                     name="idCardNumber"
                                     placeholder=""

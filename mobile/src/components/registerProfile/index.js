@@ -177,6 +177,7 @@ class Index extends React.Component {
               folk : info.folk,
               date : moment(info.birthDate),
               healthState : info.healthState,
+              marriageState : info.marriageState,
               idCardNumber : info.idCardNumber,
               validFrom: moment(info.validFrom),
               validTo: moment(info.validTo),

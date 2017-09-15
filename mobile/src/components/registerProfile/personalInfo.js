@@ -54,7 +54,8 @@ class PersonalInfo extends React.Component {
         previewVisible: false,
         healthState:['良好'],
         folk:['汉族'],
-        gender:['男']
+        gender:['男'],
+        marriageState: ['未婚']
     }
 
     nextStep(){
@@ -97,6 +98,7 @@ class PersonalInfo extends React.Component {
                  folk : form.getFieldValue('folk'),
                  birthDate : form.getFieldValue('birthDate'),
                  healthState : form.getFieldValue('healthState'),
+                 marriageState : form.getFieldValue('marriageState'),
                  idCardNumber : form.getFieldValue('idCardNumber'),
                  validFrom: form.getFieldValue('validFrom'),
                  validTo: form.getFieldValue('validTo'),
@@ -142,6 +144,7 @@ class PersonalInfo extends React.Component {
                 folk : personal.folk,
                 birthDate : personal.birthDate,
                 healthState : personal.healthState,
+                marriageState : personal.marriageState,
                 idCardNumber : personal.idCardNumber,
                 validFrom: personal.validFrom,
                 validTo: personal.validTo,
@@ -365,6 +368,18 @@ class PersonalInfo extends React.Component {
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
                         <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
                     </Picker>
+            </FormItem>
+            <FormItem>
+                <Picker
+                    cols={1}
+                    name='marriageState'
+                    {...getFieldProps('marriageState', {
+                        rules: [{ required: true, message: '请选择婚姻状况!' }],
+                        initialValue : personal.marriageState ? [personal.marriageState] : ['未婚']
+                    })}
+                    data={[{label:'未婚',value:'未婚'},{label:'已婚',value:'已婚'},{label:'离异',value:'离异'},{label:'丧偶',value:'丧偶'}]}>
+                    <List.Item arrow="horizontal" style={{padding : 0}}>婚姻状况</List.Item>
+                </Picker>
             </FormItem>
             <InputItem
                 name="homeAddress"
