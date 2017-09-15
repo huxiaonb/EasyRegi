@@ -103,7 +103,7 @@ export default {
         const formData = new FormData();
         formData.append('files[]', file);
         return _request({
-            url:'../weChat/applicant/personalInfo/submit/' + openId,
+            url:'../weChat/applicant/personalInfo/submit?id=' + openId, //&type=photo (idfront/idback/other)
             type: 'POST',
             data: formData,
         })

@@ -245,7 +245,8 @@ exports.findApplicantByOpenId = function(req, res, next){
 }
 
 exports.submitRegisterInformation = function(req, res, next){
-  var openId = _.get(req, ['params', 'openId'], '');
+  var openId = _.get(req, ['query', 'id'], ''),
+      type = _.get(req, ['query', 'type'], '');
   var files = _.get(req, ['files']);
   console.log(openId);
   console.log(files);
@@ -272,8 +273,8 @@ exports.submitRegisterInformation = function(req, res, next){
   // console.log(applicantName);
 
   // res.end();
-  if(_.isEmpty(openId)){
-    console.log('no open id');
+  if(_.isEmpty(openId) || _.isEmpty(type)){
+    console.log('no open id or type');
     return res.end();
   } else {
     console.log('open id exists');
@@ -283,14 +284,19 @@ exports.submitRegisterInformation = function(req, res, next){
         var dbApplicant = applicants[0],
             clonedApplicant = _.clone(req.body);
         if(fileSize !== 0){
-          if(!_.isEmpty(_.get(clonedApplicant, ['wechatOpenId'])))
-            clonedApplicant.photoName = photoName;
-          else {
+          if(_.isEmpty(_.get(clonedApplicant, ['wechatOpenId']))){
             clonedApplicant = _.clone(dbApplicant);
             delete clonedApplicant._id;
-            clonedApplicant.photoName = photoName;
           }
-        }
+          if(type == 'photo')
+            clonedApplicant.photoName = photoName;
+          else if(type == 'idfront')
+            clonedApplicant.idCardFrontPhotoName = photoName;
+          else if(type == 'idback')
+            clonedApplicant.idCardBackPhotoName = photoName;
+          else if(type == 'other')
+            clonedApplicant.otherCredentialPhotoName = photoName;
+      }
         var registeredCompanies = _.get(dbApplicant, ['registeredCompanies'], []);
         if(!_.isEmpty(registeredCompanies)){
           clonedApplicant.registeredCompanies = registeredCompanies;
@@ -311,7 +317,14 @@ exports.submitRegisterInformation = function(req, res, next){
           wechatOpenId: openId
         };
         if(fileSize !== 0){
-          clonedApplicant.photoName = photoName;
+            if(type == 'photo')
+                clonedApplicant.photoName = photoName;
+            else if(type == 'idfront')
+                clonedApplicant.idCardFrontPhotoName = photoName;
+            else if(type == 'idback')
+                clonedApplicant.idCardBackPhotoName = photoName;
+            else if(type == 'other')
+                clonedApplicant.otherCredentialPhotoName = photoName;
         }
         var applicantEntity = new Applicant(clonedApplicant);
         applicantEntity.save().then(persistedObj => {

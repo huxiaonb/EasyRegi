@@ -48,7 +48,7 @@ function renderPreviewPage(req, res, next){
                     email: _.get(dbApplicant, ['email'], ''),
                     qqNumber: _.get(dbApplicant, ['qqNumber'], ''),
                     photoName: _.get(dbApplicant, ['photoName'], ''),
-                    idCardPhotoName: _.get(dbApplicant, ['idCardPhotoName'], ''),
+                    idCardFrontPhotoName: _.get(dbApplicant, ['idCardFrontPhotoName'], ''),
                     familyMembers: _.get(dbApplicant, ['familyMembers'], []),
                     educationHistories:newH,
                     workExperiences: newW
