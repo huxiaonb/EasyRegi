@@ -87,10 +87,11 @@ export default {
         })
         
     },
-    findNearbyPositions(addr){
+    findNearbyPositions(info){
         return _request({
-            url: '../weChat/position/findNearbyPositions/' + addr,
-            type: 'GET',
+            url: '../weChat/position/findNearbyPositions/',
+            type: 'POST',
+            data : info
         })
     },
     findAllPositions(){

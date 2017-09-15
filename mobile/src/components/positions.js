@@ -69,16 +69,10 @@ class Positions extends React.Component{
                 locationFlag : true
             });
         }else{
-            //alert('3');
-            let re = {};
-            let addr = this.constructAddrByLocation(info);;
-            if(addr != ''){
-                Toast.loading('Loading...', 0);
-                re = await lapi.findNearbyPositions(addr);
-            }
-                
-                // re = await lapi.findAllPositions();
-            //console.log(re);
+            
+            Toast.loading('Loading...', 0);
+            let re = await lapi.findNearbyPositions(info);
+            
             if(info){
                 this.setState({
                     geolocation : info,
@@ -103,12 +97,21 @@ class Positions extends React.Component{
         if(waitShowList && waitShowList.length < 5){
             this.setState({noMoreP : true})
         }
+        
         let pArr = [...this.state.positionPanelLists];
         if(waitShowList != null && waitShowList != undefined) {
             waitShowList.map((ele, idx)=>{
-                let headerName = ele.name;
+                //let headerName = ele.name;
+                let accHeader = (
+                    <div>
+                        <h2>{ele.companyName} 招聘 {ele.name}</h2>
+                        <div>
+                            <span>距离 ：{ele.distance}公里</span><span>招聘人数： {ele.totalRecruiters}</span><span>学历：xxx</span><span>年龄 ： xxx</span>
+                        </div>
+                    </div>
+                );
                 const positionPanelItem = (
-                    <Accordion.Panel header={headerName} key={`position_${ele._id}`}>
+                    <Accordion.Panel header={accHeader} key={`position_${ele._id}`}>
                         <List>
                             <InputItem
                             name="companyName"
@@ -150,15 +153,15 @@ class Positions extends React.Component{
         });
     }
     render(){
+        
         let {geolocation, nearbyPositions, isLocationExist,locationFlag, waitShowList, positionPanelLists, noMoreP} = this.state;
         // let location = JSON.stringify(geolocation)
         if(locationFlag){
             return (
             <div className="result-example">
-                <Result style={{height:'500px',marginTop:'30%'}}
-                    img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
-                    message="未能获取到位置信息，无法显示周边招聘信息"
-                />                
+            <Accordion>
+                <Accordion.Panel header={accHeader} ><h3>这里显示内容</h3></Accordion.Panel>
+            </Accordion>                    
             </div>)
         }
 
