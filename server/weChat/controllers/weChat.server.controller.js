@@ -326,13 +326,15 @@ exports.submitRegisterInformation = function(req, res, next){
             else if(type == 'other')
                 clonedApplicant.otherCredentialPhotoName = photoName;
         }
-        var applicantEntity = new Applicant(clonedApplicant);
-        applicantEntity.save().then(persistedObj => {
-          console.log(persistedObj);
-          res.end();
-        }).catch(function(error){
-          console.error('Error in saving applicant of wechat open id', openId, error);
-          return next(error);
+        Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
+        .exec(function(error, result){
+            if(error) {
+                console.error('Error in uploading photo type', type, error);
+                return next(error);
+            } else {
+                console.log('Uploading photo type %s successfully for wechat open id %s', type,openId);
+                res.end();
+            }
         });
       }
     }).catch(function(err){
