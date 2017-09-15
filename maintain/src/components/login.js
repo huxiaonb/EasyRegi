@@ -3,7 +3,6 @@ import { render } from 'react-dom'
 import {Form, Button, Input, Select, Row, Col, message} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect';
-import ImagePicker from './ImagePicker';
 import DistrictSelect from './districtSelect'
 import Loading from './Loading'
 // import AutoComplete from 'antd/lib/auto-complete'
@@ -151,7 +150,13 @@ class Login extends React.Component{
                             name='comp_name'
                             label='公司全称'
                             hasFeedback>
-                            <ImagePicker openId={123}/>
+                            {getFieldDecorator('comp_name',{
+                                rules:[{
+                                    type:'string',required:true,message:'请输入公司全称'
+                                }]
+                            })(
+                                <Input className='login-text' placeholder='公司全称'/>
+                            )}
                         </FormItem>
                         </Col>
                         <Col span={12}>
