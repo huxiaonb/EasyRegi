@@ -49,7 +49,7 @@ class Positions extends React.Component{
                 re = await lapi.findNearbyPositions(info);
             }
                 // re = await lapi.findAllPositions();
-            alert(JSON.stringify(re));
+            //alert(JSON.stringify(re));
             if(re != null && re != undefined && re.positions != null && re.positions != undefined){
                 this.setState({
                     nearbyPositions: re.positions,
@@ -64,7 +64,7 @@ class Positions extends React.Component{
         //alert('2');
         let info = this.props.args;
         //未成功获取位置信息
-        alert(JSON.stringify(this.props.args));
+        //alert(JSON.stringify(this.props.args));
         if(!info || info.addr === ''){
             //alert('4');
             this.setState({
@@ -80,7 +80,7 @@ class Positions extends React.Component{
             }
 
                 // re = await lapi.findAllPositions();
-            alert(JSON.stringify(re));
+            //alert(JSON.stringify(re));
             if(info){
                 this.setState({
                     geolocation : info,
@@ -115,7 +115,7 @@ class Positions extends React.Component{
                     <div>
                         <h3>{ele.companyName} 招聘 {ele.name}</h3>
                         <div>
-                            <span>距离 ：{ele.distance/1000}公里</span><span>招聘人数： {ele.totalRecruiters}</span><span>学历：xxx</span><span>年龄 ： xxx</span>
+                            <span>距离：{parseInt(ele.distance)}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>
                         </div>
                     </div>
                 );

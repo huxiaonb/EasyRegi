@@ -248,9 +248,13 @@ exports.findApplicantByOpenId = function(req, res, next){
 exports.submitRegisterInformation = function(req, res, next){
   var openId = _.get(req, ['query', 'id'], ''),
       type = _.get(req, ['query', 'type'], '');
-  var files = _.get(req, ['files']);
-  console.log(openId);
+  var files = _.get(req, ['fileObj']);
+  console.log('-------');
+  console.log(req.body);       
+  console.log(type);
   console.log(files);
+  console.log('-------');
+        //console.log('-------');
   var fileSize = 0;
   var relativePhotoPath = '';
   if(!_.isEmpty(files)
@@ -302,7 +306,9 @@ exports.submitRegisterInformation = function(req, res, next){
         if(!_.isEmpty(registeredCompanies)){
           clonedApplicant.registeredCompanies = registeredCompanies;
         }
-
+        console.log('--111--');
+        console.log(clonedApplicant);
+        console.log('--111--');
         Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
         .exec(function(error, result){
           if(error) {
@@ -494,6 +500,36 @@ function getAllCompanyNames(req, res, next){
 
 }
 
+function getShortDistance(lon1, lat1, lon2, lat2) {
+        var DEF_PI = 3.14159265359; // PI
+        var DEF_2PI = 6.28318530712; // 2*PI
+        var DEF_PI180 = 0.01745329252; // PI/180.0
+        var DEF_R = 6370693.5; // radius of earth
+        var ew1, ns1, ew2, ns2;
+        var dx, dy, dew;
+        var distance;
+        // 角度转换为弧度
+        ew1 = lon1 * DEF_PI180;
+        ns1 = lat1 * DEF_PI180;
+        ew2 = lon2 * DEF_PI180;
+        ns2 = lat2 * DEF_PI180;
+        // 经度差
+        dew = ew1 - ew2;
+        // 若跨东经和西经180 度，进行调整
+        if (dew > DEF_PI)
+            dew = DEF_2PI - dew;
+        else if (dew < -DEF_PI)
+            dew = DEF_2PI + dew;
+        dx = DEF_R * Math.cos(ns1) * dew; // 东西方向长度(在纬度圈上的投影长度)
+        dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
+        // 勾股定理求斜边长
+        distance = Math.sqrt(dx * dx + dy * dy).toFixed(0);
+        // console.log('----------1-----------');
+        // console.log(distance);
+        // console.log('---------2------------');
+        return distance;
+    }
+
 exports.findNearbyPositions = function(req, res, next){
   // var addr = _.get(req, ['params', 'addressReg'], '');
   var locationInfo = _.get(req, ['body']);
@@ -524,6 +560,9 @@ exports.findNearbyPositions = function(req, res, next){
     });
   } else {
     Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
+        // console.log('----------3-----------');
+        // console.log(dbCompanies);
+        // console.log('----------3-----------');
       if(err1) {
         console.log('Error in getting company by address reg', err1);
         res.status(500).send({success: false, errmsg: '获取职位信息失败'});
@@ -534,22 +573,30 @@ exports.findNearbyPositions = function(req, res, next){
         // console.log(JSON.stringify(dbCompanies));
         var ids = [];
         var latLngArr = [];
+        var latLngDistances = [];
+        var _this = this;
         _.forEach(dbCompanies, function(cop){
           if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
             ids.push(cop._id);
             console.log(cop._id);
           if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
             latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
+            latLngDistances.push(parseInt(getShortDistance(locationInfo.lng,locationInfo.lat,_.get(cop, ['lng']),_.get(cop, ['lat'])))/1000);
           }
         });
+        // console.log('---------------------');
+        // console.log(latLngDistances);
+        // console.log('---------------------');
+        
         console.log(ids);
         console.log(latLngArr);
-        getDistanceBetweenUserAndCompanies(latLngStr, latLngArr, function(err3, latLngDistances){
+        //getDistanceBetweenUserAndCompanies(latLngStr, latLngArr, function(err3, latLngDistances){
           Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
               if(err2) {
                   console.log('Error in finding positions per id', err2);
                   res.status(500).send({success: false, errmsg: '获取职位信息失败'});
               } else {
+               
                   if(!_.isEmpty(dbPositions)){
                       var positionGroup = _.groupBy(dbPositions, 'companyId');
                       var sortedPositions = [],
@@ -562,7 +609,22 @@ exports.findNearbyPositions = function(req, res, next){
                             var copPositions = positionGroup[cop._id];
                             var tempPositions = [];
                             _.forEach(copPositions, function(posi){
-                                let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index].distance, duration : latLngDistances[index].duration});
+                              
+                              //let clonePosi = _.cloneDeep(posi);
+                              let clonePosi = {
+                                name : posi.name,
+                                totalRecruiters : posi.totalRecruiters,
+                                salary : posi.salary,
+                                welfares : posi. welfares,
+                                positionDesc : posi.positionDesc,
+                                _id : posi._id,
+                                companyId : posi.companyId,
+                                phoneNumber : posi.phoneNumber,
+                                companyName:cop.alias,
+                                distance:latLngDistances[index],
+                              };
+                              
+                                //let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index]});
                                 tempPositions.push(clonePosi);
                                 // console.log(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
                             });
@@ -576,14 +638,42 @@ exports.findNearbyPositions = function(req, res, next){
                           var str = cop.lat + ',' + cop.lng;
                           if(_.indexOf(latLngArr, str) == -1){
                             _.forEach(copPositions, function(posi){
-                                let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                               
+                                 let clonePosi = {
+                                  name : posi.name,
+                                  totalRecruiters : posi.totalRecruiters,
+                                  salary : posi.salary,
+                                  welfares : posi. welfares,
+                                  positionDesc : posi.positionDesc,
+                                  _id : posi._id,
+                                  companyId : posi.companyId,
+                                  phoneNumber : posi.phoneNumber,
+                                  companyName:cop.alias,
+                                  //no distance?
+                                };
+                                // let clonePosi = _.clone(posi);
+                                // clonePosi.companyName = cop.alias;
                                 tempPositions.push(clonePosi);
                             });
                             unsortPositions = _.concat(unsortPositions, tempPositions);
                           }
                         } else {
                           _.forEach(copPositions, function(posi){
-                              let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                              //let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                              let clonePosi = {
+                                  name : posi.name,
+                                  totalRecruiters : posi.totalRecruiters,
+                                  salary : posi.salary,
+                                  welfares : posi. welfares,
+                                  positionDesc : posi.positionDesc,
+                                  _id : posi._id,
+                                  companyId : posi.companyId,
+                                  phoneNumber : posi.phoneNumber,
+                                  companyName:cop.alias,
+                                  //no distance?
+                                };
+                              // let clonePosi = _.clone(posi);
+                              // clonePosi.companyName = cop.alias;
                               tempPositions.push(clonePosi);
                           });
                           unsortPositions = _.concat(unsortPositions, tempPositions);
@@ -630,7 +720,7 @@ exports.findNearbyPositions = function(req, res, next){
                   }
               }
           });
-        });
+       //});
       }
     });
     
@@ -638,6 +728,7 @@ exports.findNearbyPositions = function(req, res, next){
   
 }
 
+    
 function getDistanceBetweenUserAndCompanies(latLng, companyLatLngArr, callback){
   var distanceApi = config.qqapi.distanceApi,
       apikey = config.qqmapKey,
