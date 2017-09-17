@@ -38,6 +38,16 @@ export default class ImagePicker extends React.Component {
     reader.addEventListener('load', () => callback(img, reader.result));
     reader.readAsDataURL(img);
   }
+  dataURItoBlob(dataURI) {
+    var byteString = atob(dataURI.split(',')[1]);
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], {type: mimeString});
+}
 
   beforeUpload(file) {
         const {type} = this.props;
@@ -56,7 +66,22 @@ export default class ImagePicker extends React.Component {
                   url : imageUrl
                 }]
               });
-              this.props.presave(file,'add', type);
+              //var blob = _this.dataURItoBlob(imageUrl);
+              const formData = new FormData();
+              //formData.append('xxx', file)      
+              //formData.append('files[]', blob);
+              formData.append('file', file);
+              _this.props.presave(formData, 'add', type);
+              // var reader = new FileReader();
+              // reader.onload = function(e){
+              //   //console.log(e.target.result);
+              //   let fileObj = {
+              //     fileObj : file,
+              //     originalObj : e.target.result
+              //   }
+              //   _this.props.presave(fileObj, 'add', type);
+              // }
+              // reader.readAsText(file); 
             });
         }
         return false;
@@ -78,6 +103,7 @@ export default class ImagePicker extends React.Component {
       <div className="clearfix">
       
         <Upload
+          action='../weChat/applicant/personalInfo/submit'
           listType="picture-card"
           className="upload-span"
           fileList={fileList}

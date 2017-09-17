@@ -1,4 +1,5 @@
 import URL from "url-parse"
+import reqwest from 'reqwest';
 
 
 /**
@@ -101,12 +102,20 @@ export default {
         })
     },
     uploadFile(f, openId){
-        const formData = new FormData();
-        formData.append('files[]', f.file);
-        return _request({
-            url:'../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,
-            type: 'POST',
-            data: formData,
-        })
+        // return $.ajax({
+        //     url:'../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,
+        //     type: 'POST',
+        //     contentType : 'multipart/form-data; boundary=foo',
+        //     processData: false,
+        //     data : f.data
+        // })
+        reqwest({
+            url: '../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,
+            method: 'post',
+            processData: false,
+            data: f.data,
+            
+            });
+        
     }
 }

@@ -26,10 +26,10 @@ export default class OhterInfo extends React.Component {
         this.props.prev();
     }
 
-    presave(file, kw, type){
+    presave(data, kw, type){
         if(kw === 'add'){
             this.setState({
-                fileList : [...this.state.fileList, ...[{file, type}]]
+                fileList : [...this.state.fileList, ...[{data, type}]]
             })
         }else if(kw === 'del'){
             let fArr = this.state.fileList;

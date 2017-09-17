@@ -248,9 +248,9 @@ exports.findApplicantByOpenId = function(req, res, next){
 exports.submitRegisterInformation = function(req, res, next){
   var openId = _.get(req, ['query', 'id'], ''),
       type = _.get(req, ['query', 'type'], '');
-  var files = _.get(req, ['fileObj']);
-  console.log('-------');
-  console.log(req.body);       
+  var files = _.get(req, ['files']);
+  console.log('----111111---');
+  //console.log(req);       
   console.log(type);
   console.log(files);
   console.log('-------');
