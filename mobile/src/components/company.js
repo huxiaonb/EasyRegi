@@ -430,8 +430,8 @@ class Company extends React.Component{
                         </List>
                         <WhiteSpace size="lg" />
                         <List>    
-                        <CheckboxItem  key={0} checked={bCheck} onChange={this.changeB.bind(this)}>个人保证已填写资料属实并同意体检不合格时不予录用</CheckboxItem>
-                        <CheckboxItem  key={1} checked={mCheck} onChange={this.changeM.bind(this)}>支付1元支持入职易</CheckboxItem>
+                        <CheckboxItem  key={0} checked={bCheck} onChange={this.changeB.bind(this)}>承诺填写内容属实</CheckboxItem>
+                        <CheckboxItem  key={1} checked={mCheck} onChange={this.changeM.bind(this)}>同意体检不合格不予录取</CheckboxItem>
                         </List>               
                         <WhiteSpace size="lg" />
                         <Button type='primary' inline size="large" disabled={!(bCheck && mCheck)} onClick={this.subm.bind(this)}>提交本人简历</Button>    
