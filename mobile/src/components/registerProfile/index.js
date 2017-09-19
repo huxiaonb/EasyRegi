@@ -127,10 +127,10 @@ class Index extends React.Component {
 			if(!!openId){
           appi.wechatOpenId = openId;
       }else{
-        	appi.wechatOpenId = '1234';									
-					console.log('set Wechat ID');
+        	//appi.wechatOpenId = '1234';									
+					console.log('no openid');
       }
-      console.log(appi);
+      //console.log(appi);
       let re = await lapi.getApplicant(appi.wechatOpenId);
       let r = re.length ? await lapi.updateApplicant(re[0]._id ,appi) : await lapi.createApplicant(appi)
       console.log(r);
