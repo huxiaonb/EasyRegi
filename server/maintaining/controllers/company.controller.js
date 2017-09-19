@@ -3,6 +3,8 @@ var _ = require('lodash'),
     moment = require('moment'),
     crypto = require('crypto'),
     request = require('request');
+var config = require('../../../config/config');
+var logger = require('../../../config/lib/logger');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var Applicant = mongoose.model('Applicant');
@@ -40,12 +42,12 @@ function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
         pwd = _.get(req, ['body', 'pwd'], '');
     if(_.isEmpty(email) || _.isEmpty(pwd)){
-        console.log('login id and pwd are required');
+        logger.info('login id and pwd are required');
         res.status(500).send({success: false, errmsg: 'login id and pwd are required'});
     } else {
         login(email, pwd, function(error, companyItem){
             if(error){
-                console.log('Error in finding an account', email, error);
+                logger.info('Error in finding an account', email, error);
                 res.status(500).send({success: false, errmsg: '用户名或密码错误', isAccountValid: false, isAccountActive: false});
             }
             else {
@@ -73,8 +75,8 @@ function companyUserLogin(req, res, next){
                         var currentTimeStamp = Date.now();
                         if(_.isUndefined(companyItem.activeTokenExpires) || (!_.isUndefined(companyItem.activeTokenExpires) && Number.parseInt(companyItem.activeTokenExpires) < currentTimeStamp)){
                             generateVerificationEmail(email, function(err1, sendEmailResult){
-                                if(err1) console.log('Error in generate verification email', email, err1);
-                                else console.log('resend verification email successfully');
+                                if(err1) logger.info('Error in generate verification email', email, err1);
+                                else logger.info('resend verification email successfully');
                                 res.status(500).send({success: false, errmsg: '账户未激活', isAccountValid: true, isAccountActive: false});                                        
                             });
                         } else {
@@ -82,7 +84,7 @@ function companyUserLogin(req, res, next){
                         }
                     }
                 } else {
-                    console.log('cannot find an account with email %s and pwd %s', email, pwd);
+                    logger.info('cannot find an account with email %s and pwd %s', email, pwd);
                     res.status(500).send({success: false, errmsg: '用户名或密码错误', isAccountValid: false, isAccountActive: false});
                 }
             }
@@ -93,7 +95,7 @@ function companyUserLogin(req, res, next){
 function login(email, pwd, callback){
     Company.findOne({email: email, password: pwd}, function(error, companyItem){
         if(error) {
-            console.error('Error in finding company by login id: %s %s', email, error);
+            logger.error('Error in finding company by login id: %s %s', email, error);
             return callback('Error in finding company', null);
         } else {
             if(_.isEmpty(companyItem)){
@@ -116,7 +118,7 @@ function login(email, pwd, callback){
                 };
                 
                 
-                console.log(clonedCompany);
+                logger.info(clonedCompany);
                 return callback(null, clonedCompany);
             }
         }
@@ -138,7 +140,7 @@ function getCompanyInfo(req, res, next){
     var sessionId = _.get(req, ['headers', 'access-token'], '');
     Session.findOne({_id: sessionId}, function(sesErr, sessionItem){
         if(sesErr) {
-            console.log('Error in finding session', sesErr);
+            logger.info('Error in finding session', sesErr);
             res.status(500).send({success: false, errmsg: 'Error in finding session'});
         } else {
             if(_.isEmpty(sessionItem)){
@@ -148,7 +150,7 @@ function getCompanyInfo(req, res, next){
                 var companyInfoStr = _.get(session, ['companyInfo'], '{}');
                 var companyInfo = JSON.parse(companyInfoStr);
                 if(_.isEmpty(companyInfo)){
-                    console.log('not login');
+                    logger.info('not login');
                     res.render('server/weChat/views/index');
                 } else {
                     var expiresDateStr = _.get(companyInfo, ['expires'], ''),
@@ -156,7 +158,7 @@ function getCompanyInfo(req, res, next){
                     var expiresDate = new Date(expiresDateStr),
                         current = new Date();
                     if(current.getTime() > expiresDate.getTime()){
-                        console.log('login session expires, please login again');
+                        logger.info('login session expires, please login again');
                         res.render('server/weChat/views/index');
                     } else {
                         if(_.isEmpty(companyId)){
@@ -164,7 +166,7 @@ function getCompanyInfo(req, res, next){
                         } else {
                             Company.findOne({_id: companyId}, function(error, companyItem){
                                 if(error) {
-                                    console.log('Error in getCompanyInfo', error);
+                                    logger.info('Error in getCompanyInfo', error);
                                     res.status(500).send({success: false, errmsg: error});
                                 } else {
                                     if(_.isEmpty(companyItem)){
@@ -211,27 +213,27 @@ function upsertCompany(req, res, next){
         success: false,
         errmsg: ''
     };
-    console.log(companyItem);
+    logger.info(companyItem);
     if(_.isEmpty(email)){
-        console.error('no email found in req body');
+        logger.error('no email found in req body');
         res.status(500).send({success: false, errmsg: 'no email found in req body'});
     } else {
         Company.findOne({email: email}, function(error, foundCompany){
             if(error) {
-                console.error('Error in finding company by email', email, error);
+                logger.error('Error in finding company by email', email, error);
                 res.status(500).send({success: false, errmsg: 'Error in finding company by email'});
             } else {
                 if(_.isEmpty(foundCompany)){
                     //save
                     if(_.isEmpty(pwd)){
-                        console.log('Password is required');
+                        logger.info('Password is required');
                         res.status(500).send({success: false, errmsg: 'Password is required'});
                     } else {
                         var companyEntity = new Company(companyItem);
-                        console.log(companyEntity)
+                        logger.info(companyEntity)
                         companyEntity.save(function(error, data){
                             if(error) {
-                                console.log('Error in saving company', error)
+                                logger.info('Error in saving company', error)
                                 upsertResult.errmsg = 'Error in saving company';
                                 res.json(upsertResult);
                             } else {
@@ -246,13 +248,13 @@ function upsertCompany(req, res, next){
                     //update
                     Company.update({email: email}, {$set: companyItem}, {upsert: false}, function(error, updateResult){
                         if(error) {
-                            console.log('Error in updating company', error);
+                            logger.info('Error in updating company', error);
                             upsertResult.errmsg = 'Error in updating company';
                             res.json(upsertResult);
                         } else {
                             Company.findOne({email: email}, function(err, updatedCompany){
                                 if(err) {
-                                    console.log('Error in finding company', err);
+                                    logger.info('Error in finding company', err);
                                     upsertResult.errmsg = 'Error in finding company';
                                     res.json(upsertResult);
                                 } else {
@@ -285,7 +287,7 @@ function updateCompanyInfo(req, res, next){
     var companyItem = _.get(req, ['body'], {}),
         email = _.get(companyItem, ['email'], '');
     if(_.isEmpty(email)){
-        console.error('no email found in req body');
+        logger.error('no email found in req body');
         res.status(500).send({success: false, errmsg: 'no email found in req body'});
     } else {
         var companyEntity = {
@@ -309,7 +311,7 @@ function updateCompanyInfo(req, res, next){
             url: locationUrl,
             json: true
         }, function(error, response, locationResult) {
-            console.log(locationResult);
+            logger.info(locationResult);
 
             if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(locationResult, ['status']) == 0) {
                 var addrArr = addrStr.split(','),
@@ -320,18 +322,18 @@ function updateCompanyInfo(req, res, next){
                     companyEntity.lng = latLng.lng;
                 }
             }
-            console.log(companyEntity);
+            logger.info(companyEntity);
             Company.update({email: email}, {$set: companyEntity}, {upsert: false}, function(err1, updateResult){
                 if(err1) {
-                    console.log('Error in updating company', email, err1);
+                    logger.info('Error in updating company', email, err1);
                     res.status(500).send({success: false, errmsg: 'Error in updating company'});
                 } else {
                     Company.findOne({email: email}, function(err2, dbCompany){
                         if(err2){
-                            console.log('Error in finding company', email, err1);
+                            logger.info('Error in finding company', email, err1);
                             res.status(500).send({success: false, errmsg: 'Error in finding company'});
                         } else if(_.isEmpty(dbCompany)){
-                            console.log('company for %s does not exists', email);
+                            logger.info('company for %s does not exists', email);
                             res.status(500).send({success: false, errmsg: 'company does not exists'});
                         } else {
                             dbCompany.password = '';
@@ -367,17 +369,17 @@ function registerCompany(req, res, next){
         var queryCriteria = {$or: []};
         queryCriteria.$or.push({email: email});
         var companyName = _.get(req, ['body', 'companyName'], '');
-        // console.log(companyName)
+        // logger.info(companyName)
         if(!_.isEmpty(companyName))
             queryCriteria.$or.push({companyName: companyName});
         Company.findOne(queryCriteria, function(err1, dbCompany){
             if(err1) {
-                console.log('Error in finding company by email', email, err1);
+                logger.info('Error in finding company by email', email, err1);
                 res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
             } else if(_.isEmpty(dbCompany)){
-                console.log('no comany found, system will create new account for company');
+                logger.info('no comany found, system will create new account for company');
                 var companyEntity = new Company(companyItem);
-                // console.log(companyEntity);
+                // logger.info(companyEntity);
                 companyItem.active = false;
                 var qqLocationApi = _.get(config, ['qqapi', 'geocoderApi'], '')
                     apiKey = _.get(config, ['qqmapKey'], ''),
@@ -398,10 +400,10 @@ function registerCompany(req, res, next){
                             companyItem.lng = latLng.lng;
                         }
                     }
-                    console.log(JSON.stringify(companyItem));
+                    logger.info(JSON.stringify(companyItem));
                     Company.update({email: email},{$set: companyItem},{upsert: true},function(error, updResult){
                         if(error) {
-                            console.log('Error in saving company', error)
+                            logger.info('Error in saving company', error)
                             res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
                         } else {
                             Company.findOne({email: email}, function(err2, data){
@@ -425,14 +427,14 @@ function registerCompany(req, res, next){
                                     emailOpt.html = verificationEmailContent;
                                     sendVerificationEmail(emailOpt, function(err4, emailResult){
                                         if(err4) {
-                                            console.log('Error in sending verification email', err4);
+                                            logger.info('Error in sending verification email', err4);
                                             res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
                                         } else {
                                             Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
                                                 if(err5) {
-                                                    console.log('Error in update verification info', err5);
+                                                    logger.info('Error in update verification info', err5);
                                                 } else
-                                                    console.log('update verification info');
+                                                    logger.info('update verification info');
                                                     res.status(200).send({success: true, errmsg: '', redirect: true});
                                             });
                                         }
@@ -445,7 +447,7 @@ function registerCompany(req, res, next){
                     });
                 });
             } else {
-                console.log('Company already exists');
+                logger.info('Company already exists');
                 if(dbCompany.email == email)
                     res.status(500).send({success: false, errmsg: '邮箱已经被注册'});
                 else 
@@ -465,15 +467,15 @@ function resetPassword(req, res, next){
     } else {
         Company.findOne({email: email, password: oldPwd}, function(err1, dbCompany){
             if(err1) {
-                console.log('error in finding company by email', email, err1);
+                logger.info('error in finding company by email', email, err1);
                 res.status(500).send({success: false, errmsg: 'Error in finding company by company email'});
             } else if(_.isEmpty(dbCompany)){
-                console.log('email or password is not correct');
+                logger.info('email or password is not correct');
                 res.status(500).send({success: false, errmsg: 'email or password is not correct'});
             } else {
                 Company.update({email: email, password: oldPwd}, {$set: {password: newPwd}}, {upsert: false}, function(err2, updateResult){
                     if(err2){
-                        console.log('Error in updating password for company', email, err2);
+                        logger.info('Error in updating password for company', email, err2);
                         res.status(500).send({success: false, errmsg: 'Error in updating company by company email'});
                     } else {
                         res.status(200).send({success: true, errmsg: ''});
@@ -492,7 +494,7 @@ function getPositionsAndApplicantsNum(req, res, next){
         applicantNumber: 0
     }
     var companyId = _.get(req, ['params', 'companyId'], '');
-    console.log(companyId);
+    // logger.info(companyId);
     if(_.isEmpty(companyId)){
         countResult.errmsg = 'company id is required';
         res.status(500).send(countResult);
@@ -502,7 +504,7 @@ function getPositionsAndApplicantsNum(req, res, next){
         tasks.push(getAllApplicantsByCompanyId(companyId));
         async.parallel(tasks, function(error, result){
             if(error){
-                console.log('Error in getPositionsAndApplicantsNum', companyId, error);
+                logger.info('Error in getPositionsAndApplicantsNum', companyId, error);
                 countResult.errmsg = 'Error in getPositionsAndApplicantsNum' + error;
             } else {
                 countResult.success = true;
@@ -518,7 +520,7 @@ function getPositionsAndApplicantsNum(req, res, next){
 
 function getApplicantsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
-    console.log(companyId);
+    // logger.info(companyId);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
@@ -526,7 +528,7 @@ function getApplicantsByCompanyId(req, res, next){
         tasks.push(getAllApplicantsByCompanyId(companyId));
         async.parallel(tasks, function(error, result){
             if(error){
-                console.log('Error in finding all applicants by companyId', companyId, error);
+                logger.info('Error in finding all applicants by companyId', companyId, error);
                 res.status(500).send({success: false, errmsg: 'Error in finding all applicants by companyId', applicants: []});
             } else {
                 var applicants = [];
@@ -547,7 +549,7 @@ function getApplicantsByCompanyId(req, res, next){
 
 function getPositionsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
-    console.log(companyId);
+    // logger.info(companyId);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
@@ -555,7 +557,7 @@ function getPositionsByCompanyId(req, res, next){
         tasks.push(getAllPublishedPositionsByCompanyId(companyId));
         async.parallel(tasks, function(error, result){
             if(error){
-                console.log('Error in finding all positions by companyId', companyId, error);
+                logger.info('Error in finding all positions by companyId', companyId, error);
                 res.status(500).send({success: false, errmsg: 'Error in finding all applicants by companyId', positions: []});
             } else {
                 var positions = [];
@@ -611,7 +613,7 @@ function searchApplicants(req, res, next){
         applicantName = _.get(req, ['body', 'applicantName'], ''),
         startedAt = _.get(req, ['body', 'startedAt'], ''),
         endedAt = _.get(req, ['body', 'endedAt'], '');
-    console.log(companyId, applicantName, startedAt, endedAt);
+    // logger.info(companyId, applicantName, startedAt, endedAt);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
@@ -624,7 +626,7 @@ function searchApplicants(req, res, next){
         if(!_.isEmpty(startedAt)){
             var startDateStr = startedAt + ' 00:00:00.000';
             var startDate = new Date(startDateStr);
-            console.log(startDate);
+            logger.info(startDate);
             if(_.isDate(startDate))
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$gt: startDate}});
         }
@@ -632,17 +634,17 @@ function searchApplicants(req, res, next){
         if(!_.isEmpty(endedAt)){
             var endDateStr = endedAt + ' 23:59:59.999';
             var endDate = new Date(endDateStr);
-            console.log(endDate);
+            logger.info(endDate);
             if(_.isDate(endDate))
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
         }
 
         Applicant.find(queryCriteria, function(error, applicants){
             if(error) {
-                console.log('Error in finding applicants', error);
+                logger.info('Error in finding applicants', error);
                 res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
             } else {
-                console.log(applicants);
+                // logger.info(applicants);
                 var result = {
                     success: true,
                     errmsg: '',
@@ -668,19 +670,19 @@ function createPositionForCompany(req, res, next){
     var companyId = _.get(req, ['body', 'companyId'], ''),
         positionObj = _.get(req, ['body', 'position'], {});
     if(_.isEmpty(companyId)){
-        console.log('company id is required');
+        logger.info('company id is required');
         res.status(500).send({success: false, errmsg: 'company id is required', position: {}});
     } else {
         if(_.isEmpty(positionObj)){
-            console.log('position object is empty');
+            logger.info('position object is empty');
             res.status(500).send({success: false, errmsg: 'position object is empty', position: {}});
         } else {
             Company.findOne({_id: companyId}, function(error, dbCompany){
                 if(error) {
-                    console.log('Error in finding company by id', companyId, error);
+                    logger.info('Error in finding company by id', companyId, error);
                     res.status(500).send({success: false, errmsg: 'Error in finding company by id', position: {}});
                 } else if(_.isEmpty(dbCompany)){
-                    console.log('no company found by id');
+                    logger.info('no company found by id');
                     res.status(500).send({success: false, errmsg: 'no company found by id', position: {}});
                 } else {
                     var positionItem = {
@@ -696,13 +698,13 @@ function createPositionForCompany(req, res, next){
                     var positionEntity = new Position(positionItem);
                     positionEntity.save(function(saveErr, persistedObj){
                         if(saveErr) {
-                            console.log('Error in saving position', saveErr);
+                            logger.info('Error in saving position', saveErr);
                             res.status(500).send({success: false, errmsg: 'Error in saving position', position: {}});
                         } else {
                             var _id = _.get(persistedObj, ['_id'], ''),
                                 positionName = _.get(persistedObj, ['name'], '');
                             if(_.isEmpty(_id)){
-                                console.log('Failed in saving position');
+                                logger.info('Failed in saving position');
                                 res.status(500).send({success: false, errmsg: 'Failed in saving position', position: {}});
                             } else {
                                 var companyPosition = {
@@ -713,7 +715,7 @@ function createPositionForCompany(req, res, next){
                                 dbPositions.push(companyPosition);
                                 Company.update({_id: companyId}, {$set: {positions: dbPositions}}, {upsert: false}, function(err, result){
                                     if(err) {
-                                        console.log('Error in updating company', err);
+                                        logger.info('Error in updating company', err);
                                         res.status(500).send({success: false, errmsg: 'Error in updating company', position: {}});
                                     } else {
                                         var updateResult = {
@@ -738,13 +740,13 @@ function searchPositions(req, res, next){
         positionName = _.get(req, ['body', 'positionName'], ''),
         startedAt = _.get(req, ['body', 'startedAt'], ''),
         endedAt = _.get(req, ['body', 'endedAt'], '');
-    console.log(companyId, positionName, startedAt, endedAt);
+    // logger.info(companyId, positionName, startedAt, endedAt);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required', positions: []});
     } else {
         Company.findOne({_id: companyId}, function(error, dbCompany){
             if(error || _.isEmpty(dbCompany)){
-                console.log('Error in finding company by id', companyId, error);
+                logger.info('Error in finding company by id', companyId, error);
                 res.status(500).send({success: false, errmsg: 'Error in finding company', positions: []});
             } else {
                 var dbPositions = _.get(dbCompany, ['positions'], []),
@@ -775,7 +777,7 @@ function searchPositions(req, res, next){
                     if(!_.isEmpty(startedAt)){
                         var startDateStr = startedAt + ' 00:00:00.000';
                         var startDate = new Date(startDateStr);
-                        console.log(startDate);
+                        logger.info(startDate);
                         if(_.isDate(startDate))
                             queryCriteria.$and.push({'createdAt':{$gt: startDate}});
                     }
@@ -783,14 +785,14 @@ function searchPositions(req, res, next){
                     if(!_.isEmpty(endedAt)){
                         var endDateStr = endedAt + ' 23:59:59.999';
                         var endDate = new Date(endDateStr);
-                        console.log(endDate);
+                        logger.info(endDate);
                         if(_.isDate(endDate))
                             queryCriteria.$and.push({'createdAt':{$lt: endDate}});
                     }
 
                     Position.find(queryCriteria, function(err, positionItems){
                          if(err) {
-                            console.log('Error in finding positions', err);
+                            logger.info('Error in finding positions', err);
                             res.status(500).send({success: false, errmsg: 'Error in finding positions', positions: []});
                         } else {
                             var result = {
@@ -815,7 +817,7 @@ function deletePositionForCompany(req, res, next){
     } else {
         Company.findOne({_id: companyId}, function(error, dbCompany){
             if(error || _.isEmpty(dbCompany)){
-                console.log('Error in finding company by id', companyId, error);
+                logger.info('Error in finding company by id', companyId, error);
                 res.status(500).send({success: false, errmsg: 'Error in finding company', positions: []});
             } else {
                 var dbPositions = _.get(dbCompany, ['positions'], []);
@@ -824,12 +826,12 @@ function deletePositionForCompany(req, res, next){
                 });
                 Company.update({_id: companyId}, {$set: {positions: newPositions}}, {upsert: false}, function(err, result){
                     if(err) {
-                        console.log('Error in updating company positions for company id', companyId, err);
+                        logger.info('Error in updating company positions for company id', companyId, err);
                         res.status(500).send({success: false, errmsg: 'Error in updating company positions', positions: []});
                     } else {
                         Position.remove({_id: positionId}, function(removeErr, removeResult){
                             if(removeErr){
-                                console.log('Error in removing position for id', positionId, removeErr);
+                                logger.info('Error in removing position for id', positionId, removeErr);
                                 res.status(500).send({success: false, errmsg: 'Error in removing position for id', positions: []});
                             } else {
                                 var returnedResult = {
@@ -859,7 +861,7 @@ function updatePosition(req, res, next){
         tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
         async.parallel(tasks, function(error, result){
             if(error) {
-                console.error('Error in update company position', error);
+                logger.error('Error in update company position', error);
                 res.status(500).send({success: false, errmsg: 'Error in update company position', positions: []});
             } else {
                 var tasksResult = {
@@ -886,12 +888,12 @@ function updatePositionModel(positionObj){
         },
         positionId = _.get(positionObj, ['_id'], '');
         if(_.isEmpty(positionId)){
-            console.log('no position id found, cannot update position');
+            logger.info('no position id found, cannot update position');
             return callback(null, null);
         } else {
             Position.update({_id: positionId}, {$set: positionEntity}, {upsert: false}, function(error, updateResult){
                 if(error){
-                    console.log('Error in updating position', error);
+                    logger.info('Error in updating position', error);
                     return callback(null, null);
                 } else {
                     return callback(null, updateResult);
@@ -906,12 +908,12 @@ function updatePositionNameByCompanyId(companyId, positionObj){
     return function(callback){
         var positionId = _.get(positionObj, ['_id'], '');
         if(_.isEmpty(positionId) || _.isEmpty(companyId)){
-            console.log('no position id or companyId found for update position under company');
+            logger.info('no position id or companyId found for update position under company');
             return callback(null, null)
         } else {
             Company.findOne({_id: companyId}, function(err1, dbCompany){
                 if(err1 || _.isEmpty(dbCompany)){
-                    console.log('Error in finding dbcompany by company id', companyId, err1)
+                    logger.info('Error in finding dbcompany by company id', companyId, err1)
                     return callback(null, null);
                 } else {
                     var dbPositions = _.get(dbCompany, ['positions'], []);
@@ -922,7 +924,7 @@ function updatePositionNameByCompanyId(companyId, positionObj){
                         targetPosition.positionName = _.get(positionObj, ['name'], '');
                         Company.update({_id: companyId}, {$set: {'positions': dbPositions}}, {upsert: false}, function(err2, updateResult){
                             if(err2){
-                                console.log('Error in updating positions under company for id', companyId, err2);
+                                logger.info('Error in updating positions under company for id', companyId, err2);
                                 return callback(null, null);
                             } else {
                                 return callback(null, updateResult);
@@ -943,7 +945,7 @@ function validateEmail(req, res, next){
     } else {
         Company.findOne({email: email}, function(err1, dbCompany){
             if(err1 || _.isEmpty(dbCompany)) {
-                console.log('Error in finding company by email', email, err1);
+                logger.info('Error in finding company by email', email, err1);
                 res.render('server/weChat/views/error', {errSubject: '激活失败', errmsg: '激活失败，请联系管理员'});
             } else {
                 if(!_.isUndefined(dbCompany.active) && dbCompany.active){
@@ -958,10 +960,10 @@ function validateEmail(req, res, next){
                 }
                 Company.update({email: email}, {$set: {active: true}}, {upsert: false}, function(err2, updResult){
                     if(err2) {
-                        console.log('Error in activating company account for email', email, err2);
+                        logger.info('Error in activating company account for email', email, err2);
                         res.render('server/weChat/views/error', {errmsg: '激活失败，请联系管理员'});
                     } else {
-                        console.log('Activating successfully for company account', email);
+                        logger.info('Activating successfully for company account', email);
                         res.render('server/weChat/views/success');
                     }
                 });
@@ -982,8 +984,8 @@ function testSendEmail(req, res, next){
         html: '<p>您好！</p><p>入职易收到了邮箱 fireman88.ok@163.com 的注册申请，请点击一下链接完成注册:</p><br><a href="http://www.baidu.com">http://www.baidu.com</a><br><p>如果邮箱中不能打开链接，您也可以将它复制到浏览器地址栏中打开。</p>'
     }
     EmailUtil.sendEmail(email, function(error, info){
-        if(error) console.log(error);
-        else console.log(info.response);
+        if(error) logger.info(error);
+        else logger.info(info.response);
         res.json({success: true, errmsg: ''});
     });
 }
@@ -991,11 +993,11 @@ function testSendEmail(req, res, next){
 function sendVerificationEmail(email, callback){
     EmailUtil.sendEmail(email, function(error, info){
         if(error) {
-            console.log(error);
+            logger.info(error);
             return callback(error, null);
         }
         else {
-            console.log(info.response);
+            logger.info(info.response);
             return callback(null, {success: true, errmsg: ''});
         }
     });
@@ -1021,14 +1023,14 @@ function getCaptchaCode(req, res, next){
     } else {
         Company.findOne({email: email}, function(err1, dbCompany){
             if(err1 || _.isEmpty(dbCompany)){
-                console.log('Error in finding company by email', email, err1);
+                logger.info('Error in finding company by email', email, err1);
                 res.status(500).send({success: false, errmsg: '无效的验证邮箱'});
             } else {
                 var currentTimeStamp = Date.now();
                 if(!_.isEmpty(dbCompany.resetPwdTokenGeneratedTimeStamp) && Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp){
-                    console.log(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000), currentTimeStamp);
-                    console.log(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp);
-                    console.log('the captcha does not expire');
+                    logger.info(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000), currentTimeStamp);
+                    logger.info(Number.parseInt(dbCompany.resetPwdTokenGeneratedTimeStamp) + (60 * 1000) > currentTimeStamp);
+                    logger.info('the captcha does not expire');
                     res.status(500).send({success: false, errmsg: '验证码请求过于频繁，请查看邮箱获取验证码或者等待一分钟'});
                 } else {
                     var code = EmailUtil.generateCaptcha(4);
@@ -1039,7 +1041,7 @@ function getCaptchaCode(req, res, next){
                     };
                     Company.update({email: email}, {$set: updInfo}, {upsert: false}, function(err2, updResult){
                         if(err2) {
-                            console.log('Error in updating account', email, err2);
+                            logger.info('Error in updating account', email, err2);
                             res.status(500).send({success: false, errmsg: '更新验证码失败'});
                         } else {
                             var resetPwdSubject = _.get(config, ['emailConfig', 'resetPwdSubject'], ''),
@@ -1055,10 +1057,10 @@ function getCaptchaCode(req, res, next){
                             };
                             sendVerificationEmail(emailOpt, function(err3, sendEmailResult){
                                 if(err3) {
-                                    console.log('Error in sending captcha to email', email, err3);
+                                    logger.info('Error in sending captcha to email', email, err3);
                                     res.status(500).send({success: false, errmsg: '验证码邮件发送失败，请联系管理员'});
                                 } else {
-                                    console.log('send captcha successfully');
+                                    logger.info('send captcha successfully');
                                     res.json({success: true, errmsg: ''});
                                 }
                             });
@@ -1074,14 +1076,14 @@ function resetPasswordByCaptcha(req, res, next){
     var email = _.get(req, ['body', 'email'], ''),
         code = _.get(req, ['body', 'code'], ''),
         newPwd = _.get(req, ['body', 'newPwd'], '');
-    console.log(email, code, newPwd);
+    logger.info(email, code, newPwd);
     if(_.isEmpty(email) || _.isEmpty(code) || _.isEmpty(newPwd)){
-        console.log('necessary info is required');
+        logger.info('necessary info is required');
         res.status(500).send({success: false, errmsg: 'Please check all necessary information is passed'});
     } else {
         Company.findOne({email: email}, function(err1, dbCompany){
             if(err1 || _.isEmpty(dbCompany)){
-                console.log('Error in finding account by email', email, err1);
+                logger.info('Error in finding account by email', email, err1);
                 res.status(500).send({success: false, errmsg: '无效的验证邮箱'});
             } else {
                 if(!_.isUndefined(dbCompany.resetPwdToken) && dbCompany.resetPwdToken !== code){
@@ -1093,10 +1095,10 @@ function resetPasswordByCaptcha(req, res, next){
                 }
                 Company.update({email: email}, {$set:{password: newPwd, resetPwdTokenExpires: currentTimeStamp}}, {upsert: false}, function(err2, updResult){
                     if(err2) {
-                        console.log('Error in updating company by email', email, err2);
+                        logger.info('Error in updating company by email', email, err2);
                         res.status(500).send({success: false, errmsg: '更改密码失败'});
                     } else {
-                        console.log('reset password successfully');
+                        logger.info('reset password successfully');
                         res.json({success: true, errmsg: ''});
                     }
                 });
@@ -1130,15 +1132,15 @@ function generateVerificationEmail(email, callback){
                 emailOpt.html = verificationEmailContent;
                 sendVerificationEmail(emailOpt, function(err4, emailResult){
                     if(err4) {
-                        console.log('Error in sending verification email', err4);
+                        logger.info('Error in sending verification email', err4);
                         return callback('Error in sending verification email', null);
                     } else {
                         Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
                             if(err5) {
-                                console.log('Error in update verification info', err5);
+                                logger.info('Error in update verification info', err5);
                                 return callback('Error in update verification info', null);
                             } else {
-                                console.log('update verification info');
+                                logger.info('update verification info');
                                 return callback(null, null);
                             }
                         });

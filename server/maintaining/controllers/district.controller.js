@@ -1,6 +1,8 @@
 var _ = require('lodash'),
     mongoose = require('mongoose'),
     async = require('async');
+var config = require('../../../config/config');
+var logger = require('../../../config/lib/logger');
 
 var District = mongoose.model('District');
 
@@ -11,7 +13,7 @@ function getAllProvinces(req, res, next){
     // res.json({provinces: [{label:'北京市'}]});
     District.find({locationType: 'province', active: true}).sort({'acronym':1}).exec(function(err, dbProvinces){
         if(err) {
-            console.log('Error in getting provinces', err);
+            logger.info('Error in getting provinces', err);
             res.status(500).send({success: false, errmsg: 'error in getting all provinces', provinces: []});
         } else {
             var provinceDtos = [];
@@ -30,14 +32,14 @@ function getAllProvinces(req, res, next){
 function getChildrens(req, res, next){
     var label = _.get(req, ['query', 'label'], ''),
         parentLabel = _.get(req, ['query', 'parentLabel']);
-    console.log(label, parentLabel);
+    logger.info(label, parentLabel);
     if(_.isEmpty(label)){
         res.status(500).send({success: false, errmsg: 'label and type are required', childrens: []});
     } else {
         if(_.isEmpty(parentLabel)){
             getChildrenByParent(label, 'province', function(err, dbItems){
                 if(err) {
-                    console.log('error in getting childrens by label %s and type %s', label, type, err);
+                    logger.info('error in getting childrens by label %s and type %s', label, type, err);
                     res.status(500).send({success: false, errmsg: 'label and type are required', childrens: []});
                 } else {
                     var childrens = [];
@@ -57,19 +59,19 @@ function getChildrens(req, res, next){
         } else {
             getChildrenByParent(parentLabel, 'province', function(err, dbItems){
                 if(err) {
-                    console.log('error in getting childrens by label %s and type province', parentLabel, err);
+                    logger.info('error in getting childrens by label %s and type province', parentLabel, err);
                     res.status(500).send({success: false, errmsg: 'label and type are required', childrens: []});
                 } else {
                     var childrens = [];
                     var item = _.find(dbItems, {label: label});
-                    console.log(item);
+                    logger.info(item);
                     var id = _.get(item, ['_id'], '');
                     if(_.isEmpty(id)){
                         res.json({success: true, errmsg: '', childrens: childrens});
                     } else {
                         getChildrenByParentId(id, function(err1, dbChildrens){
                             if(err1) {
-                                console.log('error in finding childrens by parent id', id, err1);
+                                logger.info('error in finding childrens by parent id', id, err1);
                                 res.status(500).send({success: false, errmsg: 'error in finding childrens', childrens: []});
                             } else {
                                 if(!_.isEmpty(dbChildrens)){
@@ -99,13 +101,13 @@ function getChildrenByParent(label, type, callback) {
             return callback(err, null);
         } else {
             if(_.isEmpty(parent)){
-                console.log('no parent found by label %s and type %s', label, type);
+                logger.info('no parent found by label %s and type %s', label, type);
                 return callback(null, null);
             } else {
                 var id = _.get(parent, ['_id'], '');
                 getChildrenByParentId(id, function(err1, dbItems){
                     if(err1) {
-                        console.log('error in finding childrens by parent id', id, err1);
+                        logger.info('error in finding childrens by parent id', id, err1);
                         return callback(err1, null);
                     } else {
                         return callback(null, dbItems);

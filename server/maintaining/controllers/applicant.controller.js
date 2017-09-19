@@ -1,5 +1,7 @@
 var _ = require('lodash'),
     ExcelExporter = require('excel-export');
+var config = require('../../../config/config');
+var logger = require('../../../config/lib/logger');
 var mongoose = require('mongoose');
 var Applicant = mongoose.model('Applicant');
 
@@ -12,7 +14,7 @@ function dateFormat(date){
 }
 function renderPreviewPage(req, res, next){
     var applicantId = _.get(req, ['params', 'id'], '');
-    console.log('preview of applicant id by', applicantId);
+    logger.info('preview of applicant id by', applicantId);
     var data = {
         wechatOpenId: 'sdofsjdofjsdkfosjdf_Fc',
         name: '高晓松',
@@ -23,7 +25,7 @@ function renderPreviewPage(req, res, next){
     } else {
         Applicant.findOne({_id: applicantId}, function(err1, dbApplicant){
             if(err1 || _.isEmpty(dbApplicant)) {
-                console.log('Error in finding applicant by id', applicantId, err1);
+                logger.info('Error in finding applicant by id', applicantId, err1);
                 res.status(500).send({success: false, errmsg: 'Error in finding applicant'});
             } else {
                 //var that = this;
@@ -68,7 +70,7 @@ function exportApplicants(req, res, next){
         companyId = _.get(req, ['query', 'id'], ''),
         startedAt = _.get(req, ['query', 'startedAt'], ''),
         endedAt = _.get(req, ['query', 'endedAt'], '');
-    console.log(applicantName, companyId, startedAt, endedAt);
+    logger.info(applicantName, companyId, startedAt, endedAt);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required'});
     } else {
@@ -80,7 +82,7 @@ function exportApplicants(req, res, next){
         if(!_.isEmpty(startedAt)){
             var startDateStr = startedAt + ' 00:00:00.000';
             var startDate = new Date(startDateStr);
-            console.log(startDate);
+            logger.info(startDate);
             if(_.isDate(startDate))
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$gt: startDate}});
         }
@@ -88,17 +90,17 @@ function exportApplicants(req, res, next){
         if(!_.isEmpty(endedAt)){
             var endDateStr = endedAt + ' 23:59:59.999';
             var endDate = new Date(endDateStr);
-            console.log(endDate);
+            logger.info(endDate);
             if(_.isDate(endDate))
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
         }
 
         Applicant.find(queryCriteria, function(error, applicants){
             if(error) {
-                console.log('Error in finding applicants', error);
+                logger.info('Error in finding applicants', error);
                 res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
             } else {
-                console.log(applicants);
+                logger.info(applicants);
                 var conf = {
                     name: 'Sheet1',
                     cols: [{

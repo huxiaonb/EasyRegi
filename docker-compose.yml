@@ -2,7 +2,7 @@ db:
   tty: true
   image: mongo:3.4.4
   volumes:
-  - /home/app/easyregister/db:/data/db
+  - /home/app/EasyRegi/db:/data/db
   stdin_open: true
 web:
   environment:
@@ -15,7 +15,7 @@ web:
   - 465:465
   - 3000:3000
   volumes:
-    - /home/nfsshare/easyregister/upload:/home/easyRegister/public/upload
-    - /home/nfsshare/easyregister/logs:/home/easyRegister/logs
+    - /home/nfsshare/EasyRegi/upload:/home/EasyRegi/public/upload
+    - /home/nfsshare/EasyRegi/logs:/home/EasyRegi/logs
   links:
   - db:db
