@@ -209,7 +209,7 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
         console.log('openId exists');
         return next();
     } else if(_.isEmpty(wechatCode)){
-        req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
         //redirect to register page or next page as submit also need check this
         //return next();
         console.log('wechat code does not exist');

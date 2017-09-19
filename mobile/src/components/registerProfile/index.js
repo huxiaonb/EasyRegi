@@ -51,7 +51,8 @@ class Index extends React.Component {
         personal:{},
         family:{family:[]},
         otherInfo:{workExps:[],wkeys:[],edus:[],ekeys:[]}
-      }
+      },
+      isOpenIdObtained: true
     };
   updateProfile(obj){
     let {info} = this.state;
@@ -202,13 +203,17 @@ class Index extends React.Component {
           }
         });
         //this.forceUpdate();
+    } else {
+        this.setState({
+            isOpenIdObtained: false
+        });
     }
   }
   render() {
-    const { current } = this.state;
+    const { current, isOpenIdObtained } = this.state;
     let { personal, family, otherInfo } = this.state.info;
 
-    const myStep = (
+    const myStep = isOpenIdObtained ? (
       <div style={{textAlign:'left'}}>
         <Steps current={current} direction="horizontal" style={{marginBottom:'50px'}}>
           {steps.map(item => <Step key={item.title} title={item.title} />)}
@@ -220,7 +225,12 @@ class Index extends React.Component {
         </div>
       
       </div>
-    );
+    ) : (<div className="result-example">
+        <Result style={{height:'500px',marginTop:'30%'}}
+                img={<Icon type="exclamation-circle" className="icon" style={{ fill: '#FFC600' }} />}
+                message="未能获取到用户信息，请从微信公众号进入编辑个人简历"
+        />
+    </div>);
     if(this.state.successFlag){
       return(
             <div className="result-example">
