@@ -121,7 +121,7 @@ class Index extends React.Component {
               { this.props.children }
             </Content>
             <Footer style={{ textAlign: 'center',padding:0 }}>
-              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号-3
+              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号
             </Footer>
           </Layout>
           

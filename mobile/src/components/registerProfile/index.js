@@ -251,7 +251,7 @@ class Index extends React.Component {
             </div>
           </div>
           <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>
-              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号-3 
+              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号
           </div>
       </div>
     )
