@@ -208,28 +208,29 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     if(!_.isEmpty(openId)){
         logger.info('openId exists');
         return next();
-    } else if(_.isEmpty(wechatCode)){
-        // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-        //redirect to register page or next page as submit also need check this
-        //return next();
-        logger.info('wechat code does not exist');
-        return next();
     } else {
-        logger.info('wechat code exists');
-        wechatUtil.getOpenIdAndAuthAccessTokenByCode(wechatCode, function(error, result){
-            if(error) {
-                return next();
-            } else {
-                if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
-                    req.session.openId = _.get(result, ['openId'], '');
-                    req.session.accessToken = _.get(result, ['accessToken'], '');
+        if(_.isEmpty(wechatCode)){
+            // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+            //redirect to register page or next page as submit also need check this
+            //return next();
+            logger.info('wechat code does not exist');
+            return next();
+        } else {
+            logger.info('wechat code exists');
+            wechatUtil.getOpenIdAndAuthAccessTokenByCode(wechatCode, function(error, result){
+                if(error) {
+                    return next();
+                } else {
+                    if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
+                        req.session.openId = _.get(result, ['openId'], '');
+                        req.session.accessToken = _.get(result, ['accessToken'], '');
+                    }
+                    logger.info(req.session.openId, req.session.accessToken);
+                    return next();
                 }
-                logger.info(req.session.openId, req.session.accessToken);
-                return next();
-            }
-        });
+            });
+        }
     }
-  // }
 }
 
 exports.findApplicantByOpenId = function(req, res, next){

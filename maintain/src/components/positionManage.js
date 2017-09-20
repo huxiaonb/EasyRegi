@@ -196,8 +196,8 @@ class PositionManage extends React.Component{
             className: 'log-result-noWrap',
         },{
             title: '招聘人数',
-            dataIndex: 'totalRecuriters',
-            key : 'totalRecuriters',
+            dataIndex: 'totalRecruiters',
+            key : 'totalRecruiters',
             className: 'log-result-noWrap',
         },{
             title: '薪资',

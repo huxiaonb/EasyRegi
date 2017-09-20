@@ -113,7 +113,7 @@ class Positions extends React.Component{
                 //let headerName = ele.name;
                 let accHeader = (
                     <div>
-                        <h3>{ele.companyName} 招聘 {ele.name}</h3>
+                        <h3><b>{ele.companyName} 招聘 {ele.name}</b></h3>
                         <div>
                             <span>距离：{parseInt(ele.distance)}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>
                         </div>
