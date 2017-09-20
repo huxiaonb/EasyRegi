@@ -2,7 +2,7 @@ db:
   tty: true
   image: mongo:3.4.4
   volumes:
-  - /home/app/EasyRegi/db:/data/db
+  - /home/app/easyregister/db:/data/db
   stdin_open: true
 web:
   environment:
