@@ -298,8 +298,7 @@ function updateCompanyInfo(req, res, next){
             alias: _.get(companyItem, ['alias'], ''),
             contactPersonName: _.get(companyItem, ['contactPersonName'], ''),
             phoneNumber: _.get(companyItem, ['phoneNumber'], ''),
-            description: _.get(companyItem, ['description'], ''),
-            positions: _.get(companyItem, ['positions'], []),
+            description: _.get(companyItem, ['description'], '')
         };
         var qqLocationApi = _.get(config, ['qqapi', 'geocoderApi'], '')
             apiKey = _.get(config, ['qqmapKey'], ''),

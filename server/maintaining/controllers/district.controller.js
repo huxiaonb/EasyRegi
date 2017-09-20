@@ -32,7 +32,7 @@ function getAllProvinces(req, res, next){
 function getChildrens(req, res, next){
     var label = _.get(req, ['query', 'label'], ''),
         parentLabel = _.get(req, ['query', 'parentLabel']);
-    logger.info(label, parentLabel);
+    // logger.info(label, parentLabel);
     if(_.isEmpty(label)){
         res.status(500).send({success: false, errmsg: 'label and type are required', childrens: []});
     } else {
