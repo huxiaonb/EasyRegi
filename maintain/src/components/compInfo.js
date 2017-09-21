@@ -4,6 +4,7 @@ import {Button, Input, DatePicker, Row, Col,Form,Select,message} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 import DistrictSelect from './districtSelect'
+import Loading from './Loading'
 // import Form from 'antd/lib/form'
 // import Input from 'antd/lib/input'
 // import Button from 'antd/lib/button'
@@ -30,6 +31,7 @@ class CompInfo extends React.Component{
         getCompanyInfo : PropTypes.func
     }
     state = {
+        loading : false,
         editFlag:false,
         dsArr : [],
         detailAddr : '',
@@ -44,13 +46,14 @@ class CompInfo extends React.Component{
              if (!!err){
                  return;
              }
+            this.setState({loading:true});
             let {pValue, cValue, thirdValue} = this.refs.dSelect.state;
             let dsValue = [];
             pValue ? dsValue.push(pValue) : '';
             cValue ? dsValue.push(cValue) : '';
             thirdValue ? dsValue.push(thirdValue) : '';
-            
-            let compInfo = Object.assign({},{
+            let fullComp = Object.assign({},this.context.comp);
+            let compInfo = Object.assign({},fullComp,{
                 companyName: form.getFieldValue('comp_name'),
                 alias: form.getFieldValue('comp_alias'),
                 companyAddress: dsValue.join(',') + ',' + detailAddr,
@@ -66,6 +69,7 @@ class CompInfo extends React.Component{
                 message.success('更新成功');
                 this.context.getCompanyInfo();
                 this.setState({
+                    loading :false,
                     dsArr : dsValue,
                     editFlag : !this.state.editFlag
                 })
@@ -101,6 +105,11 @@ class CompInfo extends React.Component{
         })
     }
     render(){
+        if(this.state.loading){
+            return(<div>
+                <Loading />
+            </div>);
+        }
         let {getFieldDecorator} = this.props.form;
         let {comp} = this.context;
         let infoSection=this.state.editFlag?(

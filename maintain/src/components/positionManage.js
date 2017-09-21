@@ -284,7 +284,9 @@ class PositionManage extends React.Component{
                         pageSize: 20,
                         current: 1,
                     }}
-                    bordered={true}/>
+                    bordered={true}
+                    scroll={{x:1300}}
+                />
                 </div>
                 
                 <Modal

@@ -159,7 +159,9 @@ export default class ApplicantManage extends React.Component{
                         current: 1,
                     }}
                     onRowClick={this.preview.bind(this)}
-                    bordered={true}/>
+                    bordered={true}
+                    scroll={{x:1300}}
+                    />
                 </div>
 
 
