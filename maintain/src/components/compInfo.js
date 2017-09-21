@@ -73,6 +73,9 @@ class CompInfo extends React.Component{
                     dsArr : dsValue,
                     editFlag : !this.state.editFlag
                 })
+            }else{
+                message.error('更新失败');
+                this.setState({loading : false});
             }
         })
             
