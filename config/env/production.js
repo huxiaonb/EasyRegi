@@ -23,6 +23,9 @@ module.exports = {
       maxsize: 10485760,
       maxFiles: 2,
       json: false
+    },
+    options: {
+        logdir: './logs'
     }
   },
   mailer: {

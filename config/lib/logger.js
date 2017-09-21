@@ -6,9 +6,45 @@ var _ = require('lodash'),
   fs = require('fs'),
   winston = require('winston'),
   FileStreamRotator = require('file-stream-rotator'),
-  path = require('path');
+  path = require('path'),
+  moment = require('moment');
+const logDir = 'logs';
 // list of valid formats for the logging
 var validFormats = ['combined', 'common', 'dev', 'short', 'tiny'];
+const tsFormat = () => (new Date()).toLocaleString();
+
+function dateFormat() {
+    return moment().format('YYYY-MM-DD HH:mm:ss:SSS');
+};
+
+function formatter(args) {
+    var logMessage = dateFormat() + ' - ' + args.level + ': ['+process.pid+'] ' + args.message;
+    if(args.level=='error'){
+        logMessage = logMessage + '\n'+ args.meta.stack;
+    }
+    return logMessage;
+}
+
+function getInfoLevelFileName(){
+  var date = new Date(),
+      month = '',
+      day = '',
+      realMonthNum = 0;
+  realMonthNum = date.getMonth() + 1;
+  if(date.getMonth() < 10) {
+    month = '0' + realMonthNum.toString();
+  } else {
+    month = realMonthNum.toString();
+  }
+  if(date.getDate() < 10) {
+    day = '0' + date.getDate().toString();
+  } else {
+    day = date.getDate().toString();
+  }
+  var postfix = date.getFullYear().toString() + month + day;
+  return 'logs/info-' + postfix + '.log';
+}
+fs.existsSync(config.log.options.logdir) || fs.mkdirSync(config.log.options.logdir)
 
 // Instantiating the default winston application logger with the Console
 // transport
@@ -16,14 +52,32 @@ var logger = new winston.Logger({
   transports: [
     new winston.transports.Console({
       level: 'info',
+      timestamp: tsFormat,
       colorize: true,
       showLevel: true,
       handleExceptions: true,
-      humanReadableUnhandledException: true
+      humanReadableUnhandledException: true,
+      formatter: formatter
     }),
     new (winston.transports.File)({
+      name: 'info-file',
+      level: 'info',
+      timestamp: tsFormat,
+      filename: 'logs/info.log',
+      colorize: true,
+      showLevel: true,
+      handleExceptions: true,
+      humanReadableUnhandledException: true,
+      maxsize:1024*1024*10,
+      formatter: formatter
+    }),
+    new (winston.transports.File)({
+      name: 'error-file',
       level: 'error',
-      filename: 'exception.log'
+      timestamp: tsFormat,
+      filename: 'logs/exception.log',
+      maxsize:1024*1024*10,
+      formatter: formatter
     })
   ],
   exitOnError: false
@@ -92,12 +146,12 @@ logger.getLogOptions = function getLogOptions(configOptions) {
   }
 
   var logPath = configFileLogger.directoryPath + '/' + configFileLogger.fileName;
-
+  console.log(logPath)
   return {
-    level: 'debug',
+    level: 'info',
     colorize: false,
     filename: logPath,
-    timestamp: true,
+    timestamp: tsFormat,
     maxsize: configFileLogger.maxsize ? configFileLogger.maxsize : 10485760,
     maxFiles: configFileLogger.maxFiles ? configFileLogger.maxFiles : 2,
     json: (_.has(configFileLogger, 'json')) ? configFileLogger.json : false,
@@ -105,7 +159,8 @@ logger.getLogOptions = function getLogOptions(configOptions) {
     tailable: true,
     showLevel: true,
     handleExceptions: true,
-    humanReadableUnhandledException: true
+    humanReadableUnhandledException: true,
+    datePattern:'.yyyy-MM-dd.log',
   };
 
 };
@@ -151,6 +206,6 @@ logger.getLogFormat = function getLogFormat() {
   return format;
 };
 
-logger.setupFileLogger({});
+// logger.setupFileLogger({});
 
 module.exports = logger;

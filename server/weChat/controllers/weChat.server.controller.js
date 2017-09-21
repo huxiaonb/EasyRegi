@@ -1,5 +1,6 @@
 'use strict';
 var config = require('../../../config/config');
+var logger = require('../../../config/lib/logger');
 var mongoose = require('mongoose');
 var CompanyInfoSegment = mongoose.model('CompanyInfoSegment');
 var CompanyTemplate = mongoose.model('CompanyTemplate');
@@ -91,15 +92,15 @@ exports.companyIntroduction = function (req, res) {
 };
 
 exports.homePage = function (req, res) {
-  console.log('getWechatOpenId');
-  console.log(req.query.code);
+  logger.info('getWechatOpenId');
+  logger.info(req.query.code);
   if(!req.query.code){
-    console.log('no code exist in requset.');
+    logger.info('no code exist in requset.');
     CompanyTemplate.find({'type': '招聘行程'}, function (err, companyTemplates) {
       res.render('server/weChat/views/homePage', {recruitmentProcessUrl: _.result(_.first(companyTemplates), 'url')});
     });
   } else{
-    console.log('wechat code exists');
+    logger.info('wechat code exists');
     request.get({
       url: 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxf81a6447d41fe23b&secret=16082848595de5763ab6fbc4385047a2&code=' + req.query.code + '&grant_type=authorization_code',
       json: true
@@ -107,8 +108,8 @@ exports.homePage = function (req, res) {
       if(!error && response.statusCode == 200 && !!body){
         var access_token = body.access_token;
         var openId = body.openid;
-        console.log('access_token is:' + access_token);
-        console.log('openId is: ' + openId);
+        logger.info('access_token is:' + access_token);
+        logger.info('openId is: ' + openId);
         if(!!openId){
           if(!req.session.openId){
             req.session.openId = openId;
@@ -129,7 +130,7 @@ function renderHomePage(req, res) {
 }
 
 exports.register = function(req, res) {
-  console.log('render register page with open id', _.get(req, ['session', 'openId'], ''));
+  logger.info('render register page with open id', _.get(req, ['session', 'openId'], ''));
   res.render('server/weChat/views/register', {openId: _.get(req, ['session', 'openId'], '')});
 }
 
@@ -157,26 +158,26 @@ exports.createUnifiedOrder = function(req, res) {
       trade_type: 'JSAPI',
   }
   opts.sign = wechatUtil.sign(opts);
-  //console.log(wechatUtil.buildXML(opts));
-  //console.log(opts);
+  //logger.info(wechatUtil.buildXML(opts));
+  //logger.info(opts);
   request({
 		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
 		method: 'POST',
 		body: wechatUtil.buildXML(opts),
 	}, function(err, response, body){
-      // console.log('-----------1-------------');
-      // console.log(err);
-      // console.log('-----------2-------------');
-      //console.log(response);
-      // console.log('-----------3-------------');
-      // console.log(body);
-      // console.log('-----------4-------------');
+      // logger.info('-----------1-------------');
+      // logger.info(err);
+      // logger.info('-----------2-------------');
+      //logger.info(response);
+      // logger.info('-----------3-------------');
+      // logger.info(body);
+      // logger.info('-----------4-------------');
       parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
         if(err){
-          console.log(err);
+          logger.info(err);
           res.send(err).end()
         }else if(result.return_code === 'SUCCESS'){
-          //console.log(result);
+          //logger.info(result);
           let objtoSign = {
             appId: result. appid,
             nonceStr:result.nonce_str,
@@ -190,7 +191,7 @@ exports.createUnifiedOrder = function(req, res) {
         }
       });
 		  
-      // console.log(fn)
+      // logger.info(fn)
       // if(fn.return_code === 'SUCCESS'){
       //   res.json(fn);
       // }
@@ -200,36 +201,36 @@ exports.createUnifiedOrder = function(req, res) {
 
 exports.getOpenIdAndAuthAccessToken = function(req, res, next){
   // return function(req, res, next){
-    console.log('getWechatOpenId');
     // req.session.openId = '';
     var wechatCode = _.get(req, ['query', 'code'], '');
-    console.log(wechatCode);
+    logger.info('getWechatOpenId', wechatCode);
     var openId = _.get(req, ['session', 'openId'], '');
     if(!_.isEmpty(openId)){
-        console.log('openId exists');
-        return next();
-    } else if(_.isEmpty(wechatCode)){
-        // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-        //redirect to register page or next page as submit also need check this
-        //return next();
-        console.log('wechat code does not exist');
+        logger.info('openId exists');
         return next();
     } else {
-        console.log('wechat code exists');
-        wechatUtil.getOpenIdAndAuthAccessTokenByCode(wechatCode, function(error, result){
-            if(error) {
-                return next();
-            } else {
-                if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
-                    req.session.openId = _.get(result, ['openId'], '');
-                    req.session.accessToken = _.get(result, ['accessToken'], '');
+        if(_.isEmpty(wechatCode)){
+            // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+            //redirect to register page or next page as submit also need check this
+            //return next();
+            logger.info('wechat code does not exist');
+            return next();
+        } else {
+            logger.info('wechat code exists');
+            wechatUtil.getOpenIdAndAuthAccessTokenByCode(wechatCode, function(error, result){
+                if(error) {
+                    return next();
+                } else {
+                    if(_.isEmpty(_.get(req, ['session', 'openId'], ''))){
+                        req.session.openId = _.get(result, ['openId'], '');
+                        req.session.accessToken = _.get(result, ['accessToken'], '');
+                    }
+                    logger.info(req.session.openId, req.session.accessToken);
+                    return next();
                 }
-                console.log(req.session.openId, req.session.accessToken);
-                return next();
-            }
-        });
+            });
+        }
     }
-  // }
 }
 
 exports.findApplicantByOpenId = function(req, res, next){
@@ -249,12 +250,12 @@ exports.submitRegisterInformation = function(req, res, next){
   var openId = _.get(req, ['query', 'id'], ''),
       type = _.get(req, ['query', 'type'], '');
   var files = _.get(req, ['files']);
-  console.log('----111111---');
-  //console.log(req);       
-  console.log(type);
-  console.log(files);
-  console.log('-------');
-        //console.log('-------');
+  logger.info('----111111---');
+  //logger.info(req);
+  logger.info(type);
+  logger.info(files);
+  logger.info('-------');
+        //logger.info('-------');
   var fileSize = 0;
   var relativePhotoPath = '';
   if(!_.isEmpty(files)
@@ -262,29 +263,29 @@ exports.submitRegisterInformation = function(req, res, next){
       fileSize = files.file.size;
       relativePhotoPath = files.file.path;
   }
-  console.log(relativePhotoPath, fileSize);
+  logger.info(relativePhotoPath, fileSize);
   if (!fileSize) {
     if (relativePhotoPath) {
       try {
         fs.unlink(path.join(process.cwd(), relativePhotoPath))
       } catch(e) {
-        console.log(e);
+        logger.info(e);
       }
     }
   }
   var separatedPath = relativePhotoPath.split(path.sep);
   var photoName = separatedPath[separatedPath.length - 1];
   // var applicantName = req.body.name;
-  // console.log(applicantName);
+  // logger.info(applicantName);
 
   // res.end();
   if(_.isEmpty(openId) || _.isEmpty(type)){
-    console.log('no open id or type');
+    logger.info('no open id or type');
     return res.end();
   } else {
-    console.log('open id exists');
+    logger.info('open id exists');
     Applicant.find({wechatOpenId: openId}).then(applicants => {
-      console.log(applicants);
+      logger.info(applicants);
       if(!_.isEmpty(applicants)){
         var dbApplicant = applicants[0],
             clonedApplicant = _.clone(req.body);
@@ -306,16 +307,16 @@ exports.submitRegisterInformation = function(req, res, next){
         if(!_.isEmpty(registeredCompanies)){
           clonedApplicant.registeredCompanies = registeredCompanies;
         }
-        console.log('--111--');
-        console.log(clonedApplicant);
-        console.log('--111--');
+        logger.info('--111--');
+        logger.info(clonedApplicant);
+        logger.info('--111--');
         Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
         .exec(function(error, result){
           if(error) {
-            console.error('Error in upsert applicant', error);
+            logger.error('Error in upsert applicant', error);
             return next(error);
           } else {
-            console.log('Applicant update successfully for wechat open id', openId);
+            logger.info('Applicant update successfully for wechat open id', openId);
             res.end();
           }
         });
@@ -336,16 +337,16 @@ exports.submitRegisterInformation = function(req, res, next){
         Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
         .exec(function(error, result){
             if(error) {
-                console.error('Error in uploading photo type', type, error);
+                logger.error('Error in uploading photo type', type, error);
                 return next(error);
             } else {
-                console.log('Uploading photo type %s successfully for wechat open id %s', type,openId);
+                logger.info('Uploading photo type %s successfully for wechat open id %s', type,openId);
                 res.end();
             }
         });
       }
     }).catch(function(err){
-      console.error('Error in find applicant by wechat open id', openId, err);
+      logger.error('Error in find applicant by wechat open id', openId, err);
       return next(err);
     });
   }
@@ -354,17 +355,17 @@ exports.submitRegisterInformation = function(req, res, next){
 exports.renderRegisterCompanyPage = function(req, res){
   var openId = _.get(req, ['session', 'openId'], '');
   if(_.isEmpty(openId)){
-    console.log('openId does not exist, cannot access register company page');
+    logger.info('openId does not exist, cannot access register company page');
     res.end();
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
-        console.log('Applicant does not exist, and need submit personal information for applicant');
+        logger.info('Applicant does not exist, and need submit personal information for applicant');
         res.render('server/weChat/views/register', {openId: _.get(req, ['session', 'openId'], '')});
       } else {
-        console.log('Applicant has already submit personal information');
+        logger.info('Applicant has already submit personal information');
         res.render('server/weChat/views/company', {openId: _.get(req, ['session', 'openId'], '')});
       }
     });
@@ -374,23 +375,23 @@ exports.renderRegisterCompanyPage = function(req, res){
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
       companyId = _.get(req, ['body', 'companyId', '0'], '');
-      //console.log(companyId);
+      //logger.info(companyId);
   var current = new Date();
   if(_.isEmpty(openId)){
-    //console.log('openId does not exist, cannot submit register company');
+    //logger.info('openId does not exist, cannot submit register company');
     res.end();
   } else if(_.isEmpty(companyId)){
-    //console.log('companyId does not exist, cannot submit register company');
+    //logger.info('companyId does not exist, cannot submit register company');
     res.end();
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
-        //console.log('Applicant does not exist, cannot register company');
+        //logger.info('Applicant does not exist, cannot register company');
         res.end();
       } else {
-        //console.log('applicant exitst, ready to select company');
+        //logger.info('applicant exitst, ready to select company');
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
           if(!_.isEmpty(companies)){
@@ -411,21 +412,21 @@ exports.submitRegisterCompany = function(req, res){
               dbRegisteredCompany.companyAlias = _.get(dbCompany, ['alias'], '');
               dbRegisteredCompany.registerDate = current;
             }
-            console.log(dbApplicant.registeredCompanies);
+            logger.info(dbApplicant.registeredCompanies);
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {
-                //console.log('Error in updating applicant', error);
+                //logger.info('Error in updating applicant', error);
                 res.end();
               } else {
-                //console.log(persistedObj);
+                //logger.info(persistedObj);
                 res.end();
               }
             })
 
 
           } else {
-            //console.log('cannot find company with company id', companyId);
+            //logger.info('cannot find company with company id', companyId);
             res.end();
           }
         });
@@ -433,7 +434,7 @@ exports.submitRegisterCompany = function(req, res){
         // res.end();
       }
     }).catch(function(error){
-      console.log('Error in finding applicant by open id', openId, error);
+      logger.info('Error in finding applicant by open id', openId, error);
       res.end();
     });
   }
@@ -443,10 +444,10 @@ exports.submitRegisterForm = function(req, res){
   var openId = _.get(req, ['params', 'openId'], '');
 
   if(_.isEmpty(openId)){
-    console.log('open id does not exists');
+    logger.info('open id does not exists');
     res.end();
   } else {
-    console.log('open id exists');
+    logger.info('open id exists');
     Applicant.find({wechatOpenId: openId}).then(applicants => {
       var clonedApplicant = _.clone(_.get(req, ['body'], {}));
       if(!_.isEmpty(applicants)){
@@ -463,10 +464,10 @@ exports.submitRegisterForm = function(req, res){
       Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
       .exec(function(error, result){
         if(error) {
-          console.error('Error in upsert applicant', error);
+          logger.error('Error in upsert applicant', error);
           return next(error);
         } else {
-          console.log('Applicant update successfully for wechat open id', openId);
+          logger.info('Applicant update successfully for wechat open id', openId);
           res.end();
         }
       });
@@ -477,7 +478,7 @@ exports.submitRegisterForm = function(req, res){
 function getAllCompanyNames(req, res, next){
     Company.find({}, function(error, companies){
       if(error) {
-        console.error('Error in finding company names', error);
+        logger.error('Error in finding company names', error);
         res.end();
       } else {
         var companyNames = [];
@@ -524,9 +525,9 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
         // 勾股定理求斜边长
         distance = Math.sqrt(dx * dx + dy * dy).toFixed(0);
-        // console.log('----------1-----------');
-        // console.log(distance);
-        // console.log('---------2------------');
+        // logger.info('----------1-----------');
+        // logger.info(distance);
+        // logger.info('---------2------------');
         return distance;
     }
 
@@ -546,13 +547,13 @@ exports.findNearbyPositions = function(req, res, next){
       }
   }
   addr = addrArr.join(',');
-  console.log(locationInfo);
-  console.log(latLngStr);
-  console.log(addr);
+  logger.info(locationInfo);
+  logger.info(latLngStr);
+  logger.info(addr);
   if(_.isEmpty(addr)){
     Position.find({}, function(err, dbPositions){
       if(err) {
-        console.log('Error in getting positions', err);
+        logger.info('Error in getting positions', err);
         res.status(500).send({success: false, errmsg: '获取职位信息失败'});
       } else {
         res.json({success: true, positions: dbPositions});
@@ -560,17 +561,17 @@ exports.findNearbyPositions = function(req, res, next){
     });
   } else {
     Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
-        // console.log('----------3-----------');
-        // console.log(dbCompanies);
-        // console.log('----------3-----------');
+        // logger.info('----------3-----------');
+        // logger.info(dbCompanies);
+        // logger.info('----------3-----------');
       if(err1) {
-        console.log('Error in getting company by address reg', err1);
+        logger.info('Error in getting company by address reg', err1);
         res.status(500).send({success: false, errmsg: '获取职位信息失败'});
       } else if(_.isEmpty(dbCompanies)) {
-        console.log('no companies found in that area');
+        logger.info('no companies found in that area');
         res.json({success: true, positions: []});
       } else {
-        // console.log(JSON.stringify(dbCompanies));
+        // logger.info(JSON.stringify(dbCompanies));
         var ids = [];
         var latLngArr = [];
         var latLngDistances = [];
@@ -578,22 +579,22 @@ exports.findNearbyPositions = function(req, res, next){
         _.forEach(dbCompanies, function(cop){
           if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
             ids.push(cop._id);
-            console.log(cop._id);
+            // logger.info(cop._id);
           if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
             latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
             latLngDistances.push(parseInt(getShortDistance(locationInfo.lng,locationInfo.lat,_.get(cop, ['lng']),_.get(cop, ['lat'])))/1000);
           }
         });
-        // console.log('---------------------');
-        // console.log(latLngDistances);
-        // console.log('---------------------');
+        // logger.info('---------------------');
+        // logger.info(latLngDistances);
+        // logger.info('---------------------');
         
-        console.log(ids);
-        console.log(latLngArr);
+        logger.info(ids);
+        logger.info(latLngArr);
         //getDistanceBetweenUserAndCompanies(latLngStr, latLngArr, function(err3, latLngDistances){
           Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
               if(err2) {
-                  console.log('Error in finding positions per id', err2);
+                  logger.info('Error in finding positions per id', err2);
                   res.status(500).send({success: false, errmsg: '获取职位信息失败'});
               } else {
                
@@ -604,7 +605,7 @@ exports.findNearbyPositions = function(req, res, next){
                       _.forEach(latLngArr, function(latLntString, index){
                         var arr = latLntString.split(',');
                         var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                        // console.log(arr[0], arr[1], index, cop);
+                        // logger.info(arr[0], arr[1], index, cop);
                         if(!_.isEmpty(cop)){
                             var copPositions = positionGroup[cop._id];
                             var tempPositions = [];
@@ -626,7 +627,7 @@ exports.findNearbyPositions = function(req, res, next){
                               
                                 //let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index]});
                                 tempPositions.push(clonePosi);
-                                // console.log(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
+                                // logger.info(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
                             });
                             sortedPositions = _.concat(sortedPositions, tempPositions);
                         }
@@ -689,7 +690,7 @@ exports.findNearbyPositions = function(req, res, next){
                               return false;
                             }
                           });
-                          console.log(matchedCop);
+                          logger.info(matchedCop);
                           if(!_.isEmpty(matchedCop)) {
                             var copLatLngStr = _.get(matchedCop, ['lat'], '') + ',' + _.get(matchedCop, ['lng'], '');
                             var matchedDistanceObj = latLngDistanceMap[copLatLngStr];
@@ -713,7 +714,7 @@ exports.findNearbyPositions = function(req, res, next){
                         return b.distance > c.distance;
                       });
                       sortedPositions = _.concat(sortedPositions, unsortPositions);
-                      console.log(sortedPositions.length);
+                      logger.info(sortedPositions.length);
                       res.json({success: true, positions: sortedPositions});
                   } else {
                       res.json({success: true, positions: []});
@@ -734,16 +735,16 @@ function getDistanceBetweenUserAndCompanies(latLng, companyLatLngArr, callback){
       apikey = config.qqmapKey,
       distanceUrl = distanceApi + '?mode=driving&from=' + latLng + '&to=' + companyLatLngArr.join(';') + '&key=' + apikey,
       elements = [];
-    console.log(distanceUrl);
+    logger.info(distanceUrl);
     request.get({
         url: distanceUrl,
         json: true
     }, function(error, response, distanceResult) {
-        console.log(JSON.stringify(distanceResult));
+        logger.info(JSON.stringify(distanceResult));
         if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(distanceResult, ['status']) == 0) {
           elements = _.get(distanceResult, ['result', 'elements'], []);
         } else {
-          console.log('Error in getting distance', error, _.get(response, ['statusCode'], 0), _.get(distanceResult, ['status']));
+          logger.info('Error in getting distance', error, _.get(response, ['statusCode'], 0), _.get(distanceResult, ['status']));
         }
         return callback(null, elements);
     });
@@ -752,12 +753,12 @@ function getDistanceBetweenUserAndCompanies(latLng, companyLatLngArr, callback){
 exports.findAllPositions = function(req, res, next){
   Position.find({}, function(err, dbPositions){
     if(err) {
-      console.log('Error in finding all postions', err);
+      logger.info('Error in finding all postions', err);
       res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
     } else {
       Company.find({}, function(err1, dbCompanies){
         if(err1) {
-          console.log('Error in finding all companies', err);
+          logger.info('Error in finding all companies', err);
           res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
         } else {
           if(_.isEmpty(dbPositions)){
@@ -782,7 +783,7 @@ exports.findAllPositions = function(req, res, next){
                 resultPositions.push(clonePosition);
               }
             });
-            console.log(JSON.stringify(resultPositions));
+            logger.info(JSON.stringify(resultPositions));
             res.json({success: true, positions: resultPositions});
           }
         }

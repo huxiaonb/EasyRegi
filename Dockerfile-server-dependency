@@ -2,11 +2,11 @@ FROM node:8.1.0
 
 MAINTAINER "Mace Fu"
 
-RUN mkdir -p /home/easyRegister
+RUN mkdir -p /home/EasyRegi
 
-WORKDIR /home/easyRegister
+WORKDIR /home/EasyRegi
 
-COPY package.json /home/easyRegister
+COPY package.json /home/EasyRegi
 
 RUN npm install --registry=https://registry.npm.taobao.org
 

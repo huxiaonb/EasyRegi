@@ -146,7 +146,11 @@ class Index extends React.Component {
 
   async componentWillMount(){
     //0: set wechat id
-
+    if(openId === null || openId === undefined || openId === ''){
+        this.setState({
+            isOpenIdObtained: false
+        });
+    }
     //1st: try to get info
     let r = await lapi.getApplicant(openId);
     //2nd : set data
@@ -203,10 +207,6 @@ class Index extends React.Component {
           }
         });
         //this.forceUpdate();
-    } else {
-        this.setState({
-            isOpenIdObtained: false
-        });
     }
   }
   render() {
@@ -251,7 +251,7 @@ class Index extends React.Component {
             </div>
           </div>
           <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>
-              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号-3 
+              Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号
           </div>
       </div>
     )
