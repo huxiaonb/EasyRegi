@@ -20,15 +20,15 @@ class Company extends React.Component{
         mCheck : false,
         selectCompId: '',
         personalInfo: {},
-        companies: [{value: '123', label: 'OOCL'},{value: '金山', label: '金山'}, {value: '西山居', label: '西山居'}],
-        currentCompany: ['123'],
-        testFamilyMembers: [{_id:'qwer', name:'付雷',relationship:'父母',phoneNumber:'12345678902'},{_id:'safd', name:'黄俊',relationship:'父母',phoneNumber:'12345678903'}],
-        testThreeTypesRelations: {_id:'qwer', name:'付雷',relationship:'父母',phoneNumber:'12345678902'},
-        testWorkExperience: [{_id:'work_adsf', companyName: '金山', title: '前端工程师', salaryRange: '5', startedAt: '2016-09-01', endedAt: '2017-07-02'}, {_id:'work_asdfg', companyName: 'OOCL', title: '软件工程师', salaryRange: '4', startedAt: '2014-12-01', endedAt: '2016-08-30'}],
-        testEducation: [{_id:'education_adsf', colledgeName: '澳门大学', major: '软件工程', isGraduated: '0', startedAt: '2011-09-01', endedAt: '2014-07-01'}, {_id:'education_adsfh', colledgeName: '澳门科技大学', major: '软件技术', isGraduated: '0', startedAt: '2007-09-01', endedAt: '2011-07-01'}],
-        testEmergencyContact: {_id:'asdf', name:'付大军',relationship:'兄弟',phoneNumber:'12345678905'},
-        salaryRangePickerItem: [{value: '0', label: '2000以下'}, {value: '1', label: '2000~3000'}, {value: '2', label: '3000~4000'}, {value: '3', label: '4000~5000'}, {value: '4', label: '5000~10000'}, {value: '5', label: '10000以上'}],
-        relationships: [{value: 'parents', label: '父母'}, {value: 'couple', label: '夫妻'}, {value: 'bros', label: '兄弟'}, {value: 'sis', label: '姐妹'}, {value: 'other', label: '其他亲属'}]
+        companies: [],
+        currentCompany: [],
+        testFamilyMembers: [],
+        
+        testWorkExperience: [],
+        testEducation: [],
+        
+        salaryRangePickerItem: [],
+        relationships: []
     }
 
   
@@ -155,7 +155,7 @@ class Company extends React.Component{
                 />                
             </div>
             );
-        let {bCheck, mCheck, testFamilyMembers, testWorkExperience, testEducation, testThreeTypesRelations, testEmergencyContact, salaryRangePickerItem, relationships} = this.state;
+        let {bCheck, mCheck, testFamilyMembers, testWorkExperience, testEducation, salaryRangePickerItem, relationships} = this.state;
         var familyMembersListItems = [], workExperiencesListItems = [], educationListItem = [];
         let bDate = this.state.personalInfo.birthDate ? this.state.personalInfo.birthDate.format('YYYY-MM-DD') : '';
         const familyMemberNum = testFamilyMembers.length;
@@ -233,10 +233,10 @@ class Company extends React.Component{
             }
             var startedAt = ele.startedAt, endedAt = ele.endedAt;
             if(startedAt != null && startedAt != undefined){
-                startedAt = startedAt.substr(0, 10);
+                startedAt = moment(startedAt).format('YYYY-MM-DD');
             }
             if(endedAt != null && endedAt != undefined){
-                endedAt = endedAt.substr(0, 10);
+                endedAt = moment(endedAt).format('YYYY-MM-DD');
             }
             console.log('salary', actualSalaryRange)
             const workExperiences = (
@@ -280,10 +280,10 @@ class Company extends React.Component{
                 isGraduated = '肄业';
             var startedAt = ele.startedAt, endedAt = ele.endedAt;
             if(startedAt != null && startedAt != undefined){
-                startedAt = startedAt.substr(0, 10);
+                startedAt = moment(startedAt).format('YYYY-MM-DD');
             }
             if(endedAt != null && endedAt != undefined){
-                endedAt = endedAt.substr(0, 10);
+                endedAt = moment(endedAt).format('YYYY-MM-DD');
             }
              
              
