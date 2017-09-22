@@ -157,6 +157,7 @@ class Company extends React.Component{
             );
         let {bCheck, mCheck, testFamilyMembers, testWorkExperience, testEducation, testThreeTypesRelations, testEmergencyContact, salaryRangePickerItem, relationships} = this.state;
         var familyMembersListItems = [], workExperiencesListItems = [], educationListItem = [];
+        let bDate = this.state.personalInfo.birthDate ? this.state.personalInfo.birthDate.format('YYYY-MM-DD') : '';
         const familyMemberNum = testFamilyMembers.length;
         testFamilyMembers.map((ele, idx)=>{
             let familyMember = null;
@@ -284,6 +285,8 @@ class Company extends React.Component{
             if(endedAt != null && endedAt != undefined){
                 endedAt = endedAt.substr(0, 10);
             }
+             
+             
             const educationItem = (
                 <List key={`education_${ele._id}`}><InputItem
                     name="colledgeName"
@@ -351,7 +354,7 @@ class Company extends React.Component{
                                     <InputItem
                                     name="birthDate"
                                     placeholder=""
-                                    value={this.state.personalInfo.birthDate}
+                                    value={bDate}
                                     disabled
                                     >出生日期</InputItem>
                                     <InputItem
