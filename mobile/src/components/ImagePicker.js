@@ -27,7 +27,7 @@ export default class ImagePicker extends React.Component {
     });
   }
   handleRemove(file){
-    this.props.presave(file,'del');
+    this.props.presave(file,'del',this.props.type);
     this.setState({
       fileList : []
     })

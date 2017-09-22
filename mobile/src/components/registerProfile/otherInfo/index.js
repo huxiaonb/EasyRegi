@@ -34,7 +34,7 @@ export default class OhterInfo extends React.Component {
         }else if(kw === 'del'){
             let fArr = this.state.fileList;
             fArr.filter((a,idx)=>{
-                if(a.uid === file.uid){
+                if(a.type === type){
                     fArr.splice(idx, 1);
                 }
             })
@@ -46,9 +46,37 @@ export default class OhterInfo extends React.Component {
     }
     sumitAll(){
         const openId = this.props.openId;
-        this.state.fileList.map(f=>{
-            lapi.uploadFile(f, openId);
-        });
+        //新用户录入信息必须要上传正反面，否则不做照片验证
+        if(this.context.profile.otherInfo.workExps.length === 0){
+            if(this.state.fileList.length < 2){
+                Toast.info('请上传身份证正反面照片！');
+                return;
+            }else{
+                let idf = false, idb = false;
+                this.state.fileList.map(f=>{
+                    if(f.type === 'idfront'){
+                        idf = true;
+                    }
+                    if(f.type === 'idback'){
+                        idb = true;
+                    }
+                });
+                if(idf && idb){
+                    this.state.fileList.map(f=>{
+                        lapi.uploadFile(f, openId);
+                    });
+                }else{
+                    Toast.info('请上传身份证正反面照片！');
+                    return;
+                } 
+            }
+        }else{
+             this.state.fileList.map(f=>{
+                lapi.uploadFile(f, openId);
+            });
+        }
+        
+       
         this.saveForTempory(0);
         if(this.context.profile.otherInfo.workExps.length && this.context.profile.otherInfo.edus.length){
             this.props.handleSubmit();
@@ -159,7 +187,7 @@ export default class OhterInfo extends React.Component {
         let { workExps,edus,wkeys,ekeys } = this.context.profile.otherInfo;
         const noti1 = (
             
-            <Badge dot>
+            <Badge>
                 <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
                     请上传免冠照
                 </span>
@@ -186,7 +214,7 @@ export default class OhterInfo extends React.Component {
         )
         const noti4 = (
             
-            <Badge dot>
+            <Badge>
                 <span title='请上传照片' style={{color:'#108ee9',cursor:'pointer'}}>
                     请上传其他照片
                 </span>
