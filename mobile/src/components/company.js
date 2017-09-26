@@ -73,6 +73,8 @@ class Company extends React.Component{
                     }
                 ); 
             }
+        } else {
+            Toast.hide();
         }
         
     }

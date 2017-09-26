@@ -379,17 +379,17 @@ exports.submitRegisterCompany = function(req, res){
   var current = new Date();
   if(_.isEmpty(openId)){
     //logger.info('openId does not exist, cannot submit register company');
-    res.end();
+    res.status(500).send({success: false, errmsg: '用户代码为空'});
   } else if(_.isEmpty(companyId)){
     //logger.info('companyId does not exist, cannot submit register company');
-    res.end();
+    res.status(500).send({success: false, errmsg: '公司代码为空'});
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
         //logger.info('Applicant does not exist, cannot register company');
-        res.end();
+        res.status(500).send({success: false, errmsg: '用户不存在，不能提交简历'});
       } else {
         //logger.info('applicant exitst, ready to select company');
         var dbApplicant = applicants[0];
@@ -417,25 +417,23 @@ exports.submitRegisterCompany = function(req, res){
             .exec(function(error, persistedObj){
               if(error) {
                 //logger.info('Error in updating applicant', error);
-                res.end();
+                res.status(500).send({success: false, errmsg: '更新用户提交简历到公司失败'});
               } else {
                 //logger.info(persistedObj);
-                res.end();
+                res.json({success: true, registeredCompanies: dbApplicant.registeredCompanies});
               }
             })
 
 
           } else {
             //logger.info('cannot find company with company id', companyId);
-            res.end();
+            res.status(500).send({success: false, errmsg: '找不到指定公司'});
           }
         });
-        res.render('server/weChat/views/company', {openId: _.get(req, ['session', 'openId'], '')});
-        // res.end();
       }
     }).catch(function(error){
-      logger.info('Error in finding applicant by open id', openId, error);
-      res.end();
+        logger.info('Error in finding applicant by open id', openId, error);
+        res.status(500).send({success: false, errmsg: '查找用户出现错误'});
     });
   }
 }
