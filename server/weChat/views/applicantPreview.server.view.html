@@ -2748,11 +2748,11 @@ td
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r4'>
 <td height=28 class=x70 style='height:21pt;' >姓名</td>
-<td colspan=5 id='tc6' class=x95 style='border-right:1px solid windowtext;' ></td>
+<td colspan=5 id='tc6' class=x95 style='border-right:1px solid windowtext;' >{{ applicant.name }}</td>
 <td colspan=2 id='tc7' class=x95 style='border-right:1px solid windowtext;' >性别</td>
-<td colspan=3 id='tc8' class=x95 style='border-right:1px solid windowtext;' ></td>
+<td colspan=3 id='tc8' class=x95 style='border-right:1px solid windowtext;' >{{ applicant.gender }}</td>
 <td colspan=4 id='tc9' class=x95 style='border-right:1px solid windowtext;' >出生年月</td>
-<td colspan=4 id='tc10' class=x122></td>
+<td colspan=4 id='tc10' class=x122>{{ applicant.birthDate }}</td>
 <td rowspan=5 height=140 class=x131 style='border-right:2px solid windowtext;border-bottom:2px solid windowtext;height:105pt;' >（一寸免冠照片）</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r5'>
@@ -2778,23 +2778,23 @@ td
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r6'>
 <td height=28 class=x74 style='height:21pt;' >健康状况</td>
-<td colspan=3 id='tc11' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=3 id='tc11' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{ applicant.healthState }}</td>
 <td colspan=2 id='tc12' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >民族</td>
-<td colspan=2 id='tc13' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=2 id='tc13' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{ applicant.folk }}</td>
 <td colspan=2 id='tc14' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >婚否</td>
-<td colspan=2 id='tc15' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=2 id='tc15' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{ applicant.marriageState }}</td>
 <td colspan=3 id='tc16' class=x71 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >籍贯</td>
 <td colspan=4 id='tc17' class=x72 style='border-bottom:1px solid windowtext;' ></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r7'>
 <td height=28 class=x74 style='height:21pt;' >家庭住址</td>
-<td colspan=18 id='tc18' class=x76 style='border-bottom:1px solid windowtext;' ></td>
+<td colspan=18 id='tc18' class=x76 style='border-bottom:1px solid windowtext;' >{{ applicant.homeAddress }}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r8'>
 <td height=28 class=x77 style='height:21pt;' >现住址</td>
-<td colspan=11 id='tc19' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
+<td colspan=11 id='tc19' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{ applicant.currentAddress }}</td>
 <td colspan=3 id='tc20' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >联系电话</td>
-<td colspan=4 id='tc21' class=x79 style='border-bottom:2px solid windowtext;' ></td>
+<td colspan=4 id='tc21' class=x79 style='border-bottom:2px solid windowtext;' >{{ applicant.mobile }}</td>
  </tr>
  <tr height=10 style='mso-height-source:userset;height:7.5pt' id='r9'>
 <td colspan=20 id='tc22' height=10 class=x95 style='border-right:1px solid windowtext;height:7.5pt;' ></td>
@@ -2807,28 +2807,28 @@ td
 <td colspan=9 id='tc26' class=x72 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' >住址</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r11'>
-<td colspan=2 id='tc27' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=3 id='tc28' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=5 id='tc29' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=9 id='tc30' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=2 id='tc27' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].relationship}}</td>
+<td colspan=3 id='tc28' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].name}}</td>
+<td colspan=5 id='tc29' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].phoneNumber}}</td>
+<td colspan=9 id='tc30' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].address}}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r12'>
-<td colspan=2 id='tc31' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=3 id='tc32' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=5 id='tc33' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=9 id='tc34' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=2 id='tc31' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].relationship}}</td>
+<td colspan=3 id='tc32' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].name}}</td>
+<td colspan=5 id='tc33' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].phoneNumber}}</td>
+<td colspan=9 id='tc34' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].address}}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r13'>
-<td colspan=2 id='tc35' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=3 id='tc36' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=5 id='tc37' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=9 id='tc38' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=2 id='tc35' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].relationship}}</td>
+<td colspan=3 id='tc36' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].name}}</td>
+<td colspan=5 id='tc37' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].phoneNumber}}</td>
+<td colspan=9 id='tc38' class=x76 style='border-right:2px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.familyMembers[].address}}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r14'>
-<td colspan=2 id='tc39' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
-<td colspan=3 id='tc40' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
-<td colspan=5 id='tc41' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
-<td colspan=9 id='tc42' class=x79 style='border-right:2px solid windowtext;border-bottom:2px solid windowtext;' ></td>
+<td colspan=2 id='tc39' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.familyMembers[].relationship}}</td>
+<td colspan=3 id='tc40' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.familyMembers[].name}}</td>
+<td colspan=5 id='tc41' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.familyMembers[].phoneNumber}}</td>
+<td colspan=9 id='tc42' class=x79 style='border-right:2px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.familyMembers[].address}}</td>
  </tr>
  <tr height=10 style='mso-height-source:userset;height:7.5pt' id='r15'>
 <td colspan=20 id='tc43' height=10 class=x110 style='height:7.5pt;' ></td>
@@ -2853,27 +2853,27 @@ td
 <td class=x72>毕业/肄业</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r19'>
-<td colspan=8 id='tc54' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=8 id='tc54' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.educationHistories[0].colledgeName}}</td>
 <td colspan=3 id='tc55' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
 <td class=x75>至</td>
 <td colspan=3 id='tc56' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=3 id='tc57' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td class=x123></td>
+<td colspan=3 id='tc57' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.educationHistories[0].major}}</td>
+<td class=x123>{{applicant.educationHistories[0].isGraduated}}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r20'>
-<td colspan=8 id='tc58' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=8 id='tc58' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.educationHistories[1].colledgeName}}</td>
 <td colspan=3 id='tc59' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
 <td class=x75>至</td>
-<td colspan=3 id='tc60' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
-<td colspan=3 id='tc61' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=3 id='tc60' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.educationHistories[1].major}}</td>
+<td colspan=3 id='tc61' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.educationHistories[1].isGraduated}}</td>
 <td class=x123></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r21'>
-<td colspan=8 id='tc62' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
+<td colspan=8 id='tc62' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.educationHistories[2].colledgeName}}</td>
 <td colspan=3 id='tc63' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
 <td class=x78>至</td>
-<td colspan=3 id='tc64' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
-<td colspan=3 id='tc65' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
+<td colspan=3 id='tc64' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.educationHistories[1].major}}</td>
+<td colspan=3 id='tc65' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.educationHistories[2].isGraduated}}</td>
 <td class=x124></td>
  </tr>
  <tr height=10 style='mso-height-source:userset;height:7.5pt' id='r22'>
@@ -2887,7 +2887,7 @@ td
 <td class=x125>证明人及<br>联系方式</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r24'>
-<td colspan=8 id='tc70' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=8 id='tc70' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[0].companyName}}</td>
 <td colspan=3 id='tc71' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
 <td class=x75>至</td>
 <td colspan=3 id='tc72' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
@@ -2895,7 +2895,7 @@ td
 <td class=x76></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r25'>
-<td colspan=8 id='tc74' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
+<td colspan=8 id='tc74' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[0].companyName}}</td>
 <td colspan=3 id='tc75' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
 <td class=x75>至</td>
 <td colspan=3 id='tc76' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' ></td>
@@ -2903,7 +2903,7 @@ td
 <td class=x123></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r26'>
-<td colspan=8 id='tc78' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
+<td colspan=8 id='tc78' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.workExperiences[0].companyName}}</td>
 <td colspan=3 id='tc79' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
 <td class=x78>至</td>
 <td colspan=3 id='tc80' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' ></td>
