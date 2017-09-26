@@ -13,7 +13,8 @@ function dateFormat(date){
     return date.getFullYear() +'年' +  fMonth +  date.getDate()+'日';
 }
 function renderPreviewPage(req, res, next){
-    var applicantId = _.get(req, ['params', 'id'], '');
+    var applicantId = _.get(req, ['query', 'id'], ''),
+        companyName = _.get(req, ['query', 'companyName'], '');
     logger.info('preview of applicant id by', applicantId);
     var data = {
         wechatOpenId: 'sdofsjdofjsdkfosjdf_Fc',
@@ -30,9 +31,105 @@ function renderPreviewPage(req, res, next){
             } else {
                 //var that = this;
                 var formatDate = dateFormat(_.get(dbApplicant, ['birthDate'], ''));
-                var his = _.get(dbApplicant, ['educationHistories'], []);
-                var works = _.get(dbApplicant, ['workExperiences'], []);
-                
+                var familyMembers = _.get(dbApplicant, ['familyMembers'], []),
+                    family = [];
+                var his = _.get(dbApplicant, ['educationHistories'], []),
+                    educationHistories = [];
+                var works = _.get(dbApplicant, ['workExperiences'], []),
+                    workExperiences = [];
+                var threeCategoryRelations = _.get(dbApplicant, ['threeCategoryRelations'], []),
+                    threeC = [];
+                var i = 0;
+                for(i = 0; i < 4; i++){
+                    if(i < familyMembers.length){
+                        var familyItem = {
+                            relationship: familyMembers[i].relationship || '',
+                            name: familyMembers[i].name || '',
+                            phoneNumber: familyMembers[i].phoneNumber || '',
+                            address: familyMembers[i].address || ''
+                        };
+                        family.push(familyItem);
+                    } else {
+                        var familyItem = {
+                            relationship: '',
+                            name: '',
+                            phoneNumber: '',
+                            address: ''
+                        };
+                        family.push(familyItem);
+                    }
+                }
+
+                for(i = 0; i < 3; i++){
+                    if(i < his.length){
+                        var educationHistoryItem = {
+                            colledgeName: his[i].colledgeName || '',
+                            startedAt: dateFormat(his[i].startedAt) || '',
+                            endedAt: dateFormat(his[i].endedAt) || '',
+                            major: his[i].major || '',
+                            isGraduated: his[i].isGraduated || ''
+                        };
+                        educationHistories.push(educationHistoryItem);
+                    } else {
+                        var educationHistoryItem = {
+                            colledgeName: '',
+                            startedAt: '',
+                            endedAt: '',
+                            major: '',
+                            isGraduated: ''
+                        };
+                        educationHistories.push(educationHistoryItem);
+                    }
+                }
+
+                for(i = 0; i < 3; i++){
+                    if(i < works.length){
+                        var workItem = {
+                            companyName: works[i].companyName || '',
+                            startedAt: dateFormat(works[i].startedAt) || '',
+                            endedAt: dateFormat(works[i].endedAt) || '',
+                            resignReason: works[i].resignReason || '',
+                            guarantorName: works[i].guarantorName || '',
+                            guarantorPhoneNumber: works[i].guarantorPhoneNumber || '',
+                            guarantorInfo: works[i].guarantorName + '-' + works[i].guarantorPhoneNumber,
+                        };
+                        workExperiences.push(workItem);
+                    } else {
+                        var workItem = {
+                            companyName: '',
+                            startedAt: '',
+                            endedAt: '',
+                            resignReason: '',
+                            guarantorName: '',
+                            guarantorPhoneNumber: '',
+                            guarantorInfo: ''
+                        };
+                        workExperiences.push(workItem);
+                    }
+                }
+
+                for(i = 0; i < 2; i++){
+                    if(i < threeCategoryRelations.length){
+                        var threeCItem = {
+                            type: threeCategoryRelations[i].type || '',
+                            relationship: threeCategoryRelations[i].relationship || '',
+                            employeeNumber: threeCategoryRelations[i].employeeNumber || '',
+                            name: threeCategoryRelations[i].name || '',
+                            department: threeCategoryRelations[i].department || ''
+                        };
+                        threeC.push(threeCItem);
+                    } else {
+                        var threeCItem = {
+                            type: '',
+                            relationship: '',
+                            employeeNumber: '',
+                            name: '',
+                            department: ''
+                        };
+                        threeC.push(threeCItem);
+                    }
+                }
+
                 var newH = his.map(item=>(Object.assign(item,{range: dateFormat(item.startedAt) +'~' + dateFormat(item.endedAt)})));
                 var newW = works.map(item=>(Object.assign(item,{range: dateFormat(item.startedAt) +'~' + dateFormat(item.endedAt)})));
 
@@ -52,12 +149,17 @@ function renderPreviewPage(req, res, next){
                     qqNumber: _.get(dbApplicant, ['qqNumber'], ''),
                     photoName: _.get(dbApplicant, ['photoName'], ''),
                     idCardFrontPhotoName: _.get(dbApplicant, ['idCardFrontPhotoName'], ''),
-                    familyMembers: _.get(dbApplicant, ['familyMembers'], []),
-                    educationHistories:newH,
-                    workExperiences: newW
-                }
+                    familyMembers: family,
+                    educationHistories: educationHistories,
+                    workExperiences: workExperiences,
+                    emergencyContactName: _.get(dbApplicant, ['emergencyContactName'], ''),
+                    emergencyContactPhoneNumber: _.get(dbApplicant, ['emergencyContactPhoneNumber'], ''),
+                    emergencyContactAddress: _.get(dbApplicant, ['emergencyContactAddress'], ''),
+                    threeCategoryRelations: threeC
+                };
                 res.render('./server/weChat/views/applicantPreview', {
-                    applicant: app
+                    applicant: app,
+                    companyName: companyName
                 });
             }
         })

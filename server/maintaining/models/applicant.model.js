@@ -34,8 +34,8 @@ var educationHistorySchema = new Schema({
     major: String,
     /*
         isGraduated：
-        '0' --- 毕业,
-        '1' --- 肄业
+        毕业,
+        肄业
     */ 
     isGraduated: String,
     degree: String

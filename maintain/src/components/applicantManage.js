@@ -69,7 +69,8 @@ export default class ApplicantManage extends React.Component{
         window.open(url, '_blank');
     }
     preview(record, index, event){
-       window.open('../../applicant/preview/' + record._id, '_blank');
+        let companyName = this.context.comp.companyName;
+       window.open('../../applicant/preview?id=' + record._id + '&companyName=' + companyName, '_blank');
     }
     async searchApplicants(query={companyId:this.context.comp._id}){
         try{
