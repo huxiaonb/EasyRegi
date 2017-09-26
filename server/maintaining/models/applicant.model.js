@@ -12,10 +12,19 @@ var familyMemberSchema = new Schema({
     name: String,
     relationship: String,
     phoneNumber: String,
+    address: String,
     /*
         设为紧急联系人
      */
     emergencyFlag : Boolean
+});
+
+var threeCategorySchema = new Schema({
+    name: String,
+    department: String,
+    type: String,
+    relationship: String,
+    employeeNumber: String
 });
 
 var educationHistorySchema = new Schema({
@@ -55,7 +64,10 @@ var workExperienceSchema = new Schema({
     */
     salaryRange: String,
     contactPersonName: String,
-    phoneNumber: String
+    phoneNumber: String,
+    resignReason: String,
+    guarantorName: String,
+    guarantorPhoneNumber: String
 });
 
 var applicantSchema = new Schema({
@@ -90,7 +102,11 @@ var applicantSchema = new Schema({
     workExperiences: [workExperienceSchema],
     appliedPositions: [appliedPositionSchema],
     registeredCompanies: [registeredCompanySchema],
-    marriageState: String
+    marriageState: String,
+    emergencyContactName: String,
+    emergencyContactPhoneNumber: String,
+    emergencyContactAddress: String,
+    threeCategoryRelations: [threeCategorySchema]
 },{
     collection: 'applicants',
     timestamps: true

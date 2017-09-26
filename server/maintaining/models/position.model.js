@@ -36,7 +36,12 @@ var PositionSchema = new Schema({
     jobRequire:{
         type: String,
         default:''
-    }
+    },
+    salaryStart: String,
+    salaryEnd: String,
+    contactPerson: String,
+    ageRangeStart: String,
+    ageRangeEnd: String
 },{
     collection: 'positions',
     timestamps: true
