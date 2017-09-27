@@ -7,7 +7,7 @@ import moment from 'moment';
 import '../less/index.less'
 
 import PersonalInfo from './personalInfo';
-import FamilyInfo from './familyInfo';
+import Family from './family/index';
 import OtherInfo from './otherInfo/index';
 import lapi from './lapi'
 
@@ -49,8 +49,9 @@ class Index extends React.Component {
       current: 0,
       info:{
         personal:{},
-        family:{family:[]},
-        otherInfo:{workExps:[],wkeys:[],edus:[],ekeys:[]}
+        family:{family:[],threeCategory : []},
+        otherInfo:{workExps:[],wkeys:[],edus:[],ekeys:[]},
+        emergency:{}
       },
       isOpenIdObtained: true
     };
@@ -61,7 +62,8 @@ class Index extends React.Component {
         info = Object.assign(info,{personal : obj.personalInfo})
         break;
       case 2 :
-        info = Object.assign(info,{family : {family:obj.family}})
+        info = Object.assign(info,{family : {family:obj.family, threeCategory : obj.threeCategory}})
+        info = Object.assign(info,{emergency : obj});
         break;
       case 3 :
         info = Object.assign(info,{otherInfo : obj.otherInfo})
@@ -84,7 +86,7 @@ class Index extends React.Component {
     //callApi && if dataObj have date value need change will copy a Object
     let{workExps,edus} = this.state.info.otherInfo;
     if(workExps.length && edus.length){
-      let {personal,family} = this.state.info;
+      let {personal,family,emergency} = this.state.info;
       let personalCopy = Object.assign({},personal);
       // let pdate = Object.assign(personalCopy.birthDate,{});
       let appi = Object.assign({},personalCopy,{
@@ -92,7 +94,15 @@ class Index extends React.Component {
         validFrom: personalCopy.validFrom.toDate(),
         validTo: personalCopy.validTo.toDate()
       });
+
+      //紧急联系人
+      appi.emergencyContactName=emergency.emergencyContactName;
+      appi.emergencyContactPhoneNumber=emergency.emergencyContactPhoneNumber;
+      appi.emergencyContactAddress=emergency.emergencyContactAddress;
+      appi.emergencycontactrelation=emergency.emergencycontactrelation;
+
       appi.familyMembers = family.family;
+      appi.threeCategory = threeCategory.threeCategory;
       let workExperiences = [],educationHistories = [];
       workExps.map((wkc,idx)=>{
         let wk = Object.assign({},wkc);
@@ -174,6 +184,7 @@ class Index extends React.Component {
             info.educationHistories[idx].date = [ed.startedAt,ed.endedAt];
           });
           console.log(info.workExperiences,info.educationHistories);
+        
         this.setState({
           info:{
             personal:{
@@ -196,13 +207,20 @@ class Index extends React.Component {
               qqNumber : info.qqNumber
             },
             family:{
-              family : info.familyMembers
+              family : info.familyMembers ? info.familyMembers : [],
+              threeCategory : info.threeCategory ? info.threeCategory : []
             },
             otherInfo:{
-              workExps : info.workExperiences,
-              edus : info.educationHistories,
+              workExps : info.workExperiences ? info.workExperiences : [],
+              edus : info.educationHistories ? info.educationHistories : [],
               wkeys:wkeys,
               ekeys:ekeys
+            },
+            emergency : {
+              emergencyContactName : info.emergencyContactName,
+              emergencyContactPhoneNumber : info.emergencyContactPhoneNumber,
+              emergencyContactAddress : info.emergencyContactAddress,
+              emergencycontactrelation:info.emergencycontactrelation
             }
           }
         });
@@ -211,7 +229,7 @@ class Index extends React.Component {
   }
   render() {
     const { current, isOpenIdObtained } = this.state;
-    let { personal, family, otherInfo } = this.state.info;
+    let { personal, family, otherInfo, emergency } = this.state.info;
 
     const myStep = isOpenIdObtained ? (
       <div style={{textAlign:'left'}}>
@@ -220,7 +238,7 @@ class Index extends React.Component {
         </Steps>
         <div className="steps-content">
           {steps[this.state.current].content=='0' && <PersonalInfo personal={personal} next={this.next.bind(this)}/>}
-          {steps[this.state.current].content=='1' && <FamilyInfo family={family} prev={this.prev.bind(this)} next={this.next.bind(this)}/>}
+          {steps[this.state.current].content=='1' && <Family family={family.family} emergency={emergency} tc={family.threeCategory} prev={this.prev.bind(this)} next={this.next.bind(this)}/>}
           {steps[this.state.current].content=='2' && <OtherInfo  openId={openId} otherInfo={otherInfo} prev={this.prev.bind(this)} handleSubmit={this.handleSubmit.bind(this)} />}
         </div>
       

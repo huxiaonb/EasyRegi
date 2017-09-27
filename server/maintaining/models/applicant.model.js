@@ -106,6 +106,7 @@ var applicantSchema = new Schema({
     emergencyContactName: String,
     emergencyContactPhoneNumber: String,
     emergencyContactAddress: String,
+    emergencycontactrelation : String,
     threeCategoryRelations: [threeCategorySchema]
 },{
     collection: 'applicants',

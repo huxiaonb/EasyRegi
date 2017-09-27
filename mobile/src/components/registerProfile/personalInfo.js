@@ -237,7 +237,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入姓名"
                 >
-                <span className='custom-required'>*</span>姓名
+                姓名<span className='custom-required'>*</span>
             </InputItem>
             <InputItem
                 style={{color:'inherit'}}
@@ -258,7 +258,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入身份证号码"
                 >
-                <span className='custom-required'>*</span>身份证号
+                身份证号<span className='custom-required'>*</span>
             </InputItem>
              <InputItem
                 name="issuingAuthority"
@@ -276,7 +276,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入发证机关"
                 >
-                <span className='custom-required'>*</span>发证机关
+                发证机关<span className='custom-required'>*</span>
             </InputItem>
             <InputItem
                 name="nativePlace"
@@ -294,7 +294,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入籍贯"
                 >
-                <span className='custom-required'>*</span>籍贯
+                籍贯<span className='custom-required'>*</span>
             </InputItem>
             <FormItem>
                 <DatePicker mode="date"
@@ -398,7 +398,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入家庭住址"
                 >
-                <span className='custom-required'>*</span>家庭住址
+                家庭住址<span className='custom-required'>*</span>
             </InputItem>
            <InputItem
                 name="currentAddress"
@@ -412,7 +412,7 @@ class PersonalInfo extends React.Component {
                     Toast.info(getFieldError('currentAddress').join('、'));
                 }}
                 placeholder="请输入现住址">
-                <span className='custom-required'>*</span>现住址
+                现住址<span className='custom-required'>*</span>
             </InputItem>
             
             <InputItem
@@ -432,7 +432,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入联系手机"
                >
-               <span className='custom-required'>*</span>联系手机          
+               联系手机<span className='custom-required'>*</span>          
              </InputItem>
              <InputItem
                 name='email'
