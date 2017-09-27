@@ -2757,24 +2757,24 @@ td
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r5'>
 <td height=28 class=x82 style='height:21pt;' >身份证编号</td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x83></td>
-<td class=x115></td>
+<td class=x83>{{ applicant.idCardNumber[0] }}</td>
+<td class=x83>{{ applicant.idCardNumber[1] }}</td>
+<td class=x83>{{ applicant.idCardNumber[2] }}</td>
+<td class=x83>{{ applicant.idCardNumber[3] }}</td>
+<td class=x83>{{ applicant.idCardNumber[4] }}</td>
+<td class=x83>{{ applicant.idCardNumber[5] }}</td>
+<td class=x83>{{ applicant.idCardNumber[6] }}</td>
+<td class=x83>{{ applicant.idCardNumber[7] }}</td>
+<td class=x83>{{ applicant.idCardNumber[8] }}</td>
+<td class=x83>{{ applicant.idCardNumber[9] }}</td>
+<td class=x83>{{ applicant.idCardNumber[10] }}</td>
+<td class=x83>{{ applicant.idCardNumber[11] }}</td>
+<td class=x83>{{ applicant.idCardNumber[12] }}</td>
+<td class=x83>{{ applicant.idCardNumber[13] }}</td>
+<td class=x83>{{ applicant.idCardNumber[14] }}</td>
+<td class=x83>{{ applicant.idCardNumber[15] }}</td>
+<td class=x83>{{ applicant.idCardNumber[16] }}</td>
+<td class=x115>{{ applicant.idCardNumber[17] }}</td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r6'>
 <td height=28 class=x74 style='height:21pt;' >健康状况</td>
@@ -2892,7 +2892,7 @@ td
 <td class=x75>至</td>
 <td colspan=3 id='tc72' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[0].endedAt}}</td>
 <td colspan=3 id='tc73' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[0].resignReason}}</td>
-<td class=x76>{{applicant.workExperiences[0].guarantorName}}{{applicant.workExperiences[0].separator}}{{applicant.workExperiences[0].guarantorPhoneNumber}}</td>
+  <td class=x76 style="text-align: center;"><p style="margin:0px !important;">{{applicant.workExperiences[0].guarantorName}}</p><p style="margin:0px !important;">{{applicant.workExperiences[0].guarantorPhoneNumber}}</p></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r25'>
 <td colspan=8 id='tc74' class=x74 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[1].companyName}}</td>
@@ -2900,7 +2900,7 @@ td
 <td class=x75>至</td>
 <td colspan=3 id='tc76' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[1].endedAt}}</td>
 <td colspan=3 id='tc77' class=x75 style='border-right:1px solid windowtext;border-bottom:1px solid windowtext;' >{{applicant.workExperiences[1].resignReason}}</td>
-<td class=x123>{{applicant.workExperiences[1].guarantorName}}{{applicant.workExperiences[0].separator}}{{applicant.workExperiences[1].guarantorPhoneNumber}}</td>
+<td class=x123 style="text-align: center;"><p style="margin:0px !important;">{{applicant.workExperiences[1].guarantorName}}</p><p style="margin:0px !important;">{{applicant.workExperiences[1].guarantorPhoneNumber}}</p></td>
  </tr>
  <tr height=28 style='mso-height-source:userset;height:21pt' id='r26'>
 <td colspan=8 id='tc78' class=x77 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.workExperiences[2].companyName}}</td>
@@ -2908,7 +2908,7 @@ td
 <td class=x78>至</td>
 <td colspan=3 id='tc80' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.workExperiences[2].endedAt}}</td>
 <td colspan=3 id='tc81' class=x78 style='border-right:1px solid windowtext;border-bottom:2px solid windowtext;' >{{applicant.workExperiences[2].resignReason}}</td>
-<td class=x124>{{applicant.workExperiences[2].guarantorName}}{{applicant.workExperiences[0].separator}}{{applicant.workExperiences[2].guarantorPhoneNumber}}</td>
+<td class=x124 style="text-align: center;"><p style="margin:0px !important;">{{applicant.workExperiences[2].guarantorName}}</p><p style="margin:0px !important;">{{applicant.workExperiences[2].guarantorPhoneNumber}}</p></td>
  </tr>
  <tr height=10 style='mso-height-source:userset;height:7.5pt' id='r27'>
 <td colspan=20 id='tc82' height=10 class=x110 style='height:7.5pt;' ></td>
@@ -3035,6 +3035,7 @@ td
  <tr height=18 style='mso-height-source:userset;height:13.5pt' id='r42'>
 <td colspan=20 id='tc113' height=18 class=x80 style='height:13.5pt;' >{{companyName}}</td>
  </tr>
+ <tr><td colspan=20 height=18 class=x80 style='height:13.5pt;'><input type="button" value="打印简历" class="noprint" onclick="onPrintClick(this)" style="margin-top:15px;"></td></tr>
 <![if supportMisalignedColumns]>
  <tr height=0 style='display:none'>
   <td width=86 style='width:64.5pt'></td>
@@ -3087,11 +3088,23 @@ td
  }
  ChangeRowspanHiddenData();
 </script>
-
+<script language = 'javascript' type='text/javascript'>
+    function onPrintClick(self)
+    {
+        self.style.display="none";
+        window.print();
+        self.style.display="";
+    }
+</script>
             
             </body>
 
 <style>
+ td{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: center;
+ }
 <!--
 .x131
  {
@@ -3204,5 +3217,9 @@ td
  mso-protection:locked visible;
  }
 -->
+</style>
+<style media=print>
+ .noprint{display:none;}
+ table{page-break-after: avoid;}
 </style>
 </html>

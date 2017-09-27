@@ -9,8 +9,21 @@ exports.renderPreviewPage = renderPreviewPage;
 exports.exportApplicants = exportApplicants;
 
 function dateFormat(date){
-    var fMonth = date.getMonth() + 1 +'月';
-    return date.getFullYear() +'年' +  fMonth +  date.getDate()+'日';
+    var month = date.getMonth() + 1,
+        day = date.getDate(),
+        fMonth = '',
+        fDay = '';
+    if(month < 10){
+        fMonth = '0' + month.toString();
+    } else {
+        fMonth = month.toString();
+    }
+    if(day < 10){
+        fDay = '0' + day.toString();
+    } else {
+        fDay = day.toString();
+    }
+    return date.getFullYear() +'-' +  fMonth + '-' +  fDay;
 }
 function renderPreviewPage(req, res, next){
     var applicantId = _.get(req, ['query', 'id'], ''),
@@ -31,6 +44,9 @@ function renderPreviewPage(req, res, next){
             } else {
                 //var that = this;
                 var formatDate = dateFormat(_.get(dbApplicant, ['birthDate'], ''));
+                var idCardNumber = _.get(dbApplicant, ['idCardNumber'], ''),
+                    idCardNumberLenth = idCardNumber.length;
+                    idNumberArr = [];
                 var familyMembers = _.get(dbApplicant, ['familyMembers'], []),
                     family = [];
                 var his = _.get(dbApplicant, ['educationHistories'], []),
@@ -40,6 +56,18 @@ function renderPreviewPage(req, res, next){
                 var threeCategoryRelations = _.get(dbApplicant, ['threeCategoryRelations'], []),
                     threeC = [];
                 var i = 0;
+                for(i = 0; i < 18; i++){
+                    if(i < idCardNumberLenth){
+                        var num = idCardNumber[i];
+                        if(num != null && num != undefined){
+                            idNumberArr.push(num);
+                        } else {
+                            idNumberArr.push('');
+                        }
+                    } else {
+                        idNumberArr.push('');
+                    }
+                }
                 for(i = 0; i < 4; i++){
                     if(i < familyMembers.length){
                         var familyItem = {
@@ -140,7 +168,8 @@ function renderPreviewPage(req, res, next){
                     birthDate: formatDate,
                     healthState: _.get(dbApplicant, ['healthState'], ''),
                     marriageState: _.get(dbApplicant, ['marriageState'], ''),
-                    idCardNumber: _.get(dbApplicant, ['idCardNumber'], ''),
+                    idCardNumber: idNumberArr,
+                    nativePlace: _.get(dbApplicant, ['nativePlace'], ''),
                     homeAddress: _.get(dbApplicant, ['homeAddress'], ''),
                     currentAddress: _.get(dbApplicant, ['currentAddress'], ''),
                     mobile: _.get(dbApplicant, ['mobile'], ''),
