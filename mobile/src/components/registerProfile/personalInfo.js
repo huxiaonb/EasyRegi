@@ -421,7 +421,7 @@ class PersonalInfo extends React.Component {
                     rules: [{
                         type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
                     }, {
-                        whitespace: true, required: true, message: '请输入有效的联系电话！'
+                        whitespace: true,  message: '请输入有效的联系电话！'
                     }],
                     initialValue : personal.mobile
                 })}
@@ -432,7 +432,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入联系电话"
                >
-               联系电话<span className='custom-required'>*</span>          
+               联系电话         
              </InputItem>
              <InputItem
                 name='email'
