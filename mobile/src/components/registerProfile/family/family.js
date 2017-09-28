@@ -90,12 +90,14 @@ class FamilyInfo extends React.Component {
                     ['name_'+ idx]: fm.name,
                     ['relationship_' + idx] : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
                     ['mphoneNumber_' + idx] : fm.phoneNumber,
+                    ['homeAddress_' + idx] : fm.homeAddress,
                     ['em_check_' + idx] : fm.emergencyFlag
                 })
             }else{
                 form.setFieldsValue({
                     name : fm.name,
                     relationship : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
+                    homeAddress : fm.homeAddress,
                     mphoneNumber : fm.phoneNumber,
                     em_check : fm.emergencyFlag
                 })
@@ -181,8 +183,6 @@ class FamilyInfo extends React.Component {
                         {...getFieldProps(`mphoneNumber_${key}`, {
                             rules: [{
                                 type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系电话！'
-                            }, {
-                                required: true, message: '请输入有效的联系电话！'
                             }]
                         })}
                         clear
@@ -191,6 +191,25 @@ class FamilyInfo extends React.Component {
                             Toast.info(getFieldError(`mphoneNumber_${key}`).join('、'));
                         }}
                         placeholder="请输入联系电话">联系电话<span className='custom-required'>*</span>
+                    </InputItem>
+                    <InputItem
+                        name={`homeAddress_${key}`}
+                        {...getFieldProps(`homeAddress_${key}`, {
+                            rules:[{
+                                type:'string'
+                            },{
+                                required:true,message:'请输入有效的家庭住址！'
+                            }],
+                            
+                        })}
+                        clear
+                        error={!!getFieldError(`homeAddress_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`homeAddress_${key}`).join('、'));
+                        }}
+                        placeholder="请输入家庭住址"
+                        >
+                        家庭住址<span className='custom-required'>*</span>
                     </InputItem>
                  
                 </Card>
@@ -242,8 +261,6 @@ class FamilyInfo extends React.Component {
                         {...getFieldProps('mphoneNumber', {
                             rules: [{
                                 type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系电话！'
-                            }, {
-                                required: true, message: '请输入有效的联系电话！'
                             }]
                         })}
                         clear
@@ -251,7 +268,26 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('mphoneNumber').join('、'));
                         }}
-                        placeholder="请输入联系手机">联系电话<span className='custom-required'>*</span>
+                        placeholder="请输入联系电话">联系电话<span className='custom-required'>*</span>
+                    </InputItem>
+                    <InputItem
+                        name="homeAddress"
+                        {...getFieldProps('homeAddress', {
+                            rules:[{
+                                type:'string'
+                            },{
+                                required:true,message:'请输入有效的住址！'
+                            }],
+                           
+                        })}
+                        clear
+                        error={!!getFieldError('homeAddress')}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError('homeAddress').join('、'));
+                        }}
+                        placeholder="请输入住址"
+                        >
+                        住址<span className='custom-required'>*</span>
                     </InputItem>
                     
                     </Card>

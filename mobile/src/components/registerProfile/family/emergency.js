@@ -63,9 +63,9 @@ class EmergencyContact extends React.Component {
                name="mobile"
                {...getFieldProps('mobile', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系手机！'
+                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
                     }, {
-                        whitespace: true, required: true, message: '请输入有效的联系手机！'
+                        whitespace: true, message: '请输入有效的联系电话！'
                     }],
                     initialValue : emergency.emergencyContactPhoneNumber
                 })}
@@ -74,9 +74,9 @@ class EmergencyContact extends React.Component {
                 onErrorClick={() => {
                     Toast.info(getFieldError('mobile').join('、'));
                 }}
-                placeholder="请输入联系手机"
+                placeholder="请输入联系电话"
                >
-               联系手机<span className='custom-required'>*</span>          
+               联系电话<span className='custom-required'>*</span>          
              </InputItem>
              <InputItem
                 name="homeAddress"
@@ -84,7 +84,7 @@ class EmergencyContact extends React.Component {
                     rules:[{
                         type:'string'
                     },{
-                        required:true,message:'请输入有效的家庭住址！'
+                        required:true,message:'请输入有效的住址！'
                     }],
                     initialValue : emergency.emergencyContactAddress
                 })}
@@ -93,9 +93,9 @@ class EmergencyContact extends React.Component {
                 onErrorClick={() => {
                     Toast.info(getFieldError('homeAddress').join('、'));
                 }}
-                placeholder="请输入家庭住址"
+                placeholder="请输入住址"
                 >
-                家庭住址<span className='custom-required'>*</span>
+                住址<span className='custom-required'>*</span>
             </InputItem>
             </Card>
             </form>

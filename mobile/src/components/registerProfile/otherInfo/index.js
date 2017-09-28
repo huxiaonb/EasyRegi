@@ -137,7 +137,7 @@ export default class OhterInfo extends React.Component {
         });
         if(wFlag && eFlag){
             this.context.updateProfile({otherInfo:{workExps:workFs,wkeys:workF.getFieldValue('keys'),edus:eduFs,ekeys:eduF.getFieldValue('keys')},flag:3});
-            if(!!pFlag)Toast.success('暂存成功!');
+            //if(!!pFlag)Toast.success('暂存成功!');
         }
     }
     /*componentDidMount(){

@@ -12,6 +12,7 @@ var familyMemberSchema = new Schema({
     name: String,
     relationship: String,
     phoneNumber: String,
+    homeAddress : String,
     address: String,
     /*
         设为紧急联系人

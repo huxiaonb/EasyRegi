@@ -82,7 +82,7 @@ class PersonalInfo extends React.Component {
                     }else if(key === 'homeAddress'){
                         errMsg += '家庭住址, '
                     }else if(key === 'mobile'){
-                        errMsg += '手机号码, '
+                        errMsg += '电话号码, '
                     }
                 });
                 if(errMsg !== '请填写'){
@@ -419,9 +419,9 @@ class PersonalInfo extends React.Component {
                name="mobile"
                {...getFieldProps('mobile', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系手机！'
+                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
                     }, {
-                        whitespace: true, required: true, message: '请输入有效的联系手机！'
+                        whitespace: true, required: true, message: '请输入有效的联系电话！'
                     }],
                     initialValue : personal.mobile
                 })}
@@ -430,9 +430,9 @@ class PersonalInfo extends React.Component {
                 onErrorClick={() => {
                     Toast.info(getFieldError('mobile').join('、'));
                 }}
-                placeholder="请输入联系手机"
+                placeholder="请输入联系电话"
                >
-               联系手机<span className='custom-required'>*</span>          
+               联系电话<span className='custom-required'>*</span>          
              </InputItem>
              <InputItem
                 name='email'

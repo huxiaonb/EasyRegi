@@ -32,6 +32,7 @@ export default class Family extends React.Component {
                         name : family.getFieldValue('name'),
                         relationship : family.getFieldValue('relationship'),
                         phoneNumber : family.getFieldValue('mphoneNumber'),
+                        homeAddress : family.getFieldValue('homeAddress'),
                         emergencyFlag : family.getFieldValue('em_check')
                     })];
                     
@@ -40,6 +41,7 @@ export default class Family extends React.Component {
                             name : family.getFieldValue('name_'+ key),
                             relationship : family.getFieldValue('relationship_' + key),
                             phoneNumber : family.getFieldValue('mphoneNumber_' + key),
+                            homeAddress : family.getFieldValue('homeAddress_' + key),
                             emergencyFlag : family.getFieldValue('em_check_' + key)
                         })
                         familys.push(fmObj);
@@ -78,7 +80,7 @@ export default class Family extends React.Component {
         })
         if(wFlag && eFlag){
             this.context.updateProfile({emergency : emInt, family:{family:familys,fkeys:family.getFieldValue('keys'),threeCategory:threeCategorys,tkeys:threeCategory.getFieldValue('keys')},flag:2});
-            if(!!pFlag)Toast.success('暂存成功!');
+            //if(!!pFlag)Toast.success('暂存成功!',1);
             return true;
         }else{return false;}
     }
