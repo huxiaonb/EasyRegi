@@ -93,19 +93,18 @@ export default class OhterInfo extends React.Component {
              //rangetime set config
              wFlag = true;
              let keys = workF.getFieldValue('keys')
-             workFs = [Object.assign({},{
-                 companyName : workF.getFieldValue('title'),
-                 date : [workF.getFieldValue('rangeTime'),workF.getFieldValue('rangeTime_end')],
-                 title : workF.getFieldValue('position'),
-                 salaryRange : workF.getFieldValue('salary'),
-             })];
              
+             
+
              keys.map((key, index) => {
                  let fmObj = Object.assign({},{
                     companyName : workF.getFieldValue('title_' + key),
                     date : [workF.getFieldValue('rangeTime_' + key), workF.getFieldValue('rangeTime_end_' + key)],
                     title : workF.getFieldValue('position_' + key),
                     salaryRange : workF.getFieldValue('salary_' + key),
+                    resignReason : workF.getFieldValue('resign_' + key),
+                    guarantorName : workF.getFieldValue('guantor_' + key),
+                    guarantorPhoneNumber : workF.getFieldValue('guantor_phone_' + key),
                  });
                  workFs.push(fmObj);
              })

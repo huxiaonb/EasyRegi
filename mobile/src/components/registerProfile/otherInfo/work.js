@@ -70,23 +70,16 @@ class WorkExp extends React.Component {
         let {workExps, form} = this.props;
         if(workExps.length){
             workExps.map((wk,idx)=>{
-                if(idx){
-                    form.setFieldsValue({
+                form.setFieldsValue({
                         ['title_' + idx] : wk.companyName,
                         ['rangeTime_' + idx] : wk.date[0],
                         ['rangeTime_end_' + idx] : wk.date[1],
                         ['position_' + idx] : wk.title,
-                        ['salary_' + idx] : _.isArray(wk.salaryRange) ? wk.salaryRange : [wk.salaryRange]
+                        ['salary_' + idx] : _.isArray(wk.salaryRange) ? wk.salaryRange : [wk.salaryRange],
+                        ['resign_' + idx] : wk.resignReason,
+                        ['guantor_' + idx] : wk.guarantorName,
+                        ['guantor_phone_' + idx] : wk.guarantorPhoneNumber
                     })  
-                }else{
-                    form.setFieldsValue({
-                        title : wk.companyName,
-                        rangeTime : wk.date[0],
-                        rangeTime_end : wk.date[1],
-                        position : wk.title,
-                        salary : _.isArray(wk.salaryRange) ? wk.salaryRange : [wk.salaryRange]
-                    })
-                }
             });
         }
     }
@@ -132,7 +125,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入公司名称！"
                         >
-                        <span className='custom-required'>*</span>公司名称
+                        公司名称<span className='custom-required'>*</span>
                     </InputItem>
                      
                     <FormItem>
@@ -170,7 +163,7 @@ class WorkExp extends React.Component {
                         }}
                         placeholder="请输入职位！"
                         >
-                        <span className='custom-required'>*</span>职位
+                        职位<span className='custom-required'>*</span>
                     </InputItem>
                     
                     <FormItem>                
@@ -186,94 +179,73 @@ class WorkExp extends React.Component {
                             <List.Item arrow="horizontal" name="salary" style={{padding : 0}}>薪资范围</List.Item>
                         </Picker>
                     </FormItem> 
+                    <InputItem
+                        name={`resign_${key}`}
+                        {...getFieldProps(`resign_${key}`, {
+                            rules: [{
+                                required: true, 
+                                whitespace : true,
+                                message: '请输入有效的离职原因！'
+                            }]
+                        })}
+                        clear
+                        error={!!getFieldError(`resign_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`resign_${key}`).join('、'));
+                        }}
+                        placeholder="请输入离职原因！"
+                        >
+                        离职原因<span className='custom-required'>*</span>
+                    </InputItem>
+                    <InputItem
+                        name={`guantor_${key}`}
+                        {...getFieldProps(`guantor_${key}`, {
+                            rules: [{
+                                
+                                whitespace : true,
+                                message: '请输入有效的证明人！'
+                            }]
+                        })}
+                        clear
+                        error={!!getFieldError(`guantor_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`guantor_${key}`).join('、'));
+                        }}
+                        placeholder="请输入证明人！"
+                        >
+                        证明人
+                    </InputItem>
+                    <InputItem
+                        name={`guantor_phone_${key}`}
+                        {...getFieldProps(`guantor_phone_${key}`, {
+                            rules: [{
+                               
+                                whitespace : true,
+                                message: '请输入有效的证明人电话！'
+                            }]
+                        })}
+                        clear
+                        error={!!getFieldError(`guantor_phone_${key}`)}
+                        onErrorClick={() => {
+                            Toast.info(getFieldError(`guantor_phone_${key}`).join('、'));
+                        }}
+                        placeholder="请输入证明人电话！"
+                        >
+                        证明人电话
+                    </InputItem>
                 </Card>
             )});
             return(
                 
                 /* 工作经历 */
-                <Card>
+                <div>
                     <form>
-                    <Card>
-                    <Card.Header title={notiNodot} >
-                    </Card.Header>
-                    <InputItem
-                        name="title"
-                        {...getFieldProps('title', {
-                            rules:[{
-                                type:'string', pattern:/^[A-Za-z0-9_\u4e00-\u9fa5]{1,50}$/, message:'请输入有效的公司名称！'
-                            },{
-                                required:true,message:'请输入有效的公司名称！'
-                            }]
-                        })}
-                        clear
-                        error={!!getFieldError('title')}
-                        onErrorClick={() => {
-                            Toast.info(getFieldError('title').join('、'));
-                        }}
-                        placeholder="请输入公司名称！"
-                        >
-                        <span className='custom-required'>*</span>公司名称
-                    </InputItem>
-                     
-                    <FormItem>
-                        <DatePicker mode="date"
-                            name='rangeTime'
-                            {...getFieldProps('rangeTime', {
-                                rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
-                            })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
-                        </DatePicker>
-                    </FormItem>
-                    <FormItem>
-                        <DatePicker mode="date"
-                            name='rangeTime_end'
-                            {...getFieldProps('rangeTime_end', {
-                                rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
-                            })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
-                        </DatePicker>
-                     </FormItem>
-                     <InputItem
-                        name="position"
-                        {...getFieldProps('position', {
-                            rules: [{
-                                required: true, 
-                                whitespace : true,
-                                maxLenght : 10,
-                                message: '请输入有效的职位！'
-                            }]
-                        })}
-                        clear
-                        error={!!getFieldError('position')}
-                        onErrorClick={() => {
-                            Toast.info(getFieldError('position').join('、'));
-                        }}
-                        placeholder="请输入职位！"
-                        >
-                        <span className='custom-required'>*</span>职位
-                    </InputItem>
-                    
-                    <FormItem>                
-                        <Picker 
-                            cols={1}
-                            {...getFieldProps('salary', {
-                            rules:[{
-                                required:true, message:'请选择毕业与否！'
-                            }]
-                            })}
-                            data={[{label:'2000以下',value:'2000以下'},{label:'2000~5000',value:'2000~5000'},{label:'5000~8000',value:'5000~8000'},{label:'8000~9999',value:'4000~5000'},{label:'10000以上',value:'10000以上'}]}
-                            >
-                            <List.Item arrow="horizontal" name="salary" style={{padding : 0}}>薪资范围</List.Item>
-                        </Picker>
-                    </FormItem>
-                    
-                    </Card>
                         {formItems}
                     </form>
                     <div>
                         <Button type="primary" size='large' icon="plus-circle-o" onClick={this.add.bind(this)} style={{width:'100%'}}>新增工作经历</Button>
                     </div>
-                </Card>
+                </div>
             )}
 }
 

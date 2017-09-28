@@ -689,7 +689,10 @@ function createPositionForCompany(req, res, next){
                         companyId: companyId,
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
                         totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
-                        salary: _.get(positionObj, ['salary'], ''),
+                        salaryStart: _.get(positionObj, ['salaryStart'], ''),
+                        salaryEnd: _.get(positionObj, ['salaryEnd'], ''),
+                        ageRangeStart : _.get(positionObj, ['ageRangeStart'], ''),
+                        ageRangeEnd : _.get(positionObj, ['ageRangeEnd'], ''),
                         welfares: _.get(positionObj, ['welfares'], []),
                         positionDesc: _.get(positionObj, ['positionDesc'], ''),
                         jobRequire:_.get(positionObj, ['jobRequire'], '')

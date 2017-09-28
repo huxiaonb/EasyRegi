@@ -612,8 +612,10 @@ exports.findNearbyPositions = function(req, res, next){
                               //let clonePosi = _.cloneDeep(posi);
                               let clonePosi = {
                                 name : posi.name,
+                                ageRange : posi.ageRangeStart + '~' + posi.ageRangeEnd,
+                                contactPerson : posi.contactPerson,
                                 totalRecruiters : posi.totalRecruiters,
-                                salary : posi.salary,
+                                salary : posi.salaryStart + '~' + posi.salaryEnd,
                                 welfares : posi. welfares,
                                 positionDesc : posi.positionDesc,
                                 _id : posi._id,

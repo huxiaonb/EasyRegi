@@ -113,7 +113,10 @@ class Index extends React.Component {
           title : wk.title,
           salaryRange : wk.salaryRange,
           startedAt : wdate[0].toDate(),
-          endedAt : wdate[1].toDate()
+          endedAt : wdate[1].toDate(),
+          resignReason : wk.resignReason,
+          guarantorName : wk.guarantorName,
+          guarantorPhoneNumber : wk.guarantorPhoneNumber,
         };
         workExperiences.push(wm);
       });
@@ -169,9 +172,7 @@ class Index extends React.Component {
         let info = Object.assign({},r[0]);
         let wkeys=[],ekeys=[],fkeys=[],tkeys=[];
         info.workExperiences.map((wk,idx)=>{
-            if(idx){
-                wkeys.push(idx);
-            }
+            wkeys.push(idx);
             wk.startedAt = moment(wk.startedAt);
             wk.endedAt = moment(wk.endedAt);
             info.workExperiences[idx].date = [wk.startedAt,wk.endedAt];

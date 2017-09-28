@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber} from 'antd'
+import {Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Slider} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 
@@ -26,7 +26,19 @@ import './style/components.less';
 const {RangePicker } = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
-
+const salaryMarks = {
+  1000: '1000 CNY',
+  30000 : {
+    style: {
+      color: '#f50',
+    },
+    label: <strong>30000CNY</strong>,
+  },
+};
+const ageMarks = {
+  16 : '16',
+  60 : '60'
+};
 class PositionManage extends React.Component{
     static contextTypes = {
         comp: PropTypes.object
@@ -38,6 +50,19 @@ class PositionManage extends React.Component{
         resultTotal : 0,
         pFlag : false,
         rowValue : {},
+        ageRange : [20,50],
+        salaryRange : [3000,6000]
+        
+    }
+    onAgeSliderChange(value){
+        this.setState({
+            ageRange : value
+        })
+    }
+    onSalarySliderChange(value){
+        this.setState({
+            salaryRange : value
+        })
     }
     posiNameChange(e){
         this.setState({
@@ -77,18 +102,24 @@ class PositionManage extends React.Component{
     async handleOk(){
         //fetch url edit/create
         let {form} = this.props;
+        let {salaryRange, ageRange} = this.state;
         form.validateFieldsAndScroll(async (err, values)=>{
              if (!!err){
                 return;
              }
              let newP = Object.assign({},{
                  name : form.getFieldValue('p_name'),
+                 contactPerson : form.getFieldValue('p_contact'),
                  phoneNumber : form.getFieldValue('p_phone'),
                  totalRecruiters : form.getFieldValue('p_total'),
                  salary : form.getFieldValue('p_salary'),
                  welfares : form.getFieldValue('p_welfare'),
                  positionDesc : form.getFieldValue('p_desc'),
                  jobRequire : form.getFieldValue('p_require'),
+                 salaryStart : salaryRange[0],
+                 salaryEnd : salaryRange[1],
+                 ageRangeStart : ageRange[0],
+                 ageRangeEnd : ageRange[1],
              });
              if(this.state.rowValue.name){
                  try{
@@ -189,7 +220,12 @@ class PositionManage extends React.Component{
             dataIndex: 'name',
             key : 'name',
             className: 'log-result-noWrap',
-        }, {
+        },{
+            title: '联系人',
+            dataIndex: 'contactPerson',
+            key : 'contactPerson',
+            className: 'log-result-noWrap',
+        },{
             title: '联系电话',
             dataIndex: 'phoneNumber',
             key : 'phoneNumber',
@@ -200,10 +236,15 @@ class PositionManage extends React.Component{
             key : 'totalRecruiters',
             className: 'log-result-noWrap',
         },{
+            title: '年龄',
+            key : 'age',
+            className: 'log-result-noWrap',
+            render:(text,record)=>(<span>{record.ageRangeStart}~{record.ageRangeEnd}</span>)
+        },{
             title: '薪资',
-            dataIndex: 'salary',
             key : 'salary',
             className: 'log-result-noWrap',
+            render:(text,record)=>(<span>{record.salaryStart}~{record.salaryEnd}</span>)
         },{
             title: '福利',
             dataIndex: 'welfares',
@@ -311,6 +352,20 @@ class PositionManage extends React.Component{
                             )}
                         </FormItem>
                         <FormItem
+                            label='联系人'
+                            name='p_contact'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
+                            {getFieldDecorator('p_contact',{
+                                rules:[{
+                                    type:'string',required:true,maxLength:15,message:'请输入有效的联系人！'
+                                }]
+                                
+                            })(
+                                <Input/>
+                            )}
+                        </FormItem>
+                        <FormItem
                             label='联系电话'
                             name='p_phone'
                             labelCol={{ span: 5 }}
@@ -337,18 +392,21 @@ class PositionManage extends React.Component{
                             )}
                         </FormItem>
                         <FormItem
+                            label='年龄'
+                            name='p_salary'
+                            labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
+                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} defaultValue={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
+                        </FormItem>
+                        <FormItem
                             label='薪资'
                             name='p_salary'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            {getFieldDecorator('p_salary',{
-                                rules:[{
-                                    type:'string',required:true, message:'请输入有效的薪资！'
-                                }]
-                            })(
-                                <Input />
-                            )}
+                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} defaultValue={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
                         </FormItem>
+                        
+                       
                          <FormItem
                             label='福利'
                             name='p_welfare'

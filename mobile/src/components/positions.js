@@ -115,7 +115,7 @@ class Positions extends React.Component{
                     <div>
                         <h3><b>{ele.companyName} 招聘 {ele.name}</b></h3>
                         <div>
-                            <span>距离：{parseInt(ele.distance)}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>
+                            <span>距离：{parseInt(ele.distance)}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>  
                         </div>
                     </div>
                 );
@@ -128,20 +128,30 @@ class Positions extends React.Component{
                             value={ele.companyName}
                             disabled>公司</InputItem>
                             <InputItem
-                            name="salary"
-                            placeholder=""
-                            value={ele.salary}
-                            disabled>薪资</InputItem>
-                            <InputItem
                             name="totalRecruiters"
                             placeholder=""
                             value={ele.totalRecruiters}
                             disabled>招聘人数</InputItem>
                             <InputItem
+                            name="ageRange"
+                            placeholder=""
+                            value={ele.ageRange}
+                            disabled>年龄范围</InputItem>
+                            <InputItem
+                            name="contactPerson"
+                            placeholder=""
+                            value={ele.contactPerson}
+                            disabled>联系人</InputItem>
+                            <InputItem
                             name="phoneNumber"
                             placeholder=""
                             value={ele.phoneNumber}
                             disabled>联系电话</InputItem>
+                            <InputItem
+                            name="salary"
+                            placeholder=""
+                            value={ele.salary}
+                            disabled>薪资</InputItem>
                             <TextareaItem
                                 name="positionDesc"
                                 value={ele.positionDesc}

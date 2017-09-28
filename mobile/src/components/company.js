@@ -34,7 +34,7 @@ class Company extends React.Component{
   
     async subm(){
         Toast.loading('Loading...', 0);
-        
+       
         let res = await lapi.pay();
         let that = this;
         if(res){

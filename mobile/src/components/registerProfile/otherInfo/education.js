@@ -135,7 +135,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        <span className='custom-required'>*</span>学校
+                        学校<span className='custom-required'>*</span>
                     </InputItem>
                      <InputItem
                         name={`position_${key}`}
@@ -154,7 +154,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        <span className='custom-required'>*</span>专业
+                        专业<span className='custom-required'>*</span>
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -225,7 +225,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入学校名称！"
                         >
-                        <span className='custom-required'>*</span>学校
+                        学校<span className='custom-required'>*</span>
                     </InputItem>
                     <InputItem
                         name="position"
@@ -244,7 +244,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        <span className='custom-required'>*</span>专业
+                        专业<span className='custom-required'>*</span>
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
