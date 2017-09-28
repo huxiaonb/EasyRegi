@@ -17,7 +17,7 @@ class EmergencyContact extends React.Component {
         const { getFieldDecorator, getFieldValue, getFieldProps,getFieldError } = this.props.form;
         const noticeB = (
             <Badge dot>
-                <span title='紧急联系人(必填)' style={{color:'red',cursor:'pointer'}} >
+                <span title='紧急联系人(必填)' style={{color:'#108ee9',cursor:'pointer'}} >
                     紧急联系人(必填)
                 </span>
             </Badge>
@@ -35,7 +35,7 @@ class EmergencyContact extends React.Component {
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                             },{
                                 required:true, message:'请输入有效的姓名！'
-                            }],initialValue : emergency.name
+                            }],initialValue : emergency.emergencyContactName
                         })}
                         clear
                         error={!!getFieldError('name')}
@@ -52,7 +52,7 @@ class EmergencyContact extends React.Component {
                             {...getFieldProps('relationship', {
                                 rules:[{
                                     required:true, message:'请选择关系！'
-                                }],initialValue:['父母']
+                                }],initialValue:emergency.emergencycontactrelation
                             })}
                             data={relations}
                             >
@@ -67,7 +67,7 @@ class EmergencyContact extends React.Component {
                     }, {
                         whitespace: true, required: true, message: '请输入有效的联系手机！'
                     }],
-                    initialValue : emergency.mobile
+                    initialValue : emergency.emergencyContactPhoneNumber
                 })}
                 clear
                 error={!!getFieldError('mobile')}
@@ -86,7 +86,7 @@ class EmergencyContact extends React.Component {
                     },{
                         required:true,message:'请输入有效的家庭住址！'
                     }],
-                    initialValue : emergency.homeAddress
+                    initialValue : emergency.emergencyContactAddress
                 })}
                 clear
                 error={!!getFieldError('homeAddress')}

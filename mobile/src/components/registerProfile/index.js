@@ -49,7 +49,7 @@ class Index extends React.Component {
       current: 0,
       info:{
         personal:{},
-        family:{family:[],threeCategory : []},
+        family:{family:[],fkeys:[],threeCategory : [],tkeys:[]},
         otherInfo:{workExps:[],wkeys:[],edus:[],ekeys:[]},
         emergency:{}
       },
@@ -62,8 +62,8 @@ class Index extends React.Component {
         info = Object.assign(info,{personal : obj.personalInfo})
         break;
       case 2 :
-        info = Object.assign(info,{family : {family:obj.family, threeCategory : obj.threeCategory}})
-        info = Object.assign(info,{emergency : obj});
+        info = Object.assign(info,{family : obj.family});
+        info = Object.assign(info,{emergency : obj.emergency});
         break;
       case 3 :
         info = Object.assign(info,{otherInfo : obj.otherInfo})
@@ -102,7 +102,8 @@ class Index extends React.Component {
       appi.emergencycontactrelation=emergency.emergencycontactrelation;
 
       appi.familyMembers = family.family;
-      appi.threeCategory = threeCategory.threeCategory;
+      appi.threeCategoryRelations = family.threeCategory;
+      
       let workExperiences = [],educationHistories = [];
       workExps.map((wkc,idx)=>{
         let wk = Object.assign({},wkc);
@@ -166,7 +167,7 @@ class Index extends React.Component {
     //2nd : set data
     if(r.length){
         let info = Object.assign({},r[0]);
-        let wkeys=[],ekeys=[];
+        let wkeys=[],ekeys=[],fkeys=[],tkeys=[];
         info.workExperiences.map((wk,idx)=>{
             if(idx){
                 wkeys.push(idx);
@@ -185,6 +186,12 @@ class Index extends React.Component {
           });
           console.log(info.workExperiences,info.educationHistories);
         
+        info.familyMembers.map((fm,idx)=>{
+          fkeys.push(idx);
+        });
+        info.threeCategoryRelations.map((tc,idx)=>{
+          tkeys.push(idx)
+        })
         this.setState({
           info:{
             personal:{
@@ -208,7 +215,9 @@ class Index extends React.Component {
             },
             family:{
               family : info.familyMembers ? info.familyMembers : [],
-              threeCategory : info.threeCategory ? info.threeCategory : []
+              fkeys : fkeys,
+              tkeys : tkeys,
+              threeCategory : info.threeCategoryRelations ? info.threeCategoryRelations : []
             },
             otherInfo:{
               workExps : info.workExperiences ? info.workExperiences : [],
@@ -220,7 +229,7 @@ class Index extends React.Component {
               emergencyContactName : info.emergencyContactName,
               emergencyContactPhoneNumber : info.emergencyContactPhoneNumber,
               emergencyContactAddress : info.emergencyContactAddress,
-              emergencycontactrelation:info.emergencycontactrelation
+              emergencycontactrelation:[info.emergencycontactrelation]
             }
           }
         });

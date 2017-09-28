@@ -11,7 +11,7 @@ import WorkExp from './work';
 import EduExp from './education'
 import ImagePicker from '../../ImagePicker';
 import lapi from '../lapi'
-
+let workInt, eduInt = null;
 export default class OhterInfo extends React.Component {
     static contextTypes = {
         profile: PropTypes.object,
@@ -84,7 +84,8 @@ export default class OhterInfo extends React.Component {
     }
     saveForTempory(pFlag = 1){
         let wFlag, eFlag = false;
-        let { workF, eduF } = this.refs;
+        let workF = workInt.props.form;
+        let eduF = eduInt.props.form;
         let workFs,eduFs = [];
         workF.validateFields(async (err, values)=>{
              if (!!err) return
@@ -223,8 +224,8 @@ export default class OhterInfo extends React.Component {
         )
         return (
             <div key='exp_cntr'>
-                <WorkExp workExps={workExps} wkeys={wkeys} ref='workF' />
-                <EduExp edus={edus} ekeys={ekeys} ref='eduF' />
+                <WorkExp workExps={workExps} wkeys={wkeys} wrappedComponentRef={(inst) => workInt = inst} />
+                <EduExp edus={edus} ekeys={ekeys} wrappedComponentRef={(inst) => eduInt = inst} />
                 <Card>
                     <Card.Header style={{borderBottom : '1px #ddd solid',marginBottom : '15px'}} title={noti1}></Card.Header>
                     <ImagePicker openId={this.props.openId} type='photo' labelName='免冠照' presave={this.presave.bind(this)}/>

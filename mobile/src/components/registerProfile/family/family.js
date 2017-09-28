@@ -180,9 +180,9 @@ class FamilyInfo extends React.Component {
                     <InputItem
                         {...getFieldProps(`mphoneNumber_${key}`, {
                             rules: [{
-                                type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
+                                type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系电话！'
                             }, {
-                                required: true, message: '请输入有效的联系手机！'
+                                required: true, message: '请输入有效的联系电话！'
                             }]
                         })}
                         clear
@@ -190,7 +190,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError(`mphoneNumber_${key}`).join('、'));
                         }}
-                        placeholder="请输入联系手机">联系手机<span className='custom-required'>*</span>
+                        placeholder="请输入联系电话">联系电话<span className='custom-required'>*</span>
                     </InputItem>
                  
                 </Card>
@@ -241,9 +241,9 @@ class FamilyInfo extends React.Component {
                     <InputItem
                         {...getFieldProps('mphoneNumber', {
                             rules: [{
-                                type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系手机！'
+                                type: 'string', pattern: /^[0-9]{11,13}$/, message: '请输入有效的联系电话！'
                             }, {
-                                required: true, message: '请输入有效的联系手机！'
+                                required: true, message: '请输入有效的联系电话！'
                             }]
                         })}
                         clear
@@ -251,7 +251,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('mphoneNumber').join('、'));
                         }}
-                        placeholder="请输入联系手机">联系手机<span className='custom-required'>*</span>
+                        placeholder="请输入联系手机">联系电话<span className='custom-required'>*</span>
                     </InputItem>
                     
                     </Card>

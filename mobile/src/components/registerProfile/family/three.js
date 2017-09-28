@@ -56,17 +56,15 @@ class ThreeCategory extends React.Component {
        
         if(fms.length){
             fms.map((fm,idx)=>{
-            if(idx){
                 form.setFieldsValue({
-                    ['name_'+ idx]: fm.name,
-                    ['department' + idx] : fm.department,
-                    ['type' + idx] : _.isArray(fm.type) ? fm.type : [fm.type],
-                    ['relationship' + idx] : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
-                    ['employeeNumber_' + idx] : fm.employeeNumber,
-                    
+                        ['name_'+ idx]: fm.name,
+                        ['department_' + idx] : fm.department,
+                        ['type_' + idx] : _.isArray(fm.type) ? fm.type : [fm.type],
+                        ['relationship_' + idx] : _.isArray(fm.relationship) ? fm.relationship : [fm.relationship],
+                        ['employeeNumber_' + idx] : fm.employeeNumber,
+                        
+                    })
                 })
-            }
-            })
         }
     }
     render(){
@@ -86,14 +84,13 @@ class ThreeCategory extends React.Component {
         let initV = [];
         if(tc.length){
             tc.map((f,idx)=>{
-                if(idx){
-                    initV.push(idx);
-                } 
+                initV.push(idx);
             })
         }
         initV.length ? getFieldDecorator('keys', { initialValue: initV}) : getFieldDecorator('keys', { initialValue: []});
         
         const keys = getFieldValue('keys');
+        
         const formItems = keys.map((key, index) => {
             return (
                 
@@ -195,13 +192,13 @@ class ThreeCategory extends React.Component {
                     {formItems}
                     </form>
                     <div>
-                        <Button type="primary" size='large' icon="plus-circle-o" onClick={this.add.bind(this)} style={{width:'100%'}}>新增三类亲</Button>
+                        <Button type="primary" size='large' icon="plus-circle-o" onClick={this.add.bind(this)} style={{width:'100%'}}>新增三类亲信息(入职时填写)</Button>
                     </div>
                     <div className='re-tips'>
                         <div>三类亲说明：</div>
                         <div>一. 直系亲属：配偶、父母、子女、养父母、养子女、继父母、继子女</div>
                         <div>二. 旁系亲属：包括：</div>
-                        <div>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;二等亲属：兄弟姐妹、外祖父母、孙子女、外孙子女及他们的配偶</div>
+                        <div>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;二等亲属：兄弟姐妹、祖父母、外祖父母、孙子女、外孙子女及他们的配偶</div>
                         <div>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;三等亲属：叔、伯、姑、舅、姨、侄子女、外甥子女及他们的配偶</div>
                     </div>
             </div>

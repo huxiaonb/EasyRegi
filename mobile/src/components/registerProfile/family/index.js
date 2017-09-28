@@ -15,12 +15,13 @@ export default class Family extends React.Component {
     }
     
     saveForTempory(pFlag = 1){
-        
-        familyInt;
+ 
         let wFlag, eFlag = false;
         let family = familyInt.props.form;
         let threeCategory = threeCategoryInt.props.form;
+        let emergency = emergencyInt.props.form;
         let familys,threeCategorys = [];
+        let emInt = null;
         family.validateFields(async (err, values)=>{
              if (!!err){
                  return;
@@ -54,21 +55,29 @@ export default class Family extends React.Component {
              //rangetime set config
              eFlag = true
              let keys = threeCategory.getFieldValue('keys');
-             let threeCategorys = [];
              
              keys.map((key, index) => {
                  let fmObj = Object.assign({},{
                     name : threeCategory.getFieldValue('name_' + key),
                     department : threeCategory.getFieldValue('department_' + key),
-                    type : threeCategory.getFieldValue('type'),
+                    type : threeCategory.getFieldValue('type_' + key),
                     relationship : threeCategory.getFieldValue('relationship_' + key),
                     employeeNumber: threeCategory.getFieldValue('employeeNumber_' + key)
                 });
                  threeCategorys.push(fmObj);
              })
         });
+        emergency.validateFields(async (err, values)=>{
+            if (!!err) return
+            emInt = Object.assign({},{
+                        emergencyContactName : emergency.getFieldValue('name'),
+                        emergencycontactrelation : emergency.getFieldValue('relationship'),
+                        emergencyContactPhoneNumber : emergency.getFieldValue('mobile'),
+                        emergencyContactAddress : emergency.getFieldValue('homeAddress')
+                    })
+        })
         if(wFlag && eFlag){
-            this.context.updateProfile({family:{family:familys,fkeys:family.getFieldValue('keys'),threeCategory:threeCategorys,tkeys:threeCategory.getFieldValue('keys')},flag:2});
+            this.context.updateProfile({emergency : emInt, family:{family:familys,fkeys:family.getFieldValue('keys'),threeCategory:threeCategorys,tkeys:threeCategory.getFieldValue('keys')},flag:2});
             if(!!pFlag)Toast.success('暂存成功!');
             return true;
         }else{return false;}
@@ -86,7 +95,6 @@ export default class Family extends React.Component {
     }
 
     render(){
-        
         return(
             <div>
                 <FamilyInfo family={this.props.family} wrappedComponentRef={(inst) => familyInt = inst} />
