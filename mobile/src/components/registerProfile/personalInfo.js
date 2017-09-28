@@ -455,7 +455,7 @@ class PersonalInfo extends React.Component {
                 name="tele"
                 {...getFieldProps('tele', {
                     rules: [{
-                        type: 'string', pattern: /^([0-9]{3,4}\-)?[0-9]{6,10}(\-[0-9]{1,4})?$/, message: '请输入有效的联系座机！'
+                        type: 'string', pattern: /^([0-9]{3,4}\-)?[0-9]{6,10}(\-[0-9]{1,4})?$/, message: '请输入有效的座机！'
                     }],
                     initialValue : personal.tele
                 })}
@@ -464,9 +464,9 @@ class PersonalInfo extends React.Component {
                 onErrorClick={() => {
                     Toast.info(getFieldError('tele').join('、'));
                 }}
-                placeholder="请输入联系座机"
+                placeholder="请输入座机"
                 >
-                联系座机
+                座机
             </InputItem>
             <InputItem
                name="qqNumber"
