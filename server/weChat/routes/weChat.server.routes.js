@@ -26,6 +26,7 @@ module.exports = function (app) {
   app.route('/maintain').get(weChatController.maintain);
   app.route('/positions').get(weChatController.positions);
   app.route('/weChat/pay').post(weChatController.createUnifiedOrder);
+  app.route('/weChat/checkIfNeedPay').post(weChatController.checkIfNeedPay);
   app.route('/weChat/position/findNearbyPositions').post(weChatController.findNearbyPositions);
   app.route('/weChat/position/findAllPositions').get(weChatController.findAllPositions);
 };

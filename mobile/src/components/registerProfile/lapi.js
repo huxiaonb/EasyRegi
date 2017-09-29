@@ -81,6 +81,13 @@ export default {
             dataType: 'JSONP'
         })
     },
+    checkIfNeedPay(data){
+        return _request({
+            url: '../weChat/checkIfNeedPay',
+            type: 'POST',
+            data: data
+        })
+    },
     pay(){
         return _request({
             url:'../weChat/pay',

@@ -74,7 +74,7 @@ function renderPreviewPage(req, res, next){
                             relationship: familyMembers[i].relationship || '',
                             name: familyMembers[i].name || '',
                             phoneNumber: familyMembers[i].phoneNumber || '',
-                            address: familyMembers[i].address || ''
+                            address: familyMembers[i].homeAddress || ''
                         };
                         family.push(familyItem);
                     } else {

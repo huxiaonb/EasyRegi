@@ -16,6 +16,7 @@ const openId = $('#openId').text();
 class Company extends React.Component{
     state={
         payFlag : false,
+        resultPageTitle: '提交成功',//'付款成功',
         bCheck : false,
         mCheck : false,
         selectCompId: '',
@@ -34,48 +35,70 @@ class Company extends React.Component{
   
     async subm(){
         Toast.loading('Loading...', 0);
-       
-        let res = await lapi.pay();
-        let that = this;
-        if(res){
-            
-            if(res.return_code === 'SUCCESS'){
-                //alert(JSON.stringify(res));
-                //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
-                WeixinJSBridge.invoke(
-                    'getBrandWCPayRequest', {
-                        "appId":res.appid,     //公众号名称，由商户传入     
-                        "timeStamp":res.timeStamp,         //时间戳，自1970年以来的秒数     
-                        "nonceStr":res.nonce_str, //随机串     
-                        "package":"prepay_id=" + res.prepay_id,     
-                        "signType":"MD5",         //微信签名方式：     
-                        "paySign":res.paySign //微信签名 
-                    },
-                    async function(res){
-                        
-                            //alert(JSON.stringify(res));   
-                            if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                                var data = {
-                                openId: openId,
-                                companyId: this.state.selectCompId
+        let params = {
+            openId: openId,
+            selectCompanyId: this.state.selectCompId
+        };
+        let checkResult = await lapi.checkIfNeedPay(params);
+
+        var data = {
+            openId: openId,
+            companyId: this.state.selectCompId
+        }
+
+        if(checkResult && checkResult.success){
+            if(checkResult.needPay){
+                let res = await lapi.pay();
+                let that = this;
+                if(res){
+
+                    if(res.return_code === 'SUCCESS'){
+                        //alert(JSON.stringify(res));
+                        //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
+                        WeixinJSBridge.invoke(
+                            'getBrandWCPayRequest', {
+                                "appId":res.appid,     //公众号名称，由商户传入
+                                "timeStamp":res.timeStamp,         //时间戳，自1970年以来的秒数
+                                "nonceStr":res.nonce_str, //随机串
+                                "package":"prepay_id=" + res.prepay_id,
+                                "signType":"MD5",         //微信签名方式：
+                                "paySign":res.paySign //微信签名
+                            },
+                            async function(res){
+
+                                //alert(JSON.stringify(res));
+                                if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                    date.payDate = new Date();
+                                    let r = await lapi.submitSelectComp(data);
+
+                                    that.setState({
+                                        payFlag : true,
+                                        resultPageTitle: '付款成功'
+                                    });
+                                    Toast.hide();
+                                }else{
+                                    Toast.hide();
+                                }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+
                             }
-                            let r = await lapi.submitSelectComp(data);
-                        
-                            that.setState({
-                                payFlag : true,
-                            });
-                            Toast.hide();
-                            //console.log('成功啦！')
-                        }else{
-                            Toast.hide();
-                        }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-                        
+                        );
                     }
-                ); 
+                } else {
+                    Toast.hide();
+                }
+
+            } else {
+                let submResult = await lapi.submitSelectComp(data);
+                this.setState({
+                    payFlag : true,
+                    resultPageTitle: '提交成功'
+                });
+                Toast.hide();
             }
         } else {
             Toast.hide();
         }
+
         
     }
     handleChange(value){
@@ -145,14 +168,15 @@ class Company extends React.Component{
             });
             
         }
-
+//"付款成功"
     }
-    render(){ 
+    render(){
+        let resultPageTitle = this.state.resultPageTitle;
         let resultPage = (
             <div className="result-example">
                 <Result style={{height:'500px',marginTop:'30%'}}
                     img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
-                    title="付款成功"
+                    title={resultPageTitle}
                     message="简历已提交"
                 />                
             </div>

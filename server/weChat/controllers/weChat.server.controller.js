@@ -141,6 +141,51 @@ exports.maintain = function(req, res) {
 exports.positions = function(req, res) {
   res.render('server/weChat/views/positions');
 }
+
+exports.checkIfNeedPay = function(req, res){
+    var openId = _.get(req, ['body', 'openId'], ''),
+        selectCompanyId = _.get(req, ['body', 'selectCompanyId', '0']);
+    logger.info('check if need pay', openId, selectCompanyId);
+    if(_.isEmpty(openId) || _.isEmpty(selectCompanyId)){
+        console.log('缺少所需参数');
+        res.json({success: false, errmsg: '缺少所需参数'});
+    } else {
+        Applicant.find({
+            wechatOpenId : openId
+        }).then(applicants => {
+            console.log(JSON.stringify(applicants));
+            if(_.isEmpty(applicants)){
+                res.status(500).send({success: false, errmsg: '查找用户出错'});
+            } else {
+                var applicant = _.get(applicants, ['0'], {}),
+                    registeredCops = _.get(applicant, ['registeredCompanies'], []),
+                    cop = _.find(registeredCops, {'companyId': selectCompanyId});
+                if(_.isEmpty(cop)){
+                    console.log('not registered, need pay.');
+                    res.json({success: true, needPay: true});
+                } else {
+                    var paymentDate = _.get(cop, ['paymentDate']);
+                    if(_.isUndefined(paymentDate) || !_.isDate(paymentDate)){
+                        console.log('payment date does not exist, need pay');
+                        res.json({success: true, needPay: true});
+                    } else {
+                        var current = new Date(),
+                            payDate = new Date(paymentDate);
+                        if (current.getTime() - payDate.getTime() > 1000 * 60 * 60 * 24 * 30){
+                            res.json({success: true, needPay: true});
+                        } else {
+                            res.json({success: true, needPay: false});
+                        }
+                    }
+                }
+            }
+        }).catch(e => {
+            logger.error('Error in finding applicant by openId', openId, e);
+            res.status(500).send({success: false, errmsg: '查找用户出错'});
+        });
+    }
+}
+
 exports.createUnifiedOrder = function(req, res) {
 //1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
 //2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
@@ -374,8 +419,8 @@ exports.renderRegisterCompanyPage = function(req, res){
 
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
-      companyId = _.get(req, ['body', 'companyId', '0'], '');
-      //logger.info(companyId);
+      companyId = _.get(req, ['body', 'companyId', '0'], ''),
+      payDate = _.get(req, ['body', 'payDate']);
   var current = new Date();
   if(_.isEmpty(openId)){
     //logger.info('openId does not exist, cannot submit register company');
@@ -405,12 +450,18 @@ exports.submitRegisterCompany = function(req, res){
                 companyAlias: _.get(dbCompany, ['alias'], ''),
                 registerDate: current
               };
+              if(!_.isEmpty(payDate)){
+                  registeredCompany.paymentDate = new Date(payDate);
+              }
               registeredCompanies.push(registeredCompany);
               dbApplicant.registeredCompanies = registeredCompanies;
             } else {
               dbRegisteredCompany.companyName = _.get(dbCompany, ['companyName'], '');
               dbRegisteredCompany.companyAlias = _.get(dbCompany, ['alias'], '');
               dbRegisteredCompany.registerDate = current;
+              if(!_.isEmpty(payDate)){
+                  dbRegisteredCompany.paymentDate = new Date(payDate);
+              }
             }
             logger.info(dbApplicant.registeredCompanies);
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})

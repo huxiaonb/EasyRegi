@@ -46,7 +46,8 @@ var registeredCompanySchema = new Schema({
     companyName: String,
     companyId: String,
     companyAlias: String,
-    registerDate: Date
+    registerDate: Date,
+    paymentDate: Date
 });
 
 var workExperienceSchema = new Schema({
