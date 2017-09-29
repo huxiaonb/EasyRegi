@@ -86,7 +86,7 @@ export default class OhterInfo extends React.Component {
         let wFlag, eFlag = false;
         let workF = workInt.props.form;
         let eduF = eduInt.props.form;
-        let workFs,eduFs = [];
+        let workFs = [],eduFs = [];
         workF.validateFields(async (err, values)=>{
              if (!!err) return
              //set value to context 
