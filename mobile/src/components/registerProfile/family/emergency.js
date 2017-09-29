@@ -32,7 +32,7 @@ class EmergencyContact extends React.Component {
                         
                         {...getFieldProps('name', {
                             rules:[{
-                                type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
+                                required : true,type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                             },{
                                 required:true, message:'请输入有效的姓名！'
                             }],initialValue : emergency.emergencyContactName
@@ -64,7 +64,7 @@ class EmergencyContact extends React.Component {
                name="mobile"
                {...getFieldProps('mobile', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
+                        required : true, type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
                     }, {
                         whitespace: true, message: '请输入有效的联系电话！'
                     }],
@@ -87,7 +87,7 @@ class EmergencyContact extends React.Component {
                     },{
                         required:true,message:'请输入有效的住址！'
                     }],
-                    initialValue : emergency.emergencyContactAddress
+                    initialValue : emergency.emergencyContactAddress || ''
                 })}
                 clear
                 error={!!getFieldError('homeAddress')}
