@@ -77,10 +77,12 @@ export default class OhterInfo extends React.Component {
         }
         
        
-        this.saveForTempory(0);
-        if(this.context.profile.otherInfo.workExps.length && this.context.profile.otherInfo.edus.length){
-            this.props.handleSubmit();
-        }  
+        if(this.saveForTempory(0)){
+            if(this.context.profile.otherInfo.workExps.length && this.context.profile.otherInfo.edus.length){
+                this.props.handleSubmit();
+            }  
+        }
+        
     }
     saveForTempory(pFlag = 1){
         let wFlag, eFlag = false;
@@ -88,7 +90,7 @@ export default class OhterInfo extends React.Component {
         let eduF = eduInt.props.form;
         let workFs = [],eduFs = [];
         workF.validateFields(async (err, values)=>{
-             if (!!err) return
+             if (!!err) return false;
              //set value to context 
              //rangetime set config
              wFlag = true;
@@ -136,6 +138,7 @@ export default class OhterInfo extends React.Component {
         });
         if(wFlag && eFlag){
             this.context.updateProfile({otherInfo:{workExps:workFs,wkeys:workF.getFieldValue('keys'),edus:eduFs,ekeys:eduF.getFieldValue('keys')},flag:3});
+            return true;
             //if(!!pFlag)Toast.success('暂存成功!');
         }
     }

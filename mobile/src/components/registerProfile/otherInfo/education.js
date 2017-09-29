@@ -141,7 +141,6 @@ class EduExp extends React.Component {
                         name={`position_${key}`}
                         {...getFieldProps(`position_${key}`, {
                             rules: [{
-                                required: true, 
                                 whitespace : true,
                                 maxLenght : 20,
                                 message: '请输入有效的专业！'
@@ -154,7 +153,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        专业<span className='custom-required'>*</span>
+                        专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -162,7 +161,7 @@ class EduExp extends React.Component {
                             {...getFieldProps(`erangeTime_${key}`, {
                                 rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                     </FormItem>
                     <FormItem>
@@ -171,7 +170,7 @@ class EduExp extends React.Component {
                             {...getFieldProps(`erangeTime_end_${key}`, {
                                 rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                      </FormItem>
                     
@@ -185,7 +184,7 @@ class EduExp extends React.Component {
                             })}
                             data={degreeOpt}
                             >
-                            <List.Item arrow="horizontal" name={`degree_${key}`} style={{padding : 0}}>学历</List.Item>
+                            <List.Item arrow="horizontal" name={`degree_${key}`} style={{padding : 0}}>学历<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                     <FormItem>                
@@ -198,7 +197,7 @@ class EduExp extends React.Component {
                             })}
                             data={[{label:'毕业',value:'毕业'},{label:'肄业',value:'肄业'}]}
                             >
-                            <List.Item arrow="horizontal" name={`grad_${key}`} style={{padding : 0}}>毕业</List.Item>
+                            <List.Item arrow="horizontal" name={`grad_${key}`} style={{padding : 0}}>毕业<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                 </Card>
@@ -231,7 +230,6 @@ class EduExp extends React.Component {
                         name="position"
                         {...getFieldProps('position', {
                             rules: [{
-                                required: true, 
                                 whitespace : true,
                                 maxLenght : 20,
                                 message: '请输入有效的专业！'
@@ -244,7 +242,7 @@ class EduExp extends React.Component {
                         }}
                         placeholder="请输入专业！"
                         >
-                        专业<span className='custom-required'>*</span>
+                        专业
                     </InputItem>
                     <FormItem>
                         <DatePicker mode="date"
@@ -254,7 +252,7 @@ class EduExp extends React.Component {
                                         { type:'object', required: true, message: '请选择起始日期!' }
                                     ],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                     </FormItem>
                     <FormItem>
@@ -263,7 +261,7 @@ class EduExp extends React.Component {
                             {...getFieldProps('erangeTime_end', {
                                 rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                      </FormItem>
                     
@@ -277,7 +275,7 @@ class EduExp extends React.Component {
                             })}
                             data={degreeOpt}
                             >
-                            <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>学历</List.Item>
+                            <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>学历<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                     <FormItem>                
@@ -290,7 +288,7 @@ class EduExp extends React.Component {
                             })}
                             data={[{label:'毕业',value:'毕业'},{label:'肄业',value:'肄业'}]}
                             >
-                            <List.Item arrow="horizontal" name="grad" style={{padding : 0}}>毕业</List.Item>
+                            <List.Item arrow="horizontal" name="grad" style={{padding : 0}}>毕业<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                     </Card>

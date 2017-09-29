@@ -134,7 +134,7 @@ class WorkExp extends React.Component {
                             {...getFieldProps(`rangeTime_${key}`, {
                                 rules: [{ type:'object', required: true, message: '请选择起始日期!' }],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>起始日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                     </FormItem>
                     <FormItem>
@@ -143,7 +143,7 @@ class WorkExp extends React.Component {
                             {...getFieldProps(`rangeTime_end_${key}`, {
                                 rules: [{ type:'object', required: true, message: '请选择结束日期!' }],
                             })} 
-                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期</List.Item>
+                            maxDate={maxDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>结束日期<span className='custom-required'>*</span></List.Item>
                         </DatePicker>
                      </FormItem>
                      <InputItem
@@ -176,7 +176,7 @@ class WorkExp extends React.Component {
                             })}
                             data={[{label:'2000以下',value:'2000以下'},{label:'2000~5000',value:'2000~5000'},{label:'5000~8000',value:'5000~8000'},{label:'8000~9999',value:'4000~5000'},{label:'10000以上',value:'10000以上'}]}
                             >
-                            <List.Item arrow="horizontal" name="salary" style={{padding : 0}}>薪资范围</List.Item>
+                            <List.Item arrow="horizontal" name="salary" style={{padding : 0}}>薪资范围<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem> 
                     <InputItem

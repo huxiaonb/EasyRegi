@@ -20,7 +20,7 @@ export default class Family extends React.Component {
         let family = familyInt.props.form;
         let threeCategory = threeCategoryInt.props.form;
         let emergency = emergencyInt.props.form;
-        let familys,threeCategorys = [];
+        let familys=[],threeCategorys = [];
         let emInt = null;
         family.validateFields(async (err, values)=>{
              if (!!err){
@@ -85,9 +85,8 @@ export default class Family extends React.Component {
         }else{return false;}
     }
     prevStep(){
-        if(this.saveForTempory()){
-            this.props.prev();
-        }
+        this.saveForTempory();
+        this.props.prev();
     }
 
     nextStep(){

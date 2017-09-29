@@ -303,7 +303,7 @@ class PersonalInfo extends React.Component {
                         rules: [{ type:'object', required: true, message: '请选择有效期开始时间!' }],
                         initialValue : personal.validFrom
                     })} 
-                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期起</List.Item>
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期起<span className='custom-required'>*</span></List.Item>
                 </DatePicker>
             </FormItem>
             <FormItem>
@@ -313,7 +313,7 @@ class PersonalInfo extends React.Component {
                         rules: [{ type:'object', required: true, message: '请选择有效期结束时间!' }],
                         initialValue : personal.validTo
                     })} 
-                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期止</List.Item>
+                    maxDate={validityMaxDate} minDate={validityMinDate}><List.Item arrow="horizontal" style={{padding : 0}}>证件有效期止<span className='custom-required'>*</span></List.Item>
                 </DatePicker>
             </FormItem>
             <FormItem>                
@@ -326,7 +326,7 @@ class PersonalInfo extends React.Component {
                         })}
                         data={[{label:'男',value:'男'},{label:'女',value:'女'}]}
                         >
-                        <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>性别</List.Item>
+                        <List.Item arrow="horizontal" name="gender" style={{padding : 0}}>性别<span className='custom-required'>*</span></List.Item>
                     </Picker>
             </FormItem>
             <FormItem>
@@ -341,7 +341,7 @@ class PersonalInfo extends React.Component {
                         })} 
                         
                         data={nationOptions}>
-                    <List.Item arrow="horizontal" style={{padding : 0}}>民族</List.Item>
+                    <List.Item arrow="horizontal" style={{padding : 0}}>民族<span className='custom-required'>*</span></List.Item>
                     </Picker>
             </FormItem>
             
@@ -355,7 +355,7 @@ class PersonalInfo extends React.Component {
                         rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                         initialValue : personal.date || currentDate
                     })} 
-                    maxDate={currentDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期</List.Item></DatePicker>
+                    maxDate={currentDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期<span className='custom-required'>*</span></List.Item></DatePicker>
             </FormItem>
             <FormItem>
                     <Picker
@@ -366,7 +366,7 @@ class PersonalInfo extends React.Component {
                             initialValue : personal.healthState ? [personal.healthState] : ['良好']
                         })}
                         data={[{label:'良好',value:'良好'},{label:'一般',value:'一般'},{label:'其他',value:'其他'}]}>
-                        <List.Item arrow="horizontal" style={{padding : 0}}>健康状况</List.Item>
+                        <List.Item arrow="horizontal" style={{padding : 0}}>健康状况<span className='custom-required'>*</span></List.Item>
                     </Picker>
             </FormItem>
             <FormItem>
@@ -378,7 +378,7 @@ class PersonalInfo extends React.Component {
                         initialValue : personal.marriageState ? [personal.marriageState] : ['未婚']
                     })}
                     data={[{label:'未婚',value:'未婚'},{label:'已婚',value:'已婚'},{label:'离异',value:'离异'},{label:'丧偶',value:'丧偶'}]}>
-                    <List.Item arrow="horizontal" style={{padding : 0}}>婚姻状况</List.Item>
+                    <List.Item arrow="horizontal" style={{padding : 0}}>婚姻状况<span className='custom-required'>*</span></List.Item>
                 </Picker>
             </FormItem>
             <InputItem
@@ -403,7 +403,7 @@ class PersonalInfo extends React.Component {
            <InputItem
                 name="currentAddress"
                 {...getFieldProps('currentAddress', {
-                    rules:[{type:'string'}],
+                    rules:[{required : true,type:'string',message : '请输入有效的现住址！'}],
                     initialValue : personal.currentAddress
                 })}
                 clear
@@ -419,7 +419,7 @@ class PersonalInfo extends React.Component {
                name="mobile"
                {...getFieldProps('mobile', {
                     rules: [{
-                        type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
+                        required : true,type: 'string', pattern: /^[0-9]{11,13}$/,  message: '请输入有效的联系电话！'
                     }, {
                         whitespace: true,  message: '请输入有效的联系电话！'
                     }],
@@ -432,7 +432,7 @@ class PersonalInfo extends React.Component {
                 }}
                 placeholder="请输入联系电话"
                >
-               联系电话         
+               联系电话<span className='custom-required'>*</span>        
              </InputItem>
              <InputItem
                 name='email'

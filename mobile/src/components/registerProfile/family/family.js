@@ -176,7 +176,7 @@ class FamilyInfo extends React.Component {
                             })}
                             data={relations}
                             >
-                            <List.Item arrow="horizontal" name={`relationship_${key}`} style={{padding : 0}}>关系</List.Item>
+                            <List.Item arrow="horizontal" name={`relationship_${key}`} style={{padding : 0}}>关系<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                     <InputItem
@@ -190,7 +190,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError(`mphoneNumber_${key}`).join('、'));
                         }}
-                        placeholder="请输入联系电话">联系电话<span className='custom-required'>*</span>
+                        placeholder="请输入联系电话">联系电话
                     </InputItem>
                     <InputItem
                         name={`homeAddress_${key}`}
@@ -254,7 +254,7 @@ class FamilyInfo extends React.Component {
                             })}
                             data={relations}
                             >
-                            <List.Item arrow="horizontal" name='relationship' style={{padding : 0}}>关系</List.Item>
+                            <List.Item arrow="horizontal" name='relationship' style={{padding : 0}}>关系<span className='custom-required'>*</span></List.Item>
                         </Picker>
                     </FormItem>
                     <InputItem
@@ -268,7 +268,7 @@ class FamilyInfo extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('mphoneNumber').join('、'));
                         }}
-                        placeholder="请输入联系电话">联系电话<span className='custom-required'>*</span>
+                        placeholder="请输入联系电话">联系电话
                     </InputItem>
                     <InputItem
                         name="homeAddress"

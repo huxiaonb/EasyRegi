@@ -52,13 +52,14 @@ class EmergencyContact extends React.Component {
                             {...getFieldProps('relationship', {
                                 rules:[{
                                     required:true, message:'请选择关系！'
-                                }],initialValue:emergency.emergencycontactrelation
+                                }],initialValue:emergency.emergencycontactrelation || ['父母']
                             })}
                             data={relations}
                             >
                             <List.Item arrow="horizontal" name='relationship' style={{padding : 0}}>关系</List.Item>
                         </Picker>
                     </FormItem>
+                    
                     <InputItem
                name="mobile"
                {...getFieldProps('mobile', {
