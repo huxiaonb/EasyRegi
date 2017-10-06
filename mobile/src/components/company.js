@@ -53,7 +53,7 @@ class Company extends React.Component{
                 if(res){
 
                     if(res.return_code === 'SUCCESS'){
-                        //alert(JSON.stringify(res));
+                        alert(JSON.stringify(res));
                         //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
                         WeixinJSBridge.invoke(
                             'getBrandWCPayRequest', {
@@ -66,7 +66,7 @@ class Company extends React.Component{
                             },
                             async function(res){
 
-                                //alert(JSON.stringify(res));
+                                alert(JSON.stringify(res));
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                     date.payDate = new Date();
                                     let r = await lapi.submitSelectComp(data);
