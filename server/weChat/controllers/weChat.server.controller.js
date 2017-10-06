@@ -422,6 +422,7 @@ exports.submitRegisterCompany = function(req, res){
       companyId = _.get(req, ['body', 'companyId', '0'], ''),
       payDate = _.get(req, ['body', 'payDate']);
   var current = new Date();
+  console.log('payDate:', payDate);
   if(_.isEmpty(openId)){
     //logger.info('openId does not exist, cannot submit register company');
     res.status(500).send({success: false, errmsg: '用户代码为空'});
@@ -463,7 +464,7 @@ exports.submitRegisterCompany = function(req, res){
                   dbRegisteredCompany.paymentDate = new Date(payDate);
               }
             }
-            logger.info(dbApplicant.registeredCompanies);
+            logger.info(JSON.stringify(dbApplicant.registeredCompanies));
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {

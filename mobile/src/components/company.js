@@ -34,6 +34,7 @@ class Company extends React.Component{
 
   
     async subm(){
+        let that = this;
         Toast.loading('Loading...', 0);
         let params = {
             openId: openId,
@@ -41,7 +42,7 @@ class Company extends React.Component{
         };
         let checkResult = await lapi.checkIfNeedPay(params);
 
-        var data = {
+        let data = {
             openId: openId,
             companyId: this.state.selectCompId
         }
@@ -49,7 +50,6 @@ class Company extends React.Component{
         if(checkResult && checkResult.success){
             if(checkResult.needPay){
                 let res = await lapi.pay();
-                let that = this;
                 if(res){
 
                     if(res.return_code === 'SUCCESS'){
@@ -68,13 +68,18 @@ class Company extends React.Component{
 
                                 alert(JSON.stringify(res));
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                                    date.payDate = new Date();
+                                    data.payDate = new Date();
                                     let r = await lapi.submitSelectComp(data);
-
-                                    that.setState({
-                                        payFlag : true,
-                                        resultPageTitle: '付款成功'
-                                    });
+                                    alert('before');
+                                    try{
+                                        that.setState({
+                                            payFlag : true,
+                                            resultPageTitle: '付款成功'
+                                        });
+                                    } catch(e){
+                                        alert(e);
+                                    }
+                                    alert('after');
                                     Toast.hide();
                                 }else{
                                     Toast.hide();
