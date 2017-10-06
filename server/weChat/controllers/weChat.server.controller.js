@@ -199,7 +199,7 @@ exports.createUnifiedOrder = function(req, res) {
       out_trade_no :  Date.now().toString() + Math.random().toString().substr(2, 10),
       product_id: 'AA1234567890',
       spbill_create_ip : '39.108.136.90',
-      total_fee : 1,
+      total_fee : 100,
       trade_type: 'JSAPI',
   }
   opts.sign = wechatUtil.sign(opts);
