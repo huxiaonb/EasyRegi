@@ -53,7 +53,7 @@ class Company extends React.Component{
                 if(res){
 
                     if(res.return_code === 'SUCCESS'){
-                        alert(JSON.stringify(res));
+                        // alert(JSON.stringify(res));
                         //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
                         WeixinJSBridge.invoke(
                             'getBrandWCPayRequest', {
@@ -66,20 +66,27 @@ class Company extends React.Component{
                             },
                             async function(res){
 
-                                alert(JSON.stringify(res));
+                                // alert(JSON.stringify(res));
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                     data.payDate = new Date();
-                                    let r = await lapi.submitSelectComp(data);
+                                    let data1 = {};
                                     alert('before');
-                                    try{
-                                        that.setState({
-                                            payFlag : true,
-                                            resultPageTitle: '付款成功'
-                                        });
-                                    } catch(e){
+                                    try {
+                                        data1 = {
+                                            openId: openId,
+                                            companyId: this.state.selectCompId,
+                                            payDate: new Date()
+                                        };
+
+                                    } catch (e){
                                         alert(e);
                                     }
                                     alert('after');
+                                    let r = await lapi.submitSelectComp(data1);
+                                    that.setState({
+                                        payFlag : true,
+                                        resultPageTitle: '付款成功'
+                                    });
                                     Toast.hide();
                                 }else{
                                     Toast.hide();
