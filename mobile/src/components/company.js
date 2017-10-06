@@ -69,20 +69,7 @@ class Company extends React.Component{
                                 // alert(JSON.stringify(res));
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                     data.payDate = new Date();
-                                    let data1 = {};
-                                    alert('before');
-                                    try {
-                                        data1 = {
-                                            openId: openId,
-                                            companyId: this.state.selectCompId,
-                                            payDate: new Date()
-                                        };
-
-                                    } catch (e){
-                                        alert(e);
-                                    }
-                                    alert('after');
-                                    let r = await lapi.submitSelectComp(data1);
+                                    let r = await lapi.submitSelectComp(data);
                                     that.setState({
                                         payFlag : true,
                                         resultPageTitle: '付款成功'
