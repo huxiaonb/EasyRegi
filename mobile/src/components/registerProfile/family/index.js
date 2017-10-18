@@ -16,7 +16,9 @@ export default class Family extends React.Component {
     
     saveForTempory(pFlag = 1){
  
-        let wFlag, eFlag = false;
+        let wFlag = false; 
+        let eFlag = false;
+        let tflag = false;
         let family = familyInt.props.form;
         let threeCategory = threeCategoryInt.props.form;
         let emergency = emergencyInt.props.form;
@@ -51,11 +53,24 @@ export default class Family extends React.Component {
              //rangetime set config
             
         });
+
+        emergency.validateFields(async (err, values)=>{
+            if (!!err) return
+            //紧急联系人必填
+            eFlag = true;
+            emInt = Object.assign({},{
+                        emergencyContactName : emergency.getFieldValue('name'),
+                        emergencycontactrelation : emergency.getFieldValue('relationship'),
+                        emergencyContactPhoneNumber : emergency.getFieldValue('mobile'),
+                        emergencyContactAddress : emergency.getFieldValue('homeAddress')
+                    });
+                    
+        })
+
         threeCategory.validateFields(async (err, values)=>{
              if (!!err) return
-             //set value to context
-             //rangetime set config
-             eFlag = true
+             //未增加三类亲或者三类亲验证无误都通过设置true
+             tflag = true
              let keys = threeCategory.getFieldValue('keys');
              
              keys.map((key, index) => {
@@ -69,16 +84,9 @@ export default class Family extends React.Component {
                  threeCategorys.push(fmObj);
              })
         });
-        emergency.validateFields(async (err, values)=>{
-            if (!!err) return
-            emInt = Object.assign({},{
-                        emergencyContactName : emergency.getFieldValue('name'),
-                        emergencycontactrelation : emergency.getFieldValue('relationship'),
-                        emergencyContactPhoneNumber : emergency.getFieldValue('mobile'),
-                        emergencyContactAddress : emergency.getFieldValue('homeAddress')
-                    })
-        })
-        if(wFlag && eFlag){
+        
+        
+        if(wFlag && eFlag && tflag){
             this.context.updateProfile({emergency : emInt, family:{family:familys,fkeys:family.getFieldValue('keys'),threeCategory:threeCategorys,tkeys:threeCategory.getFieldValue('keys')},flag:2});
             //if(!!pFlag)Toast.success('暂存成功!',1);
             return true;
