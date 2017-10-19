@@ -451,14 +451,14 @@ class Company extends React.Component{
                          </Accordion>
             
                          <WhiteSpace size="lg" />
-                         <List renderHeader={()=>'选择公司'}>
+                         <List renderHeader={()=>'【选择公司投递简历】'}>
                         <Picker data={this.state.companies} cols={1} className="all-companies" value={this.state.selectCompId} onPickerChange={this.onPickerChange}>
-                            <List.Item arrow="horizontal">公司</List.Item>
+                            <List.Item arrow="horizontal">选择公司</List.Item>
                         </Picker>
                         </List>
                         <WhiteSpace size="lg" />
                         <List>    
-                        <CheckboxItem  key={0} checked={bCheck} onChange={this.changeB.bind(this)}>承诺填写内容属实</CheckboxItem>
+                        <CheckboxItem  key={0} checked={bCheck} onChange={this.changeB.bind(this)}>承诺填写内容属实，若有虚假愿接受辞退处分</CheckboxItem>
                         <CheckboxItem  key={1} checked={mCheck} onChange={this.changeM.bind(this)}>同意体检不合格不予录取</CheckboxItem>
                         </List>               
                         <WhiteSpace size="lg" />
