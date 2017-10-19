@@ -78,7 +78,7 @@ export default class OhterInfo extends React.Component {
         
        
         if(this.saveForTempory(0)){
-            if(this.context.profile.otherInfo.workExps.length && this.context.profile.otherInfo.edus.length){
+            if(this.context.profile.otherInfo.edus.length){
                 this.props.handleSubmit();
             }  
         }
