@@ -85,7 +85,7 @@ class Index extends React.Component {
     Toast.loading('Loading...', 0);
     //callApi && if dataObj have date value need change will copy a Object
     let{workExps,edus} = this.state.info.otherInfo;
-    if(workExps.length && edus.length){
+    if(edus.length){
       let {personal,family,emergency} = this.state.info;
       let personalCopy = Object.assign({},personal);
       // let pdate = Object.assign(personalCopy.birthDate,{});

@@ -47,7 +47,7 @@ export default class OhterInfo extends React.Component {
     sumitAll(){
         const openId = this.props.openId;
         //新用户录入信息必须要上传正反面，否则不做照片验证
-        if(this.context.profile.otherInfo.workExps.length === 0){
+        if(this.context.profile.otherInfo.edus.length === 0){
             if(this.state.fileList.length < 2){
                 Toast.info('请上传身份证正反面照片！');
                 return;
