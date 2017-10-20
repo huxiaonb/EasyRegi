@@ -133,7 +133,7 @@ class EduExp extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError(`title_${key}`).join('、'));
                         }}
-                        placeholder="请输入学校名称！"
+                        placeholder="请输入学校名称"
                         >
                         学校<span className='custom-required'>*</span>
                     </InputItem>
@@ -151,7 +151,7 @@ class EduExp extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError(`position_${key}`).join('、'));
                         }}
-                        placeholder="请输入专业！"
+                        placeholder="请输入专业"
                         >
                         专业
                     </InputItem>
@@ -222,7 +222,7 @@ class EduExp extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('title').join('、'));
                         }}
-                        placeholder="请输入学校名称！"
+                        placeholder="请输入学校名称"
                         >
                         学校<span className='custom-required'>*</span>
                     </InputItem>
@@ -240,7 +240,7 @@ class EduExp extends React.Component {
                         onErrorClick={() => {
                             Toast.info(getFieldError('position').join('、'));
                         }}
-                        placeholder="请输入专业！"
+                        placeholder="请输入专业"
                         >
                         专业
                     </InputItem>
