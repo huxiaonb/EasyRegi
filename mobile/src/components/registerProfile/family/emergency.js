@@ -52,7 +52,7 @@ class EmergencyContact extends React.Component {
                             {...getFieldProps('relationship', {
                                 rules:[{
                                     required:true, message:'请选择关系！'
-                                }],initialValue:emergency.emergencycontactrelation[0] ? emergency.emergencycontactrelation : ['父母']
+                                }],initialValue:emergency.emergencycontactrelation ? emergency.emergencycontactrelation : ['父母']
                             })}
                             data={relations}
                             >

@@ -105,7 +105,7 @@ class Index extends React.Component {
       appi.threeCategoryRelations = family.threeCategory;
       
       let workExperiences = [],educationHistories = [];
-      workExps.map((wkc,idx)=>{
+      workExps.length ? workExps.map((wkc,idx)=>{
         let wk = Object.assign({},wkc);
         let wdate = [...wk.date];
         let wm = {
@@ -119,7 +119,7 @@ class Index extends React.Component {
           guarantorPhoneNumber : wk.guarantorPhoneNumber,
         };
         workExperiences.push(wm);
-      });
+      }) : '';
       edus.map((edc,idx)=>{
         let ed = Object.assign({},edc);
         let edate = [...ed.date];
