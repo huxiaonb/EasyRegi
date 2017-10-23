@@ -232,85 +232,10 @@ function exportApplicants(req, res, next){
                 res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
             } else {
                 logger.info(applicants);
-                var conf = {
-                    name: 'Sheet1',
-                    cols: [{
-                        caption: '姓名',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '性别',
-                        type: 'string'
-                    }, {
-                        caption: '民族',
-                        type: 'string'
-                    }, {
-                        caption: '出生日期',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '健康状况',
-                        type: 'string'
-                    },{
-                        caption: '婚姻状况',
-                        type: 'string'
-                    }, {
-                        caption: '身份证号码',
-                        type: 'string',
-                        width: 25
-                    }, {
-                        caption: '家庭住址',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '现住址',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '手机',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '联系电话',
-                        type: 'string',
-                        width: 15
-                    }, {
-                        caption: '邮箱',
-                        type: 'string',
-                        width: 20
-                    }, {
-                        caption: 'QQ',
-                        type: 'string',
-                        width: 15
-                    }]
-                };
-                conf.rows = [];
-                if(!_.isEmpty(applicants)){
-                    _.forEach(applicants, function(app){
-                        var appRow = [];
-                        appRow.push(_.get(app, ['name'], ''));
-                        appRow.push(_.get(app, ['gender'], ''));
-                        appRow.push(_.get(app, ['folk'], ''));
-                        var birthDate = _.get(app, ['birthDate'], '');
-                        if(_.isDate(birthDate)){
-                            appRow.push(birthDate.toLocaleDateString());    
-                        } else {
-                            appRow.push(_.get(app, ['birthDate'], ''));
-                        }
-                        appRow.push(_.get(app, ['healthState'], ''));
-                        appRow.push(_.get(app, ['marriageState'], ''));
-                        appRow.push(_.get(app, ['idCardNumber'], ''));
-                        appRow.push(_.get(app, ['homeAddress'], ''));
-                        appRow.push(_.get(app, ['currentAddress'], ''));
-                        appRow.push(_.get(app, ['mobile'], ''));
-                        appRow.push(_.get(app, ['tele'], ''));
-                        appRow.push(_.get(app, ['email'], ''));
-                        appRow.push(_.get(app, ['qqNumber'], ''));
-
-                        conf.rows.push(appRow);
-                    });
-                }
-                var result = ExcelExporter.execute(conf);
+                var confs = [];
+                confs = initExcelSheetConfs(confs);
+                constructBasicInfoSheet(applicants, confs);
+                var result = ExcelExporter.execute(confs);
                 res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
                 res.setHeader("Content-Disposition", "attachment; filename=" + encodeURIComponent("入职员工") + ".xlsx");
                 res.end(result, 'binary');
@@ -319,3 +244,251 @@ function exportApplicants(req, res, next){
         });
     }
 }
+
+function initExcelSheetConfs(confs){
+    var basicInfoConf = {
+        name: 'Personal',
+        cols: [{
+            caption: '姓名',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '性别',
+            type: 'string'
+        }, {
+            caption: '民族',
+            type: 'string'
+        }, {
+            caption: '出生日期',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '健康状况',
+            type: 'string'
+        },{
+            caption: '婚姻状况',
+            type: 'string'
+        }, {
+            caption: '身份证号码',
+            type: 'string',
+            width: 25
+        }, {
+            caption: '家庭住址',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '现住址',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '手机',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '联系电话',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '邮箱',
+            type: 'string',
+            width: 20
+        }, {
+            caption: 'QQ',
+            type: 'string',
+            width: 15
+        }],
+        rows: []
+    },
+    educationConf = {
+        name: 'Education',
+        cols: [{
+            caption: '姓名',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '毕业院校',
+            type: 'string',
+            width: 25
+        }, {
+            caption: '日期起',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '日期止',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '学历',
+            type: 'string'
+        },{
+            caption: '专业',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '毕业',
+            type: 'string'
+        }],
+        rows: []
+    },
+    workExperienceConf = {
+        name: 'WorkExperience',
+        cols: [{
+            caption: '姓名',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '公司名称',
+            type: 'string',
+            width: 30
+        }, {
+            caption: '日期起',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '日期止',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '离职原因',
+            type: 'string',
+            width: 15
+        },{
+            caption: '证明人及联络方式',
+            type: 'string',
+            width: 25
+        }],
+        rows: []
+    },
+    emergencyContactConf = {
+        name: 'Emergency',
+        cols: [{
+            caption: '姓名',
+            type: 'string',
+            width: 15
+        }, {
+            caption: '紧急联络人姓名',
+            type: 'string',
+            width: 25
+        }, {
+            caption: '紧急联络人电话',
+            type: 'string',
+            width: 25
+        }, {
+            caption: '紧急联络人地址',
+            type: 'string',
+            width: 35
+        }],
+        rows: []
+    };
+    confs.push(basicInfoConf);
+    confs.push(educationConf);
+    confs.push(workExperienceConf);
+    confs.push(emergencyContactConf);
+    return confs;
+}
+
+function constructBasicInfoSheet(applicants, confs){
+    var conf = confs[0];
+    if(!_.isEmpty(applicants)){
+        _.forEach(applicants, function(app){
+            var appRow = [],
+                name = _.get(app, ['name'], ''),
+                educationHistories = _.get(app, ['educationHistories'], []),
+                workExperiences = _.get(app, ['workExperiences'], []);
+            appRow.push(name);
+            appRow.push(_.get(app, ['gender'], ''));
+            appRow.push(_.get(app, ['folk'], ''));
+            var birthDate = _.get(app, ['birthDate'], '');
+            if(_.isDate(birthDate)){
+                appRow.push(birthDate.toLocaleDateString());
+            } else {
+                appRow.push(_.get(app, ['birthDate'], ''));
+            }
+            appRow.push(_.get(app, ['healthState'], ''));
+            appRow.push(_.get(app, ['marriageState'], ''));
+            appRow.push(_.get(app, ['idCardNumber'], ''));
+            appRow.push(_.get(app, ['homeAddress'], ''));
+            appRow.push(_.get(app, ['currentAddress'], ''));
+            appRow.push(_.get(app, ['mobile'], ''));
+            appRow.push(_.get(app, ['tele'], ''));
+            appRow.push(_.get(app, ['email'], ''));
+            appRow.push(_.get(app, ['qqNumber'], ''));
+
+            conf.rows.push(appRow);
+            constructEducationHistoriesSheet(name, educationHistories, confs[1]);
+            constructWorkExperiencesSheet(name, workExperiences, confs[2]);
+            constructEmergencyContactSheet(app, confs[3]);
+        });
+    }
+    return confs;
+}
+
+function constructEducationHistoriesSheet(name, educationHistories, conf){
+    if(!_.isEmpty(educationHistories)){
+        var appRow;
+        _.forEach(educationHistories, function(edu){
+            appRow = [];
+            appRow.push(name);
+            appRow.push(_.get(edu, ['colledgeName'], ''));
+            var colledgeStartedAt = _.get(edu, ['startedAt'], ''),
+                colledgeEndedAt = _.get(edu, ['endedAt'], '');
+            if(_.isDate(colledgeStartedAt)){
+                appRow.push(colledgeStartedAt.toLocaleDateString());
+            } else {
+                appRow.push(colledgeStartedAt);
+            }
+            if(_.isDate(colledgeEndedAt)){
+                appRow.push(colledgeEndedAt.toLocaleDateString());
+            } else {
+                appRow.push(colledgeEndedAt);
+            }
+            appRow.push(_.get(edu, ['degree'], ''));
+            appRow.push(_.get(edu, ['major'], ''));
+            appRow.push(_.get(edu, ['isGraduated'], ''));
+
+            conf.rows.push(appRow);
+        });
+    }
+}
+
+function constructWorkExperiencesSheet(name, workExperiences, conf){
+    if(!_.isEmpty(workExperiences)){
+        var appRow;
+        _.forEach(workExperiences, function(wrk){
+            appRow = [];
+            appRow.push(name);
+            appRow.push(_.get(wrk, ['companyName'], ''));
+            var wrkStartedAt = _.get(wrk, ['startedAt'], ''),
+                wrkEndedAt = _.get(wrk, ['endedAt'], '');
+            if(_.isDate(wrkStartedAt)){
+                appRow.push(wrkStartedAt.toLocaleDateString());
+            } else {
+                appRow.push(wrkStartedAt);
+            }
+            if(_.isDate(wrkEndedAt)){
+                appRow.push(wrkEndedAt.toLocaleDateString());
+            } else {
+                appRow.push(wrkEndedAt);
+            }
+            appRow.push(_.get(wrk, ['resignReason'], ''));
+            var guarantorInfo = _.get(wrk, ['guarantorName'], '') + ' ' + _.get(wrk, ['guarantorPhoneNumber'], '');
+            appRow.push(guarantorInfo);
+
+            conf.rows.push(appRow);
+        });
+    }
+}
+
+function constructEmergencyContactSheet(app, conf){
+    var name = _.get(app, ['name'], ''),
+        emergencyContactName = _.get(app, ['emergencyContactName'], ''),
+        emergencyContactPhoneNumber = _.get(app, ['emergencyContactPhoneNumber'], ''),
+        emergencyContactAddress = _.get(app, ['emergencyContactAddress'], '');
+    var appRow = [];
+    appRow.push(name);
+    appRow.push(emergencyContactName);
+    appRow.push(emergencyContactPhoneNumber);
+    appRow.push(emergencyContactAddress);
+    conf.rows.push(appRow);
+}
+
