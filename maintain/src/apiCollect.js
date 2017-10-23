@@ -211,8 +211,8 @@ export default{
         var data = {
             positionName: '力',
             companyId: '5954f059c111d2bb00602cfb', //这个是必须的
-            startedAt: '2017-07-02',
-            endedAt: '2017-07-03'
+            startAt: '2017-07-02',
+            endAt: '2017-07-03'
         }
          */
         return fetch(url,{

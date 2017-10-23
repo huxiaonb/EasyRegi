@@ -695,7 +695,8 @@ function createPositionForCompany(req, res, next){
                         ageRangeEnd : _.get(positionObj, ['ageRangeEnd'], ''),
                         welfares: _.get(positionObj, ['welfares'], []),
                         positionDesc: _.get(positionObj, ['positionDesc'], ''),
-                        jobRequire:_.get(positionObj, ['jobRequire'], '')
+                        jobRequire:_.get(positionObj, ['jobRequire'], ''),
+                        contactPerson: _.get(positionObj, ['contactPerson'], '')
                     }
                     var positionEntity = new Position(positionItem);
                     positionEntity.save(function(saveErr, persistedObj){
@@ -740,8 +741,8 @@ function createPositionForCompany(req, res, next){
 function searchPositions(req, res, next){
     var companyId = _.get(req, ['body', 'companyId'], ''),
         positionName = _.get(req, ['body', 'positionName'], ''),
-        startedAt = _.get(req, ['body', 'startedAt'], ''),
-        endedAt = _.get(req, ['body', 'endedAt'], '');
+        startedAt = _.get(req, ['body', 'startAt'], ''),
+        endedAt = _.get(req, ['body', 'endAt'], '');
     // logger.info(companyId, positionName, startedAt, endedAt);
     if(_.isEmpty(companyId)){
         res.status(500).send({success: false, errmsg: 'company id is required', positions: []});
@@ -886,7 +887,12 @@ function updatePositionModel(positionObj){
             salary: _.get(positionObj, ['salary'], ''),
             welfares: _.get(positionObj, ['welfares'], []),
             positionDesc: _.get(positionObj, ['positionDesc'], ''),
-            jobRequire:_.get(positionObj, ['jobRequire'], '')
+            jobRequire:_.get(positionObj, ['jobRequire'], ''),
+            salaryStart: _.get(positionObj, ['salaryStart'], ''),
+            salaryEnd: _.get(positionObj, ['salaryEnd'], ''),
+            contactPerson: _.get(positionObj, ['contactPerson'], ''),
+            ageRangeStart: _.get(positionObj, ['ageRangeStart'], ''),
+            ageRangeEnd: _.get(positionObj, ['ageRangeEnd'], '')
         },
         positionId = _.get(positionObj, ['_id'], '');
         if(_.isEmpty(positionId)){
