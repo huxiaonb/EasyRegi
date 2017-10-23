@@ -145,7 +145,7 @@ export default class ApplicantManage extends React.Component{
             </div>
             <div className='search-action-container'>
                 <div className="title">
-                    <span >{this.state.resultTotal}条检索结果</span>
+                    <span >{this.state.resultTotal}条检索结果</span>&nbsp;<span>(双击可预览及打印员工个人简历)</span>
                 </div>
                 <div className="btns">
                     <Button icon="upload" disabled={this.state.resultTotal === 0} onClick={this.exportCSV.bind(this)}>导出结果(csv)</Button>

@@ -51,7 +51,8 @@ class PositionManage extends React.Component{
         pFlag : false,
         rowValue : {},
         ageRange : [20,50],
-        salaryRange : [3000,6000]
+        salaryRange : [3000,6000],
+        newFlag :false
         
     }
     onAgeSliderChange(value){
@@ -121,7 +122,7 @@ class PositionManage extends React.Component{
                  ageRangeStart : ageRange[0],
                  ageRangeEnd : ageRange[1],
              });
-             if(this.state.rowValue.name){
+             if(!this.state.newFlag){
                  try{
                     newP._id = this.state.rowValue._id;
                     
@@ -159,12 +160,14 @@ class PositionManage extends React.Component{
                 'p_desc' : '',
                 'p_require' : ''
             });
+            this.setState({newFlag : true});
             this.toggleP();
     }
     editP(rec){
         let {form} = this.props;
         this.setState({
             rowValue : rec,
+            newFlag : false
         });
         form.setFieldsValue({
                 'p_name' : rec.name,
