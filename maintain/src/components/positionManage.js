@@ -167,13 +167,16 @@ class PositionManage extends React.Component{
         let {form} = this.props;
         this.setState({
             rowValue : rec,
-            newFlag : false
+            newFlag : false,
+            ageRange:[rec.ageRangeStart,rec.ageRangeEnd],
+            salaryRange:[rec.salaryStart,rec.salaryEnd]
+
         });
         form.setFieldsValue({
                 'p_name' : rec.name,
+                'p_contact' : rec.contactPerson,
                 'p_phone' : rec.phoneNumber,
                 'p_total' : rec.totalRecruiters,
-                'p_salary' : rec.salary,
                 'p_welfare' : rec.welfares,
                 'p_desc' : rec.positionDesc,
                 'p_require' : rec.jobRequire
@@ -396,17 +399,17 @@ class PositionManage extends React.Component{
                         </FormItem>
                         <FormItem
                             label='年龄'
-                            name='p_salary'
+                            name='p_age'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} defaultValue={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
+                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} value={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
                         </FormItem>
                         <FormItem
                             label='薪资'
                             name='p_salary'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} defaultValue={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
+                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} value={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
                         </FormItem>
                         
                        
