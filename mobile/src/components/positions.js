@@ -102,7 +102,7 @@ class Positions extends React.Component{
     }
     loadMore(){
         let {nearbyPositions} = this.state;
-        let waitShowList = nearbyPositions.slice(-5);
+        let waitShowList = nearbyPositions.slice(0, 5);
         if(waitShowList && waitShowList.length < 5){
             this.setState({noMoreP : true})
         }
@@ -113,9 +113,9 @@ class Positions extends React.Component{
                 //let headerName = ele.name;
                 let accHeader = (
                     <div>
-                        <h3><b>{ele.companyName} 招聘 {ele.name}</b></h3>
+                        <h3><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></h3>
                         <div>
-                            <span>距离：{parseInt(ele.distance)}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>  
+                            <span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>
                         </div>
                     </div>
                 );
@@ -167,7 +167,7 @@ class Positions extends React.Component{
             });
         }
         this.setState({
-            nearbyPositions : nearbyPositions.slice(0,-5),
+            nearbyPositions : nearbyPositions.slice(5),
             positionPanelLists : pArr
         });
     }
@@ -194,7 +194,7 @@ class Positions extends React.Component{
             <div className='ant-layout'>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
-                        <div className='curr-geo'>
+                        <div className='curr-geo' style={{marginBottom:'15px'}}>
                         <span>当前位置：{addr.split(',').pop()}</span>
                         </div>
                         
@@ -204,7 +204,7 @@ class Positions extends React.Component{
                         <Accordion>
                             {positionPanelLists}
                         </Accordion>
-                        {noMoreP ? <div style={{marginTop:'10px',textAlign:'center',opacity:0.5,fontSize:'18px'}}>
+                        {noMoreP ? <div className='curr-geo' style={{marginTop:'10px',opacity:0.5}}>
                             <span style={{}}>已列出所有附近职位</span>
                         </div> :
                         <div style={{marginTop:'10px'}}><Button type='primary' onClick={this.loadMore.bind(this)}>加载更多</Button></div>}

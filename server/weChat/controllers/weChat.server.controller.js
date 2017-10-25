@@ -662,21 +662,37 @@ exports.findNearbyPositions = function(req, res, next){
                             _.forEach(copPositions, function(posi){
                               
                               //let clonePosi = _.cloneDeep(posi);
+                              let ageRangeStart = posi.ageRangeStart || '',
+                                ageRangeEnd = posi.ageRangeEnd || '',
+                                salaryStart = posi.salaryStart || '',
+                                salaryEnd = posi.salaryEnd || '',
+                                ageRange = '',
+                                salaryRange = '';
+                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
+                              }
+                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+                                  salaryRange = salaryStart + '~' + salaryEnd;
+                              }
                               let clonePosi = {
                                 name : posi.name,
-                                ageRange : posi.ageRangeStart + '~' + posi.ageRangeEnd,
+                                ageRange : ageRange,
                                 contactPerson : posi.contactPerson,
                                 totalRecruiters : posi.totalRecruiters,
-                                salary : posi.salaryStart + '~' + posi.salaryEnd,
-                                welfares : posi. welfares,
+                                salary : salaryRange,
+                                welfares : posi.welfares,
                                 positionDesc : posi.positionDesc,
                                 _id : posi._id,
                                 companyId : posi.companyId,
                                 phoneNumber : posi.phoneNumber,
-                                companyName:cop.alias,
-                                distance:latLngDistances[index],
+                                companyName:cop.companyName,
+                                alias:cop.alias,
+                                distance:Math.floor(latLngDistances[index]),
                               };
-                              
+                              var addr = _.get(cop, ['companyAddress'], ''),
+                                   addrArr = addr.split(',');
+                                clonePosi.city = findCompanyLocatedCity(addrArr);
+
                                 //let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index]});
                                 tempPositions.push(clonePosi);
                                 // logger.info(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
@@ -687,44 +703,39 @@ exports.findNearbyPositions = function(req, res, next){
                       _.forEach(dbCompanies, function(cop){
                         var copPositions = positionGroup[cop._id];
                         var tempPositions = [];
-                        if(!_.isEmpty(cop.lat) && !_.isEmpty(cop.lng)){
-                          var str = cop.lat + ',' + cop.lng;
-                          if(_.indexOf(latLngArr, str) == -1){
-                            _.forEach(copPositions, function(posi){
-                               
-                                 let clonePosi = {
-                                  name : posi.name,
-                                  totalRecruiters : posi.totalRecruiters,
-                                  salary : posi.salary,
-                                  welfares : posi. welfares,
-                                  positionDesc : posi.positionDesc,
-                                  _id : posi._id,
-                                  companyId : posi.companyId,
-                                  phoneNumber : posi.phoneNumber,
-                                  companyName:cop.alias,
-                                  //no distance?
-                                };
-                                // let clonePosi = _.clone(posi);
-                                // clonePosi.companyName = cop.alias;
-                                tempPositions.push(clonePosi);
-                            });
-                            unsortPositions = _.concat(unsortPositions, tempPositions);
-                          }
-                        } else {
+                        if(_.isEmpty(cop.lat) || _.isEmpty(cop.lng)){
                           _.forEach(copPositions, function(posi){
-                              //let clonePosi = Object.assign({},posi,{companyName : cop.alias});
+                              let ageRangeStart = posi.ageRangeStart || '',
+                                  ageRangeEnd = posi.ageRangeEnd || '',
+                                  salaryStart = posi.salaryStart || '',
+                                  salaryEnd = posi.salaryEnd || '',
+                                  ageRange = '',
+                                  salaryRange = '';
+                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
+                              }
+                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+                                  salaryRange = salaryStart + '~' + salaryEnd;
+                              }
                               let clonePosi = {
                                   name : posi.name,
+                                  contactPerson : posi.contactPerson,
                                   totalRecruiters : posi.totalRecruiters,
-                                  salary : posi.salary,
-                                  welfares : posi. welfares,
+                                  ageRange : ageRange,
+                                  salary : salaryRange,
+                                  welfares : posi.welfares,
                                   positionDesc : posi.positionDesc,
                                   _id : posi._id,
                                   companyId : posi.companyId,
                                   phoneNumber : posi.phoneNumber,
-                                  companyName:cop.alias,
-                                  //no distance?
+                                  companyName:cop.companyName,
+                                  alias:cop.alias,
+                                  distance: '-'
+                                  //no distance
                                 };
+                              var addr = _.get(cop, ['companyAddress'], ''),
+                                  addrArr = addr.split(',');
+                              clonePosi.city = findCompanyLocatedCity(addrArr);
                               // let clonePosi = _.clone(posi);
                               // clonePosi.companyName = cop.alias;
                               tempPositions.push(clonePosi);
@@ -733,34 +744,6 @@ exports.findNearbyPositions = function(req, res, next){
                         }
 
                       });
-                      /*for(var key in positionGroup){
-                          var copPositions = positionGroup[key];
-                          var matchedCop = {};
-                          _.forEach(dbCompanies, function(cop){
-                            if(key == cop._id){
-                              matchedCop = cop;
-                              return false;
-                            }
-                          });
-                          logger.info(matchedCop);
-                          if(!_.isEmpty(matchedCop)) {
-                            var copLatLngStr = _.get(matchedCop, ['lat'], '') + ',' + _.get(matchedCop, ['lng'], '');
-                            var matchedDistanceObj = latLngDistanceMap[copLatLngStr];
-                            if(!_.isEmpty(matchedDistanceObj)){
-                              _.forEach(copPositions, function(posi){
-                                posi.companyName = matchedCop.companyName;
-                                posi.distance = matchedDistanceObj.distance;
-                                posi.duration = matchedDistanceObj.duration;
-                              });
-                              sortedPositions = _.concat(sortedPositions, copPositions);
-                            } else {
-                              _.forEach(copPositions, function(posi){
-                                  posi.companyName = matchedCop.companyName;
-                              });
-                              unsortPositions = _.concat(unsortPositions, copPositions);
-                            }
-                          }
-                      }*/
 
                       sortedPositions.sort(function(b, c){
                         return b.distance > c.distance;
@@ -779,6 +762,41 @@ exports.findNearbyPositions = function(req, res, next){
     
   }
   
+}
+
+function findCompanyLocatedCity(addrArr){
+    if(addrArr.length > 0){
+        var city = '';
+        switch (addrArr[0]){
+            case '香港特别行政区':
+                city = '香港';
+                break;
+            case '澳门特别行政区':
+                city = '澳门';
+                break;
+            case '台湾省':
+                city = '台湾';
+                break;
+            case '北京市':
+                city = '北京';
+                break;
+            case '天津市':
+                city = '天津';
+                break;
+            case '重庆市':
+                city = '重庆';
+                break;
+            case '上海市':
+                city = '上海';
+                break;
+            default:
+                city = _.get(addrArr, ['1'], '');
+                break;
+        }
+        return city;
+    } else {
+        return '';
+    }
 }
 
     
