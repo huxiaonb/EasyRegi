@@ -171,6 +171,7 @@ class PositionManage extends React.Component{
         });
         form.setFieldsValue({
                 'p_name' : rec.name,
+                'p_contact' : rec.contactPerson,
                 'p_phone' : rec.phoneNumber,
                 'p_total' : rec.totalRecruiters,
                 'p_salary' : rec.salary,
