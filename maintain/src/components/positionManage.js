@@ -165,10 +165,21 @@ class PositionManage extends React.Component{
     }
     editP(rec){
         let {form} = this.props;
-        this.setState({
-            rowValue : rec,
-            newFlag : false
-        });
+        if(rec.ageRangeStart && rec.salaryStart){
+            this.setState({
+                rowValue : rec,
+                newFlag : false,
+                ageRange:[rec.ageRangeStart,rec.ageRangeEnd],
+                salaryRange:[rec.salaryStart,rec.salaryEnd]
+            });
+        }else{
+            this.setState({
+                rowValue : rec,
+                newFlag : false,
+                ageRange:[20,50],
+                salaryRange:[3000,6000]
+            });
+        }
         form.setFieldsValue({
                 'p_name' : rec.name,
                 'p_contact' : rec.contactPerson,
