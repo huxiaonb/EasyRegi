@@ -44,6 +44,7 @@ class PositionManage extends React.Component{
         comp: PropTypes.object
     }
     state={
+        loading : false,
         posiName : '',
         date : [],
         results : [],
@@ -102,6 +103,9 @@ class PositionManage extends React.Component{
     }
     async handleOk(){
         //fetch url edit/create
+        this.setState({
+            loading : true
+        })
         let {form} = this.props;
         let {salaryRange, ageRange} = this.state;
         form.validateFieldsAndScroll(async (err, values)=>{
@@ -147,7 +151,10 @@ class PositionManage extends React.Component{
                     console.log(e);
                 }
              }
-            })         
+            });
+            this.setState({
+                loading : false
+            })      
     }
     createForm(){
         let {form} = this.props;
@@ -301,7 +308,7 @@ class PositionManage extends React.Component{
         {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]*/
         //let list = [{name:'123',phoneNumber:'123',totalRecuriters:'123',salary:'123',welfares:'123',jobRequire:'123',positionDesc:'1231'}]
         let list = this.state.results;
-        let {createF} = this.state
+        let {createF, loading} = this.state
         return(
             <div>
             <div className='search-bar-container'>
@@ -350,6 +357,7 @@ class PositionManage extends React.Component{
                     visible={pFlag}
                     onOk={this.handleOk.bind(this)}
                     onCancel={this.toggleP.bind(this)}
+                    confirmLoading={loading}
                     >
                     <Form>
                         <FormItem
