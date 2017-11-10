@@ -97,21 +97,26 @@ class PositionManage extends React.Component{
     }
     
     toggleP(){
+        if(this.state.pFlag){
+            this.props.form.resetFields();
+        }
         this.setState({
-            pFlag : !this.state.pFlag
+            pFlag : false,
+            loading : false
         });
     }
     async handleOk(){
         //fetch url edit/create
-        this.setState({
-            loading : true
-        })
+            
         let {form} = this.props;
         let {salaryRange, ageRange} = this.state;
         form.validateFieldsAndScroll(async (err, values)=>{
              if (!!err){
                 return;
              }
+             this.setState({
+                loading : true,
+            });
              let newP = Object.assign({},{
                  name : form.getFieldValue('p_name'),
                  contactPerson : form.getFieldValue('p_contact'),
@@ -132,9 +137,7 @@ class PositionManage extends React.Component{
                     
                     let res = await api.updatePosition({companyId : this.context.comp._id,position:newP});
                     let data = await res.json();
-                    this.toggleP();
                     message.success('操作成功！');
-                    this.searchPosi();
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
@@ -143,32 +146,34 @@ class PositionManage extends React.Component{
                  try{
                     let res = await api.createPosition({companyId : this.context.comp._id,position:newP});
                     let data = await res.json();
-                    this.toggleP();
                     message.success('操作成功！');
-                    this.searchPosi();
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
                 }
              }
+                this.searchPosi();
+                this.setState({
+                    loading : false,
+                    pFlag : false
+                })  
             });
-            this.setState({
-                loading : false
-            })      
+                
     }
     createForm(){
         let {form} = this.props;
         form.setFieldsValue({
                 'p_name' : '',
+                'p_contact' :'',
                 'p_phone' : '',
                 'p_total' : '',
-                'p_salary' : '',
+                'p_salary' : [],
                 'p_welfare' : [],
                 'p_desc' : '',
                 'p_require' : ''
             });
-            this.setState({newFlag : true});
-            this.toggleP();
+            this.setState({newFlag : true, pFlag :true});
+            
     }
     editP(rec){
         let {form} = this.props;
@@ -177,14 +182,16 @@ class PositionManage extends React.Component{
                 rowValue : rec,
                 newFlag : false,
                 ageRange:[rec.ageRangeStart,rec.ageRangeEnd],
-                salaryRange:[rec.salaryStart,rec.salaryEnd]
+                salaryRange:[rec.salaryStart,rec.salaryEnd],
+                pFlag : true
             });
         }else{
             this.setState({
                 rowValue : rec,
                 newFlag : false,
                 ageRange:[20,50],
-                salaryRange:[3000,6000]
+                salaryRange:[3000,6000],
+                pFlag : true
             });
         }
         form.setFieldsValue({
@@ -192,12 +199,11 @@ class PositionManage extends React.Component{
                 'p_contact' : rec.contactPerson,
                 'p_phone' : rec.phoneNumber,
                 'p_total' : rec.totalRecruiters,
-                'p_salary' : rec.salary,
                 'p_welfare' : rec.welfares,
                 'p_desc' : rec.positionDesc,
                 'p_require' : rec.jobRequire
             });
-        this.toggleP();
+        
     }
     deleP(rec){
         let that = this;
@@ -345,7 +351,6 @@ class PositionManage extends React.Component{
                     dataSource={list}
                     pagination={{
                         pageSize: 20,
-                        current: 1,
                     }}
                     bordered={true}
                     scroll={{x:1300}}
@@ -419,14 +424,14 @@ class PositionManage extends React.Component{
                             name='p_age'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} defaultValue={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
+                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} value={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
                         </FormItem>
                         <FormItem
                             label='薪资'
                             name='p_salary'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} defaultValue={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
+                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} value={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
                         </FormItem>
                         
                        
