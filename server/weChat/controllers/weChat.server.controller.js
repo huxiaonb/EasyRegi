@@ -12,7 +12,8 @@ var wechatUtil = require('../utils/wechat.util');
 var Applicant = mongoose.model('Applicant');
 var Position = mongoose.model('Position');
 var parseString = require('xml2js').parseString;
-
+var moment = require('moment');
+var EmailUtil = require('../../maintaining/utils/email.util.js');
 var fs = require('fs'),
     path = require('path');
 
@@ -472,7 +473,14 @@ exports.submitRegisterCompany = function(req, res){
                 res.status(500).send({success: false, errmsg: '更新用户提交简历到公司失败'});
               } else {
                 //logger.info(persistedObj);
-                res.json({success: true, registeredCompanies: dbApplicant.registeredCompanies});
+                sendNotificationEmail(dbCompany, function(emailErr, sendEmailResult){
+                    if(emailErr) {
+                        logger.info('Error in sending notification email', email, emailErr);
+                    } else {
+                        logger.info('send notification email successfully');
+                    }
+                    res.json({success: true, registeredCompanies: dbApplicant.registeredCompanies});
+                });
               }
             })
 
@@ -488,6 +496,38 @@ exports.submitRegisterCompany = function(req, res){
         res.status(500).send({success: false, errmsg: '查找用户出现错误'});
     });
   }
+}
+
+function sendNotificationEmail(dbCompany, callback){
+    if(_.isEmpty(dbCompany)){
+        console.log('company is null');
+        return;
+    }
+    var adminEmailBanner = _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
+        companyEmail = _.get(dbCompany, ['email'], ''),
+        companyPassword = _.get(dbCompany, ['password'], ''),
+        domainUrl = _.get(config, ['domainUrl'], ''),
+        notificationSubject = _.get(config, ['emailConfig', 'applyPositionNotificationSubject'], ''),
+        notificationHtmlTemplate = _.get(config, ['emailConfig', 'applyPositionNotificationHtmlTemplate'], ''),
+        dateStr = moment().format('YYYY年MM月DD日');
+    var notificationEmailContent = notificationHtmlTemplate.replace(/\[Domain_Url\]/ig, domainUrl).replace(/\[Login_Username\]/i, companyEmail).replace(/\[Login_Password\]/i, companyPassword).replace(/\[Date_Str\]/i, dateStr);
+    var emailOpt = {
+        from: adminEmailBanner,
+        subject: notificationSubject,
+        to: companyEmail,
+        html: notificationEmailContent
+    };
+    console.log(notificationEmailContent);
+    EmailUtil.sendEmail(emailOpt, function(error, info){
+        if(error) {
+            logger.info(error);
+            return callback(error, null);
+        }
+        else {
+            logger.info(info.response);
+            return callback(null, {success: true, errmsg: ''});
+        }
+    });
 }
 
 exports.submitRegisterForm = function(req, res){
