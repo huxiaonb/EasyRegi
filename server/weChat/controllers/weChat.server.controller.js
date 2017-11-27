@@ -500,8 +500,7 @@ exports.submitRegisterCompany = function(req, res){
 
 function sendNotificationEmail(dbCompany, callback){
     if(_.isEmpty(dbCompany)){
-        console.log('company is null');
-        return;
+        return callback('company is empty', null);
     }
     var adminEmailBanner = _.get(config, ['emailConfig', 'adminEmailBanner'], ''),
         companyEmail = _.get(dbCompany, ['email'], ''),
@@ -517,7 +516,6 @@ function sendNotificationEmail(dbCompany, callback){
         to: companyEmail,
         html: notificationEmailContent
     };
-    console.log(notificationEmailContent);
     EmailUtil.sendEmail(emailOpt, function(error, info){
         if(error) {
             logger.info(error);
