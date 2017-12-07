@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var config = require('../config'),
+  cors = require('cors'),
   express = require('express'),
   morgan = require('morgan'),
   logger = require('./logger'),
@@ -24,6 +25,7 @@ var config = require('../config'),
   ueditor = require('ueditor-nodejs'),
   permission = require('./permission'),
   multipart = require('connect-multiparty');
+
 
 
 /**
@@ -187,6 +189,20 @@ module.exports.initModulesClientRoutes = function (app) {
   });
 };
 
+module.exports.initRestifyCors = function (app) {
+  app.all('*', function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "http://localhost:8080");
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    if (req.method == 'OPTIONS') {
+      res.send(200); /让options请求快速返回/
+    }
+    //res.header("X-Powered-By",' 3.2.1')
+    //res.header("Content-Type", "application/json;charset=utf-8");
+    next();
+});
+};
 /**
  * Configure the modules ACL policies
  */
@@ -244,8 +260,18 @@ module.exports.initErrorRoutes = function (app) {
  * Initialize the Express application
  */
 module.exports.init = function (db) {
+  var corsOptions = {
+    "origin": "http://localhost:8080",
+    "allowedHeaders" : "Content-Type, Content-Length, Authorization, Accept, X-Requested-With",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "credentials" : true,
+    "preflightContinue": false,
+    "optionsSuccessStatus": 204
+  }
   // Initialize express app
   var app = express();
+
+  app.use(cors(corsOptions))
 
   // Initialize local variables
   this.initLocalVariables(app);
@@ -275,6 +301,7 @@ module.exports.init = function (db) {
 
   this.initRestifyMongoose(app);
 
+  //this.initRestifyCors(app);
 
   // Initialize modules server routes
   this.initModulesServerRoutes(app);
