@@ -4,6 +4,8 @@
 import Index from './components/registerProfile/index'
 import Company from './components/company'
 import Positions from './components/positions'
+import Basic from './components/basic'
+
 
 // 尽量别直接用全局变量 $
 const $ = jQuery
@@ -19,6 +21,9 @@ class LegoComponent{
     registerForm(...args){
         return Index(this.$el, ...args)
         //return RegisterForm(this.$el, ...args)
+    }
+    basicForm(...args){
+        return Basic(this.$el, ...args)
     }
     selectCompany(...args){
         return Company(this.$el, ...args)

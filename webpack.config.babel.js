@@ -5,6 +5,7 @@ import autoprefixer from 'autoprefixer'
 const pxtorem = require('postcss-pxtorem');
 
 const config = {
+    devtool: process.env.NODE_ENV !== 'production' ? 'eval' : false,
     watch: process.env.NODE_ENV !== 'production',
     entry: {
         'maintain/index' : './maintain/src/index.js',
@@ -72,8 +73,7 @@ const config = {
     ],
     
 }
-
-if(process.env.NODE_ENV === 'production'){
+if(process.env.NODE_ENV === 'production'){    
         config.plugins.push(new webpack.optimize.UglifyJsPlugin({
             mangle: {
                 except: ['$super', '$', 'exports', 'require', 'import', 'export']

@@ -7,8 +7,7 @@ const isPro = process.env.NODE_ENV === "production"
 
 
 const config = {
-  
-
+  devtool: process.env.NODE_ENV !== 'production' ? 'eval' : false,
   entry: { "index": path.resolve(__dirname, './src/entry') },
 
   output: {

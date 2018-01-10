@@ -17,6 +17,7 @@ module.exports = function (app) {
   app.route('/weChat/companyIndex').get(weChatController.companyIndex);
   app.route('/weChat/company/:segmentType').get(weChatController.companyIntroduction);
   app.route('/register').get(weChatController.register);
+  app.route('/basic').get(weChatController.basicInfo);
   app.route('/weChat/applicant/findApplicantByOpenId').get(weChatController.findApplicantByOpenId);
   app.route('/weChat/applicant/personalInfo/submit').post(weChatController.submitRegisterInformation);
   app.route('/weChat/applicant/registerForm/submit/:openId').post(weChatController.submitRegisterForm);

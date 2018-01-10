@@ -124,10 +124,15 @@ exports.homePage = function (req, res) {
   }
 };
 
-function renderHomePage(req, res) {
-  CompanyTemplate.find({'type': '招聘行程'}, function (err, companyTemplates) {
-    res.render('server/weChat/views/homePage', {recruitmentProcessUrl: _.result(_.first(companyTemplates), 'url')});
-  });
+// function renderHomePage(req, res) {
+//   CompanyTemplate.find({'type': '招聘行程'}, function (err, companyTemplates) {
+//     res.render('server/weChat/views/homePage', {recruitmentProcessUrl: _.result(_.first(companyTemplates), 'url')});
+//   });
+// }
+
+exports.basicInfo = function(req, res) {
+  logger.info('render basic info page with open id', _.get(req, ['session', 'openId'], ''));
+  res.render('server/weChat/views/basic', {openId: _.get(req, ['session', 'openId'], '')});
 }
 
 exports.register = function(req, res) {

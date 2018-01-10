@@ -1,13 +1,16 @@
 'use strict';
 
-import gulp from 'gulp'
+import gulp from 'gulp';
+import gulpsync from 'gulp-sync';
 import plugins from 'gulp-load-plugins'
 import run from 'run-sequence'
 import webpack from 'webpack'
+import clean from 'gulp-clean'
 import nodemon from 'gulp-nodemon'
 import config  from './config/config'
 import webpackConfig from './webpack.config.babel'
 import webpackMobileConfig from './mobile/webpack.config.babel'
+
 
 
 
@@ -33,7 +36,7 @@ gulp.task('webpack-build', () => {
 
 gulp.task('clean', function () {
   return gulp.src('dist',{read:false})
-        .pipe(plugins.clean());
+        .pipe(clean({force: true}));
 });
 
 gulp.task('start', function () {
@@ -51,6 +54,6 @@ gulp.task('start', function () {
 
 
 
-gulp.task('dev', ['webpack-watch', 'start'])
+gulp.task('dev', gulpsync(gulp).sync(['clean', 'webpack-watch', 'start']))
 
-gulp.task('build', ['webpack-build', 'start'])
+gulp.task('build', gulpsync(gulp).sync(['clean', 'webpack-build', 'start']))
