@@ -2,16 +2,13 @@
 
 import gulp from 'gulp';
 import gulpsync from 'gulp-sync';
-import plugins from 'gulp-load-plugins'
-import run from 'run-sequence'
 import webpack from 'webpack'
 import clean from 'gulp-clean'
 import nodemon from 'gulp-nodemon'
-import config  from './config/config'
 import webpackConfig from './webpack.config.babel'
 import webpackMobileConfig from './mobile/webpack.config.babel'
-
-
+import babel from 'gulp-babel'
+import sourcemaps from 'gulp-sourcemaps'
 
 
 gulp.task('webpack-watch', () => {
@@ -45,6 +42,14 @@ gulp.task('start', function () {
     ext: 'js,html',
     watch: ['server/**/*', 'config/**/*']
   })
+});
+
+gulp.task('babel-sourcemaps', () => {
+    return gulp.src('ali-src/**/*.js')
+        .pipe(sourcemaps.init())
+        .pipe(babel())
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('build'))
 })
 
 

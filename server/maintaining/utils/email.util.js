@@ -16,6 +16,7 @@ var transporter = nodemailer.createTransport(emailConfig);
 
 exports.sendEmail = sendEmail;
 exports.generateCaptcha = generateCaptcha;
+exports.generateNumericCaptcha = generateNumericCaptcha;
 
 var mailTemplate = {
     from: '入职易<easyregitest@126.com>',
@@ -37,4 +38,12 @@ function generateCaptcha(num){
         numberOfCaptcha = num;
     }
     return Math.random().toString(36).substr(2, numberOfCaptcha);
+}
+
+function generateNumericCaptcha(num){
+    var numberOfCaptcha = 6, offset = 2;
+    if(_.isNumber(num) && num > 0){
+        numberOfCaptcha = num + offset;
+    }
+    return Math.random().toString().substring(2, numberOfCaptcha);
 }

@@ -124,12 +124,6 @@ exports.homePage = function (req, res) {
   }
 };
 
-// function renderHomePage(req, res) {
-//   CompanyTemplate.find({'type': '招聘行程'}, function (err, companyTemplates) {
-//     res.render('server/weChat/views/homePage', {recruitmentProcessUrl: _.result(_.first(companyTemplates), 'url')});
-//   });
-// }
-
 exports.basicInfo = function(req, res) {
   logger.info('render basic info page with open id', _.get(req, ['session', 'openId'], ''));
   res.render('server/weChat/views/basic', {openId: _.get(req, ['session', 'openId'], '')});
@@ -254,7 +248,7 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
   // return function(req, res, next){
     // req.session.openId = '';
     var wechatCode = _.get(req, ['query', 'code'], '');
-    logger.info('getWechatOpenId', wechatCode);
+    logger.info('getWechatOpenId', wechatCode, req.sessionID);
     var openId = _.get(req, ['session', 'openId'], '');
     if(!_.isEmpty(openId)){
         logger.info('openId exists');
