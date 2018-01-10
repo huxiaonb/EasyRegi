@@ -1,7 +1,6 @@
 'use strict';
 
 module.exports = function (app) {
-  // Root routing
   var weChatController = require('../controllers/weChat.server.controller');
 
  /* // Define error pages
@@ -13,11 +12,9 @@ module.exports = function (app) {
   // Define application route
   //app.route('/weChat/companyIntroduction').get(weChatController.companyIntroduction);
   app.use(weChatController.getOpenIdAndAuthAccessToken);
-  app.route('/homePage').get(weChatController.homePage);
-  app.route('/weChat/companyIndex').get(weChatController.companyIndex);
-  app.route('/weChat/company/:segmentType').get(weChatController.companyIntroduction);
   app.route('/register').get(weChatController.register);
   app.route('/basic').get(weChatController.basicInfo);
+  app.route('/saveBasicInfo').get(weChatController.saveBasicInfo);
   app.route('/weChat/applicant/findApplicantByOpenId').get(weChatController.findApplicantByOpenId);
   app.route('/weChat/applicant/personalInfo/submit').post(weChatController.submitRegisterInformation);
   app.route('/weChat/applicant/registerForm/submit/:openId').post(weChatController.submitRegisterForm);
