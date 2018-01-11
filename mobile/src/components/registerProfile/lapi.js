@@ -108,6 +108,25 @@ export default {
             type: 'GET',
         })
     },
+    getVerCode(num){
+        return _request({
+            url: '../aliCloud/sendCaptchaCode?phoneNumber=' + num,
+            type: 'GET',
+        })
+    },
+    verifyCaptcha(num){
+        return _request({
+            url: '../aliCloud/verifyCaptchaCode?captcha=' + num,
+            type: 'GET',
+        })
+    },
+    submitBasicInfo(data){
+        return _request({
+            url: '../saveBasicInfo',
+            type: 'POST',
+            data
+        });
+    },
     uploadFile(f, openId){
         // return $.ajax({
         //     url:'../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,

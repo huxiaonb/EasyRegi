@@ -4,6 +4,7 @@ import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast} from 'antd-
 import { createForm } from 'rc-form';
 import moment from 'moment';
 import lapi from '../registerProfile/lapi';
+import  '../less/index.less';
 
 const currentDate = moment().utcOffset(8);
 const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
@@ -53,8 +54,20 @@ class Step2 extends React.Component{
     }
 
      next(){
-        //获取data传进父元素
-        this.props.nextStep();
+         //字段名保持与model一致
+        let { form } = this.props;
+        let idCardNumber = form.getFieldValue('idCardNumber');
+        let nativePlace = form.getFieldValue('nativePlace');
+        let gender = form.getFieldValue('gender').toString();
+        let birthDate = form.getFieldValue('birthDate').toDate();
+        debugger;
+        form.validateFields(async (err, values)=>{
+            if (!!err) {
+                Toast.info('请确认信息填写正确！');
+            }else{
+                this.props.nextStep(2,{idCardNumber,nativePlace, gender, birthDate});
+            }
+        })
     }
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;

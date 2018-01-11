@@ -2,17 +2,31 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast,Tag} from 'antd-mobile';
 import { createForm } from 'rc-form';
+import  '../less/index.less';
 
 const FormItem = List.Item;
 
 class Step3 extends React.Component{
+    next(){
+        let { form } = this.props;
+        let highestDegree = form.getFieldValue('degree').toString();
+        let currentAddress = form.getFieldValue('currentAddress');
+        debugger;
+        form.validateFields(async (err, values)=>{
+            if (!!err) {
+                Toast.info('请确认信息填写正确！');
+            }else{
+                this.props.nextStep(3,{highestDegree,currentAddress});
+            }
+        })
+    }
     onChange(){
-        console.log('111');
+        console.log('123');
     }
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         return(
-            <form key='step2' style={{}}>
+            <form key='step3' style={{}}>
                 <List>
                     <FormItem>                
                         <Picker 
@@ -41,23 +55,24 @@ class Step3 extends React.Component{
                         现住址
                     </InputItem>
                     <FormItem>
-                        <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>技能&经验</List.Item>
+                        <List.Item arrow="horizontal" name="skill" style={{padding : 0}}>技能&经验</List.Item>
                         <Tag onChange={::this.onChange} selected>无经验</Tag>
                         <Tag onChange={::this.onChange}>电子五金</Tag>
                         <Tag onChange={::this.onChange}>模具塑胶</Tag>
-                        <br/>
                         <Tag onChange={::this.onChange}>纺织玩具</Tag>
+                        <br/>
                         <Tag onChange={::this.onChange}>文员行政</Tag>
                         <Tag onChange={::this.onChange}>后勤维修</Tag>
-                        <br/>
                         <Tag onChange={::this.onChange}>印刷宣传</Tag>
                         <Tag onChange={::this.onChange}>运输装卸</Tag>
-                        <Tag onChange={::this.onChange}>销售客服</Tag>
                         <br/>
+                        <Tag onChange={::this.onChange}>销售客服</Tag>
                         <Tag onChange={::this.onChange}>建筑装潢</Tag>
                         <Tag onChange={::this.onChange}>财务出纳</Tag>
+                        <br/>
                     </FormItem>
                 </List>
+                <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.next.bind(this)}>提交</Button>
             </form>
         );
     }
