@@ -35,15 +35,23 @@ exports.saveBasicInfo = function(req, res) {
         logger.info('req body is empty');
         res.status(500).send({success: false, errmsg: '保存失败'});
     } else {
-        Applicant.update({wechatOpenId: openId}, {$set: clonedApplicant}, {upsert: true})
-        .exec(function(error, result){
-            if(error) {
-                logger.error('Error in updating basic information', type, error);
-                res.status(500).send({success: false, errmsg: '保存失败'});
-            } else {
-                logger.info('Updating basic information successfully for wechat open id %s', openId);
-                res.json({success: true, message: '保存成功'});
+        Applicant.find({wechatOpenId: openId}).then(applicants => {
+            if(_.isEmpty(applicants)){
+                clonedApplicant.wechatOpenId = openId;
             }
+            Applicant.update({wechatOpenId: openId}, {$set: clonedApplicant}, {upsert: true})
+            .exec(function(error, result){
+                if(error) {
+                    logger.error('Error in updating basic information', type, error);
+                    res.status(500).send({success: false, errmsg: '保存失败'});
+                } else {
+                    logger.info('Updating basic information successfully for wechat open id %s', openId);
+                    res.json({success: true, message: '保存成功'});
+                }
+            });
+        }).catch(e => {
+            logger.error('Error in finding applicant by openId', openId, e);
+            res.status(500).send({success: false, errmsg: '查找用户出错'});
         });
     }
 }

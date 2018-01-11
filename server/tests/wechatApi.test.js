@@ -32,6 +32,21 @@ describe('test wechat API', function(){
                 done();
             });
         })
-    })
+    });
+
+    describe.only('api to save basic info', function(){
+        var url = 'http://localhost/saveBasicInfo';
+        var basicInfo = {tele: '1234567'};
+        it('#saveBasicInfo', function (done) {
+            request.post({
+                url: url,
+                body: basicInfo,
+                json: true
+            }, function(error, response, body){
+               console.log(error, _.get(response, ['statusCode'], ''), body);
+               done();
+            });
+        });
+    });
 
 })
