@@ -8,7 +8,7 @@ import  '../less/index.less';
 let count = 60;
 class Step1 extends React.Component{
     state = {
-        verCode : '验证码',
+        verCode : '获取验证码',
         disable : false
     }
     async next(){
@@ -74,12 +74,13 @@ class Step1 extends React.Component{
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let {disable,verCode} = this.state;
+        const bt = (<Button disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button>)
         return(
             <form key='step1' style={{}}>
                 <List >
                     <InputItem
+                        style={{textAlign : 'left'}}
                         name='name'
-                        style={{width:'6rem'}}
                         {...getFieldProps('name', {
                             rules:[{
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
@@ -95,11 +96,10 @@ class Step1 extends React.Component{
                         >
                         姓名
                     </InputItem>
-                    <div id='xxx' style={{display : 'flex'}}>
                         <InputItem
-                            style={{ width: '6rem'}}
                             name="mobile"
                             type='money'
+                            moneyKeyboardAlign="left"
                             {...getFieldProps('mobile', {
                                     rules: [{
                                         required : true, pattern: /^[0-9]{11,13}$/,  message: '请输入有效的手机号码！'
@@ -115,27 +115,31 @@ class Step1 extends React.Component{
                             >
                             手机       
                         </InputItem>
-                        <div style={{width : '2rem'}}><Button disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button></div>
-                        </div>
+                        
+                        
+                        <div id='xxx'>
                         <InputItem
-                        style={{ width: '6rem'}}
-                            name="code"
-                            type='money'
-                            {...getFieldProps('code', {
-                                    rules: [{
-                                        required : true, pattern: /^[0-9]{4,6}$/,  message: '请输入有效的验证码！'
-                                    }, {
-                                        whitespace: true,  message: '请输入有效的验证码！'
-                                    }],
-                                })}
-                                clear
-                                error={!!getFieldError('code')}
-                                onErrorClick={() => {
-                                    Toast.info(getFieldError('code').join('、'));
-                                }}
-                            >
-                            验证码       
-                        </InputItem>
+                                name="code"
+                                type='money'
+                                moneyKeyboardAlign="left"
+                                extra={bt}
+                                {...getFieldProps('code', {
+                                        rules: [{
+                                            required : true, pattern: /^[0-9]{4,6}$/,  message: '请输入有效的验证码！'
+                                        }, {
+                                            whitespace: true,  message: '请输入有效的验证码！'
+                                        }],
+                                    })}
+                                    clear
+                                    error={!!getFieldError('code')}
+                                    onErrorClick={() => {
+                                        Toast.info(getFieldError('code').join('、'));
+                                    }}
+                                >
+                                验证码       
+                            </InputItem>
+                        </div>
+                        
                 </List>
                 <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.next.bind(this)}>下一步</Button>
             </form>

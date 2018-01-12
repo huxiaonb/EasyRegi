@@ -14,7 +14,7 @@ const validityMinDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
 const FormItem = List.Item;
 
 class Step2 extends React.Component{
-    async getIdCardInfo() {
+    /*async getIdCardInfo() {
         let {form} = this.props;
         let idCardNumReg = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
         let idCardNumber = form.getFieldValue('idCardNumber');
@@ -51,21 +51,20 @@ class Step2 extends React.Component{
             }
         }
         Toast.hide();
-    }
+    }*/
 
      next(){
          //字段名保持与model一致
         let { form } = this.props;
         let idCardNumber = form.getFieldValue('idCardNumber');
-        let nativePlace = form.getFieldValue('nativePlace');
+        /*let nativePlace = form.getFieldValue('nativePlace');
         let gender = form.getFieldValue('gender').toString();
-        let birthDate = form.getFieldValue('birthDate').toDate();
-        debugger;
+        let birthDate = form.getFieldValue('birthDate').toDate();*/
         form.validateFields(async (err, values)=>{
             if (!!err) {
                 Toast.info('请确认信息填写正确！');
             }else{
-                this.props.nextStep(2,{idCardNumber,nativePlace, gender, birthDate});
+                this.props.nextStep(2,{idCardNumber/*,nativePlace, gender, birthDate*/});
             }
         })
     }
@@ -75,6 +74,7 @@ class Step2 extends React.Component{
             <form key='step2' style={{}}>
                 <List >
                     <InputItem
+                        style={{textAlign : 'left'}}
                         name="idCardNumber"
                         onBlur={()=>this.getIdCardInfo()}
                         {...getFieldProps('idCardNumber', {
@@ -90,9 +90,9 @@ class Step2 extends React.Component{
                                 Toast.info(getFieldError('idCardNumber').join('、'));
                             }}
                         >
-                        身份证号码       
+                        身份证号     
                     </InputItem>
-                    <InputItem
+                    {/*<InputItem
                         name="nativePlace"
                         {...getFieldProps('nativePlace', {
                             rules:[{
@@ -133,7 +133,7 @@ class Step2 extends React.Component{
                             rules: [{ type:'object', required: true, message: '请选择出生日期!' }],
                         })} 
                         maxDate={currentDate} minDate={minDate}><List.Item arrow="horizontal" style={{padding : 0}}>出生日期</List.Item></DatePicker>
-                </FormItem>
+                </FormItem>*/}
                 </List>
                 <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.next.bind(this)}>下一步</Button>
                 </form>

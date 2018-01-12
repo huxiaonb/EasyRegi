@@ -11,7 +11,6 @@ class Step3 extends React.Component{
         let { form } = this.props;
         let highestDegree = form.getFieldValue('degree').toString();
         let currentAddress = form.getFieldValue('currentAddress');
-        debugger;
         form.validateFields(async (err, values)=>{
             if (!!err) {
                 Toast.info('请确认信息填写正确！');
@@ -28,7 +27,7 @@ class Step3 extends React.Component{
         return(
             <form key='step3' style={{}}>
                 <List>
-                    <FormItem>                
+                    <List.Item>                
                         <Picker 
                             cols={1}
                             {...getFieldProps('degree', {
@@ -40,7 +39,8 @@ class Step3 extends React.Component{
                             >
                             <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>最高学历</List.Item>
                         </Picker>
-                    </FormItem>
+                    </List.Item>
+                    <div id='caddr'>
                     <InputItem
                         name="currentAddress"
                         {...getFieldProps('currentAddress', {
@@ -54,13 +54,14 @@ class Step3 extends React.Component{
                         placeholder="请输入现住址">
                         现住址
                     </InputItem>
-                    <FormItem>
-                        <List.Item arrow="horizontal" name="skill" style={{padding : 0}}>技能&经验</List.Item>
+                    </div>
+                    <List.Item arrow="horizontal" name="skill" style={{paddingLeft:15}}>技能&经验
+                    <br/>
                         <Tag onChange={::this.onChange} selected>无经验</Tag>
                         <Tag onChange={::this.onChange}>电子五金</Tag>
                         <Tag onChange={::this.onChange}>模具塑胶</Tag>
                         <Tag onChange={::this.onChange}>纺织玩具</Tag>
-                        <br/>
+                    <br/>  
                         <Tag onChange={::this.onChange}>文员行政</Tag>
                         <Tag onChange={::this.onChange}>后勤维修</Tag>
                         <Tag onChange={::this.onChange}>印刷宣传</Tag>
@@ -70,7 +71,8 @@ class Step3 extends React.Component{
                         <Tag onChange={::this.onChange}>建筑装潢</Tag>
                         <Tag onChange={::this.onChange}>财务出纳</Tag>
                         <br/>
-                    </FormItem>
+                    </List.Item>
+                        
                 </List>
                 <Button type="primary" style={{marginTop:'15px', marginLeft:'30px', marginRight:'30px'}} onClick={this.next.bind(this)}>提交</Button>
             </form>
