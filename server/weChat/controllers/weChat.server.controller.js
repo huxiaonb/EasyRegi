@@ -26,6 +26,7 @@ exports.basicInfo = function(req, res) {
 }
 
 exports.saveBasicInfo = function(req, res) {
+    req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var openId = _.get(req, ['session', 'openId'], ''),
         clonedApplicant = _.clone(_.get(req, ['body'], {}));
     if(_.isEmpty(openId)){

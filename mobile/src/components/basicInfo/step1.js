@@ -97,7 +97,7 @@ class Step1 extends React.Component{
                     </InputItem>
                     <div id='xxx' style={{display : 'flex'}}>
                         <InputItem
-                            style={{width:'6rem'}}
+                            style={{ width: '6rem'}}
                             name="mobile"
                             type='money'
                             {...getFieldProps('mobile', {
@@ -118,7 +118,7 @@ class Step1 extends React.Component{
                         <div style={{width : '2rem'}}><Button disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button></div>
                         </div>
                         <InputItem
-                            style={{width:'6rem'}}
+                        style={{ width: '6rem'}}
                             name="code"
                             type='money'
                             {...getFieldProps('code', {

@@ -16,24 +16,26 @@ const Brief = Item.Brief;
 class Basic extends React.Component{
     state={
         step : 1,
+        flag : false,
         basic : {}
     }
     async updateBasicInfo(){
+        Toast.loading('....');
         let {step,basic} = this.state;
-        debugger;
         if(step===3 && basic.tele && basic.idCardNumber && basic.highestDegree){
             let re = await lapi.submitBasicInfo(basic);
             if(re.success){
-                alert('123');
+                Toast.hide();
+                this.setState({
+                    flag : true
+                })
             }else{
                 Toast.err('api error!')
             }
         }
 
     }
-    aaa(){
-        console.log('123')
-    }
+    
     nextStep(n,data){
         let {step, basic} = this.state;
         let that = this;
@@ -60,7 +62,17 @@ class Basic extends React.Component{
     }
     
     render(){
-        let {step} = this.state;
+        let {step, flag} = this.state;
+        if(flag){
+            return(
+                <div className="result-example">
+                    <Result style={{ height: '500px'}}
+                        img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
+                        title="操作成功"
+                    />
+                </div>
+            )
+        }
         return(
             <div>
                 {step===1 && <Step1 nextStep={::this.nextStep} />}
