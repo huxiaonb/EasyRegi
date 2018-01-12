@@ -117,6 +117,7 @@
     "xml2js": "^0.4.17"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "postcss-pxtorem": "^3.3.1"
   }
 }
