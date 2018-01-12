@@ -128,26 +128,16 @@ exports.createUnifiedOrder = function(req, res) {
       trade_type: 'JSAPI',
   }
   opts.sign = wechatUtil.sign(opts);
-  //logger.info(wechatUtil.buildXML(opts));
-  //logger.info(opts);
   request({
 		url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
 		method: 'POST',
 		body: wechatUtil.buildXML(opts),
 	}, function(err, response, body){
-      // logger.info('-----------1-------------');
-      // logger.info(err);
-      // logger.info('-----------2-------------');
-      //logger.info(response);
-      // logger.info('-----------3-------------');
-      // logger.info(body);
-      // logger.info('-----------4-------------');
       parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
         if(err){
           logger.info(err);
           res.send(err).end()
         }else if(result.return_code === 'SUCCESS'){
-          //logger.info(result);
           let objtoSign = {
             appId: result. appid,
             nonceStr:result.nonce_str,
@@ -160,18 +150,11 @@ exports.createUnifiedOrder = function(req, res) {
           res.json(result);
         }
       });
-		  
-      // logger.info(fn)
-      // if(fn.return_code === 'SUCCESS'){
-      //   res.json(fn);
-      // }
 	});
 }
 
 
 exports.getOpenIdAndAuthAccessToken = function(req, res, next){
-  // return function(req, res, next){
-    // req.session.openId = '';
     var wechatCode = _.get(req, ['query', 'code'], '');
     logger.info('getWechatOpenId', wechatCode, req.sessionID);
     var openId = _.get(req, ['session', 'openId'], '');
@@ -181,8 +164,6 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     } else {
         if(_.isEmpty(wechatCode)){
             // req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-            //redirect to register page or next page as submit also need check this
-            //return next();
             logger.info('wechat code does not exist');
             return next();
         } else {
@@ -220,12 +201,6 @@ exports.submitRegisterInformation = function(req, res, next){
   var openId = _.get(req, ['query', 'id'], ''),
       type = _.get(req, ['query', 'type'], '');
   var files = _.get(req, ['files']);
-  logger.info('----111111---');
-  //logger.info(req);
-  logger.info(type);
-  logger.info(files);
-  logger.info('-------');
-        //logger.info('-------');
   var fileSize = 0;
   var relativePhotoPath = '';
   if(!_.isEmpty(files)
@@ -233,7 +208,6 @@ exports.submitRegisterInformation = function(req, res, next){
       fileSize = files.file.size;
       relativePhotoPath = files.file.path;
   }
-  logger.info(relativePhotoPath, fileSize);
   if (!fileSize) {
     if (relativePhotoPath) {
       try {
@@ -245,10 +219,6 @@ exports.submitRegisterInformation = function(req, res, next){
   }
   var separatedPath = relativePhotoPath.split(path.sep);
   var photoName = separatedPath[separatedPath.length - 1];
-  // var applicantName = req.body.name;
-  // logger.info(applicantName);
-
-  // res.end();
   if(_.isEmpty(openId) || _.isEmpty(type)){
     logger.info('no open id or type');
     return res.end();
@@ -277,9 +247,6 @@ exports.submitRegisterInformation = function(req, res, next){
         if(!_.isEmpty(registeredCompanies)){
           clonedApplicant.registeredCompanies = registeredCompanies;
         }
-        logger.info('--111--');
-        logger.info(clonedApplicant);
-        logger.info('--111--');
         Applicant.update({wechatOpenId: clonedApplicant.wechatOpenId}, {$set: clonedApplicant}, {upsert: true})
         .exec(function(error, result){
           if(error) {
@@ -349,20 +316,19 @@ exports.submitRegisterCompany = function(req, res){
   var current = new Date();
   console.log('payDate:', payDate);
   if(_.isEmpty(openId)){
-    //logger.info('openId does not exist, cannot submit register company');
+    logger.info('openId does not exist, cannot submit register company');
     res.status(500).send({success: false, errmsg: '用户代码为空'});
   } else if(_.isEmpty(companyId)){
-    //logger.info('companyId does not exist, cannot submit register company');
+    logger.info('companyId does not exist, cannot submit register company');
     res.status(500).send({success: false, errmsg: '公司代码为空'});
   } else {
     Applicant.find({
       wechatOpenId : openId
     }).then(applicants => {
       if(_.isEmpty(applicants)){
-        //logger.info('Applicant does not exist, cannot register company');
+        logger.info('Applicant does not exist, cannot register company');
         res.status(500).send({success: false, errmsg: '用户不存在，不能提交简历'});
       } else {
-        //logger.info('applicant exitst, ready to select company');
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
           if(!_.isEmpty(companies)){
@@ -393,10 +359,9 @@ exports.submitRegisterCompany = function(req, res){
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {
-                //logger.info('Error in updating applicant', error);
+                logger.info('Error in updating applicant', error);
                 res.status(500).send({success: false, errmsg: '更新用户提交简历到公司失败'});
               } else {
-                //logger.info(persistedObj);
                 sendNotificationEmail(dbCompany, function(emailErr, sendEmailResult){
                     if(emailErr) {
                         logger.info('Error in sending notification email', email, emailErr);
@@ -410,7 +375,7 @@ exports.submitRegisterCompany = function(req, res){
 
 
           } else {
-            //logger.info('cannot find company with company id', companyId);
+            logger.info('cannot find company with company id', companyId);
             res.status(500).send({success: false, errmsg: '找不到指定公司'});
           }
         });
@@ -537,14 +502,11 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         dy = DEF_R * (ns1 - ns2); // 南北方向长度(在经度圈上的投影长度)
         // 勾股定理求斜边长
         distance = Math.sqrt(dx * dx + dy * dy).toFixed(0);
-        // logger.info('----------1-----------');
         // logger.info(distance);
-        // logger.info('---------2------------');
         return distance;
     }
 
 exports.findNearbyPositions = function(req, res, next){
-  // var addr = _.get(req, ['params', 'addressReg'], '');
   var locationInfo = _.get(req, ['body']);
   let addrArr = [], addr = '', latLngStr = '';
   if(locationInfo != null && locationInfo != undefined){
@@ -552,16 +514,11 @@ exports.findNearbyPositions = function(req, res, next){
           addrArr.push(locationInfo.province);
       if(locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
           addrArr.push(locationInfo.city);
-      // if(info.district != null && info.district != undefined && info.district != '')
-      //     addrArr.push(info.district);
       if(locationInfo.lat != undefined && locationInfo.lng != undefined){
         latLngStr = locationInfo.lat + ',' + locationInfo.lng;
       }
   }
   addr = addrArr.join(',');
-  logger.info(locationInfo);
-  logger.info(latLngStr);
-  logger.info(addr);
   if(_.isEmpty(addr)){
     Position.find({}, function(err, dbPositions){
       if(err) {
@@ -573,9 +530,6 @@ exports.findNearbyPositions = function(req, res, next){
     });
   } else {
     Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
-        // logger.info('----------3-----------');
-        // logger.info(dbCompanies);
-        // logger.info('----------3-----------');
       if(err1) {
         logger.info('Error in getting company by address reg', err1);
         res.status(500).send({success: false, errmsg: '获取职位信息失败'});
@@ -583,7 +537,6 @@ exports.findNearbyPositions = function(req, res, next){
         logger.info('no companies found in that area');
         res.json({success: true, positions: []});
       } else {
-        // logger.info(JSON.stringify(dbCompanies));
         var ids = [];
         var latLngArr = [];
         var latLngDistances = [];
@@ -591,19 +544,11 @@ exports.findNearbyPositions = function(req, res, next){
         _.forEach(dbCompanies, function(cop){
           if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
             ids.push(cop._id);
-            // logger.info(cop._id);
           if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
             latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
             latLngDistances.push(parseInt(getShortDistance(locationInfo.lng,locationInfo.lat,_.get(cop, ['lng']),_.get(cop, ['lat'])))/1000);
           }
         });
-        // logger.info('---------------------');
-        // logger.info(latLngDistances);
-        // logger.info('---------------------');
-        
-        logger.info(ids);
-        logger.info(latLngArr);
-        //getDistanceBetweenUserAndCompanies(latLngStr, latLngArr, function(err3, latLngDistances){
           Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
               if(err2) {
                   logger.info('Error in finding positions per id', err2);
@@ -617,13 +562,10 @@ exports.findNearbyPositions = function(req, res, next){
                       _.forEach(latLngArr, function(latLntString, index){
                         var arr = latLntString.split(',');
                         var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                        // logger.info(arr[0], arr[1], index, cop);
                         if(!_.isEmpty(cop)){
                             var copPositions = positionGroup[cop._id];
                             var tempPositions = [];
                             _.forEach(copPositions, function(posi){
-                              
-                              //let clonePosi = _.cloneDeep(posi);
                               let ageRangeStart = posi.ageRangeStart || '',
                                 ageRangeEnd = posi.ageRangeEnd || '',
                                 salaryStart = posi.salaryStart || '',
@@ -655,9 +597,7 @@ exports.findNearbyPositions = function(req, res, next){
                                    addrArr = addr.split(',');
                                 clonePosi.city = findCompanyLocatedCity(addrArr);
 
-                                //let clonePosi = Object.assign({},posi,{companyName : cop.alias, distance : latLngDistances[index]});
                                 tempPositions.push(clonePosi);
-                                // logger.info(cop.companyName, latLngDistances[index].distance, latLngDistances[index].duration, clonePosi);
                             });
                             sortedPositions = _.concat(sortedPositions, tempPositions);
                         }
@@ -698,8 +638,6 @@ exports.findNearbyPositions = function(req, res, next){
                               var addr = _.get(cop, ['companyAddress'], ''),
                                   addrArr = addr.split(',');
                               clonePosi.city = findCompanyLocatedCity(addrArr);
-                              // let clonePosi = _.clone(posi);
-                              // clonePosi.companyName = cop.alias;
                               tempPositions.push(clonePosi);
                           });
                           unsortPositions = _.concat(unsortPositions, tempPositions);
