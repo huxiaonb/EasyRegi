@@ -6,7 +6,7 @@ var request = require('request'),
     _ = require('lodash');
 
 describe('position api unit test', function(){
-    describe('insert', function(){
+    describe.skip('insert', function(){
         it('insert position by POST method', function(done){
             var position = {
                 name: '软件工程师',
@@ -66,6 +66,21 @@ describe('position api unit test', function(){
             });
         })
 
-    })
+    });
+
+    describe('load position for detail page', function(){
+       it('invoke api to load position information', function(done){
+           var positionId = '59ede755b29cdb2d00fe2a22';
+           request.post({
+               baseUrl: 'http://localhost',
+               url: '/weChat/position/loadPosition',
+               body: {id: positionId},
+               json: true
+           }, function(error, response, body){
+              console.log(error, response.statusCode, JSON.stringify(body));
+              done();
+           });
+       });
+    });
 
 });

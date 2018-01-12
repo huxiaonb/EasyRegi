@@ -475,7 +475,6 @@ function getAllCompanyNames(req, res, next){
         res.json(companyNames); 
       }
     });
-
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
@@ -699,27 +698,6 @@ function findCompanyLocatedCity(addrArr){
     }
 }
 
-    
-function getDistanceBetweenUserAndCompanies(latLng, companyLatLngArr, callback){
-  var distanceApi = config.qqapi.distanceApi,
-      apikey = config.qqmapKey,
-      distanceUrl = distanceApi + '?mode=driving&from=' + latLng + '&to=' + companyLatLngArr.join(';') + '&key=' + apikey,
-      elements = [];
-    logger.info(distanceUrl);
-    request.get({
-        url: distanceUrl,
-        json: true
-    }, function(error, response, distanceResult) {
-        logger.info(JSON.stringify(distanceResult));
-        if (!error && _.get(response, ['statusCode'], 0) === 200 && _.get(distanceResult, ['status']) == 0) {
-          elements = _.get(distanceResult, ['result', 'elements'], []);
-        } else {
-          logger.info('Error in getting distance', error, _.get(response, ['statusCode'], 0), _.get(distanceResult, ['status']));
-        }
-        return callback(null, elements);
-    });
-}
-
 exports.findAllPositions = function(req, res, next){
   Position.find({}, function(err, dbPositions){
     if(err) {
@@ -760,4 +738,23 @@ exports.findAllPositions = function(req, res, next){
       });
     }
   })
+}
+
+exports.loadPosition = function(req, res) {
+    var positionId = _.get(req, ['body', 'id']);
+    if(_.isEmpty(positionId)){
+        logger.info('Position id is required');
+        res.status(500).send({success: false, errmsg: '获取职位信息失败', position: {}});
+    } else {
+        Position.find({_id: positionId}).then(positions => {
+            if(_.isEmpty(positions)){
+                res.status(500).send({success: false, errmsg: '获取职位信息失败', position: {}});
+            } else {
+                res.json({success: true, position: _.get(positions, ['0'], {})});
+            }
+        }).catch(e => {
+            logger.info('Error in finding all postions', err);
+            res.status(500).send({success: false, errmsg: '获取职位信息失败', position: {}});
+        });
+    }
 }
