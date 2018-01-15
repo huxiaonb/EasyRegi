@@ -8,7 +8,7 @@ import Step3 from './basicInfo/step3'
 
 import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
 import lapi from './registerProfile/lapi'
-import './less/index.less'
+import './less/basic.less'
 
 const Item = List.Item;
 const Brief = Item.Brief;
@@ -75,9 +75,12 @@ class Basic extends React.Component{
         }
         return(
             <div>
+                <div>欢迎使用入职易</div>
+            <div>
                 {step===1 && <Step1 nextStep={::this.nextStep} />}
                 {step===2 && <Step2 nextStep={::this.nextStep} />}
                 {step===3 && <Step3 nextStep={::this.nextStep} />}
+            </div>
             </div>
         );
     }

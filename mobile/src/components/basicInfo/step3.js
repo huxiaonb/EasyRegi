@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast,Tag} from 'antd-mobile';
 import { createForm } from 'rc-form';
-import  '../less/index.less';
+import  '../less/basic.less';
 
 const FormItem = List.Item;
 

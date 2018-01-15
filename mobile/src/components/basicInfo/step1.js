@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast} from 'antd-mobile';
 import { createForm } from 'rc-form';
 import lapi from '../registerProfile/lapi';
-import  '../less/index.less';
+import  '../less/basic.less';
 
 let count = 60;
 class Step1 extends React.Component{
@@ -94,7 +94,7 @@ class Step1 extends React.Component{
                             Toast.info(getFieldError('name').join('、'));
                         }}
                         >
-                        姓名
+                        姓&nbsp;&nbsp;&nbsp;&nbsp;名
                     </InputItem>
                         <InputItem
                             name="mobile"
@@ -113,7 +113,7 @@ class Step1 extends React.Component{
                                     Toast.info(getFieldError('mobile').join('、'));
                                 }}
                             >
-                            手机       
+                            手&nbsp;&nbsp;&nbsp;&nbsp;机       
                         </InputItem>
                         
                         

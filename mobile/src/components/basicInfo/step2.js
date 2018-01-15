@@ -4,7 +4,7 @@ import { List, InputItem, Button,Picker,DatePicker,Card, Icon,Toast} from 'antd-
 import { createForm } from 'rc-form';
 import moment from 'moment';
 import lapi from '../registerProfile/lapi';
-import  '../less/index.less';
+import  '../less/basic.less';
 
 const currentDate = moment().utcOffset(8);
 const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
