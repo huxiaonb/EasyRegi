@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
+import Steps from 'react-steps-forked-by-gd';
 
 import Step1 from './basicInfo/step1';
 import Step2 from './basicInfo/step2';
@@ -12,13 +13,26 @@ import './less/basic.less'
 
 const Item = List.Item;
 const Brief = Item.Brief;
-
+const data=[{
+        "text": "手机验证",
+        "isActive": true,
+    },
+    {
+        "text": "实名验证",
+        "isActive": false,
+    },
+    {
+        "text": "学历特长",
+        "isActive": false,
+    },
+    ]
 class Basic extends React.Component{
     state={
         step : 1,
         flag : false,
         basic : {}
     }
+
     async updateBasicInfo(){
         Toast.loading('....');
         let {step,basic} = this.state;
@@ -75,7 +89,7 @@ class Basic extends React.Component{
         }
         return(
             <div>
-                <div>欢迎使用入职易</div>
+               <Steps items={data}></Steps>
             <div>
                 {step===1 && <Step1 nextStep={::this.nextStep} />}
                 {step===2 && <Step2 nextStep={::this.nextStep} />}
