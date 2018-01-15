@@ -74,7 +74,7 @@ class Step1 extends React.Component{
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         let {disable,verCode} = this.state;
-        const bt = (<Button disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button>)
+        const bt = (<Button type="primary" disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button>)
         return(
             <form key='step1' style={{}}>
                 <List >

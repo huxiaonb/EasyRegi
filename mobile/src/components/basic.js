@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-import Steps from 'react-steps-forked-by-gd';
+import Steps from './Steps/Basic';
 
 import Step1 from './basicInfo/step1';
 import Step2 from './basicInfo/step2';
@@ -15,15 +15,15 @@ const Item = List.Item;
 const Brief = Item.Brief;
 const data=[{
         "text": "手机验证",
-        "isActive": true,
+        "activeItem": true,
     },
     {
         "text": "实名验证",
-        "isActive": false,
+        "activeItem": false,
     },
     {
         "text": "学历特长",
-        "isActive": false,
+        "activeItem": false,
     },
     ]
 class Basic extends React.Component{
@@ -89,7 +89,7 @@ class Basic extends React.Component{
         }
         return(
             <div>
-               <Steps items={data}></Steps>
+                <Steps style={{ 'marginBottom': '2rem',display:'flex'}} items={data}></Steps>
             <div>
                 {step===1 && <Step1 nextStep={::this.nextStep} />}
                 {step===2 && <Step2 nextStep={::this.nextStep} />}
