@@ -24,6 +24,7 @@
 <body>
     <div> 
         <span id='openId' hidden>{{openId}}</span>
+        <span id='dataObj' hidden>{{postion}}</span>
     </div>
     <div id='detail' style="display:flex;align-items:flex-start;justify-content:center;width:100%;height:100%;">
         
@@ -35,8 +36,8 @@
 
     </script>
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="./lib/underscore-min.js"></script>
-    <script src="./lib/jquery.min.js"></script>
+    <script src="../lib/underscore-min.js"></script>
+    <script src="../lib/jquery.min.js"></script>
     <script src="../dist/mobile/index.js?893827"></script>
     <script type="text/javascript">
         if(!window.Promise) {
@@ -44,7 +45,8 @@
             document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
         }
         $(_.once(function(){
-            Lego('#detail').detailForm();
+            var data = JSON.parse($('#dataObj')[0].innerText);
+            Lego('#detail').detailForm(data);
         }))
     </script>
 </html>

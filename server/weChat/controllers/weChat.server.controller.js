@@ -23,8 +23,20 @@ exports.basicInfo = function(req, res) {
 }
 
 exports.detailPosition = function(req, res) {
+  var positionid = _.get(req, ['params', 'positionid'], '') ;
+  //positionid = mongoose.Types.ObjectId.isValid(positionid);
+  //console.log(mongoose.Types.ObjectId);
   logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
-  res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], '')});
+  Position.find({_id: positionid}).then(positions => {
+            if(_.isEmpty(positions)){
+              res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify({err : 'no data',id:positionid})});
+            } else {
+              res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(_.get(positions, ['0']))});
+            }
+        }).catch(e => {
+            console.log(e);
+            logger.info('Error in finding postions');
+        });
 }
 
 exports.saveBasicInfo = function(req, res) {
@@ -763,3 +775,4 @@ exports.loadPosition = function(req, res) {
         });
     }
 }
+

@@ -10,28 +10,34 @@ const Item = List.Item;
 const Brief = Item.Brief;
 class Detail extends React.Component{
     state={
-        data : {}
+        data : null
     }
     async componentWillMount(){
-        let r = lapi.loadPositionDetail(id);
-        if(r.success){
-            this.setState({
-                data : r.data
-            })
+        let data = this.props.args;
+        if(data.err){
+            Toast.error('职位不存在！')
+        }else{
+            this.setState(data)
         }
     }
     render(){
+        let {data} = this.state;
+        const welfs = (data.welfares.map((idx,w)=>{
+            return(
+                <Tag selected disabled>{w}</Tag>
+            )
+        }));
         return(
         <div>
             <List>
-                <Item extra={'extra content'}>公司名称</Item>
-                <Item extra={'extra content'}>招聘职位</Item>
-                <Item extra={'extra content'}>招聘人数</Item>
-                <Item extra={'extra content'}>薪资待遇</Item>
+                <Item extra={data.companyId}>公司名称</Item>
+                <Item extra={data.name}>招聘职位</Item>
+                <Item extra={data.totalRecruiters}>招聘人数</Item>
+                <Item extra={data.salaryStart + '~' + data.salaryEnd}>薪资待遇</Item>
                 <Item>相关福利<Brief><p>123</p><p>123</p><p>123</p></Brief></Item>
-                <Item>岗位描述<Brief><p>123</p></Brief></Item>
-                <Item extra={'extra content'}>联系人</Item>
-                <Item extra={'extra content'}>联系电话</Item>
+                <Item>岗位描述<Brief><p>{data.positionDesc}</p></Brief></Item>
+                <Item extra={data.contactPerson}>联系人</Item>
+                <Item extra={data.phoneNumber}>联系电话</Item>
             </List>
             <div className='btn-grp'>
                 <Button type='primary'>关注入职易查看更多职位</Button>
