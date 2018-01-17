@@ -93,7 +93,7 @@ class Step1 extends React.Component{
                         onErrorClick={() => {
                             Toast.info(getFieldError('name').join('、'));
                         }}
-                        >
+                        placeholder="请输入姓名">
                         姓&nbsp;&nbsp;&nbsp;&nbsp;名
                     </InputItem>
                         <InputItem
@@ -112,7 +112,7 @@ class Step1 extends React.Component{
                                 onErrorClick={() => {
                                     Toast.info(getFieldError('mobile').join('、'));
                                 }}
-                            >
+                            placeholder="请输入手机号码">
                             手&nbsp;&nbsp;&nbsp;&nbsp;机       
                         </InputItem>
                         
@@ -135,7 +135,7 @@ class Step1 extends React.Component{
                                     onErrorClick={() => {
                                         Toast.info(getFieldError('code').join('、'));
                                     }}
-                                >
+                                placeholder="请输入手机号码">
                                 验证码       
                             </InputItem>
                         </div>

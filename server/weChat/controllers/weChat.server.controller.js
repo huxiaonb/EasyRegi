@@ -22,6 +22,11 @@ exports.basicInfo = function(req, res) {
   res.render('server/weChat/views/basic', {openId: _.get(req, ['session', 'openId'], '')});
 }
 
+exports.detailPosition = function(req, res) {
+  logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
+  res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], '')});
+}
+
 exports.saveBasicInfo = function(req, res) {
     req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var openId = _.get(req, ['session', 'openId'], ''),

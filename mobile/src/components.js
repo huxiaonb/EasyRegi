@@ -5,6 +5,7 @@ import Index from './components/registerProfile/index'
 import Company from './components/company'
 import Positions from './components/positions'
 import Basic from './components/basic'
+import Detail from './components/detail'
 
 
 // 尽量别直接用全局变量 $
@@ -24,6 +25,9 @@ class LegoComponent{
     }
     basicForm(...args){
         return Basic(this.$el, ...args)
+    }
+    detailForm(...args){
+        return Detail(this.$el, ...args)
     }
     selectCompany(...args){
         return Company(this.$el, ...args)

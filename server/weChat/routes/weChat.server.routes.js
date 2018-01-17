@@ -14,6 +14,7 @@ module.exports = function (app) {
     app.use(weChatController.getOpenIdAndAuthAccessToken);
     app.route('/register').get(weChatController.register);
     app.route('/basic').get(weChatController.basicInfo);
+    app.route('/details').get(weChatController.detailPosition);
     app.route('/saveBasicInfo').post(weChatController.saveBasicInfo);
     app.route('/weChat/applicant/findApplicantByOpenId').get(weChatController.findApplicantByOpenId);
     app.route('/weChat/applicant/personalInfo/submit').post(weChatController.submitRegisterInformation);

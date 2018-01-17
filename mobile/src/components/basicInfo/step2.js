@@ -89,7 +89,7 @@ class Step2 extends React.Component{
                             onErrorClick={() => {
                                 Toast.info(getFieldError('idCardNumber').join('、'));
                             }}
-                        >
+                        placeholder="请输入身份证号">
                         身份证号     
                     </InputItem>
                     {/*<InputItem

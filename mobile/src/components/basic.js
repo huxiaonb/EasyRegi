@@ -13,7 +13,7 @@ import './less/basic.less'
 
 const Item = List.Item;
 const Brief = Item.Brief;
-const data=[{
+const step_data=[{
         "text": "手机验证",
         "activeItem": true,
     },
@@ -55,12 +55,14 @@ class Basic extends React.Component{
         let that = this;
         switch(n){
             case 1:
+                step_data[1].activeItem = true;
                 this.setState({
                     step : ++step,
                     basic : Object.assign(basic,data)
                 })
                 break;
             case 2:
+                step_data[2].activeItem = true;
                 this.setState({
                     step : ++step,
                     basic : Object.assign(basic,data)
@@ -89,7 +91,7 @@ class Basic extends React.Component{
         }
         return(
             <div>
-                <Steps style={{ 'marginBottom': '2rem',display:'flex'}} items={data}></Steps>
+                <Steps style={{ 'marginBottom': '2rem',display:'flex'}} items={step_data}></Steps>
             <div>
                 {step===1 && <Step1 nextStep={::this.nextStep} />}
                 {step===2 && <Step2 nextStep={::this.nextStep} />}

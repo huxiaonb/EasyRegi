@@ -127,6 +127,13 @@ export default {
             data
         });
     },
+    loadPositionDetail(id){
+        return _request({
+            url: '../weChat/position/loadPosition',
+            type: 'POST',
+            id
+        });
+    },
     uploadFile(f, openId){
         // return $.ajax({
         //     url:'../weChat/applicant/personalInfo/submit?id=' + openId + '&type=' + f.type,
@@ -140,7 +147,6 @@ export default {
             method: 'post',
             processData: false,
             data: f.data,
-            
             });
         
     }
