@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result, SearchBar} from 'antd-mobile';
+import LuckyPacket from './lucky'
 import lapi from './registerProfile/lapi'
 import './less/index.less'
 
@@ -11,6 +12,7 @@ const Brief = Item.Brief;
 
 class Positions extends React.Component{
     state = {
+        luckyFlag : true,
         noMoreP : false,
         locationFlag : false,
         geolocation : {},
@@ -101,7 +103,7 @@ class Positions extends React.Component{
         //get position List
     }
     loadMore(){
-        let {nearbyPositions} = this.state;
+        let {nearbyPositions,luckyFlag} = this.state;
         let waitShowList = nearbyPositions.slice(0, 5);
         if(waitShowList && waitShowList.length < 5){
             this.setState({noMoreP : true})
@@ -112,54 +114,28 @@ class Positions extends React.Component{
             waitShowList.map((ele, idx)=>{
                 //let headerName = ele.name;
                 let accHeader = (
-                    <div>
-                        <h3><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></h3>
+                    <div style={{display:'flex'}}>
+                        {luckyFlag ? (<LuckyPacket style={{marginRight:'.2em'}}/>) : ('')}
                         <div>
-                            <span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span>
+                            <span><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></span>
+                            <p><span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span></p>
                         </div>
                     </div>
                 );
                 const positionPanelItem = (
                     <Accordion.Panel header={accHeader} key={`position_${ele._id}`}>
                         <List>
-                            <InputItem
-                            name="companyName"
-                            placeholder=""
-                            value={ele.companyName}
-                            disabled>公司</InputItem>
-                            <InputItem
-                            name="totalRecruiters"
-                            placeholder=""
-                            value={ele.totalRecruiters}
-                            disabled>招聘人数</InputItem>
-                            <InputItem
-                            name="ageRange"
-                            placeholder=""
-                            value={ele.ageRange}
-                            disabled>年龄范围</InputItem>
-                            <InputItem
-                            name="contactPerson"
-                            placeholder=""
-                            value={ele.contactPerson}
-                            disabled>联系人</InputItem>
-                            <InputItem
-                            name="phoneNumber"
-                            placeholder=""
-                            value={ele.phoneNumber}
-                            disabled>联系电话</InputItem>
-                            <InputItem
-                            name="salary"
-                            placeholder=""
-                            value={ele.salary}
-                            disabled>薪资</InputItem>
-                            <TextareaItem
-                                name="positionDesc"
-                                value={ele.positionDesc}
-                                placeholder=""
-                                title="岗位描述"
-                                rows={5}
-                                disabled
-                            />
+                            <Item extra={ele.companyName}>公司</Item>
+                            <Item extra={ele.totalRecruiters}>招聘人数</Item>
+                            <Item extra={ele.ageRange}>年龄范围</Item>
+                            <Item extra={ele.contactPerson}>联系人</Item>
+                            <Item extra={ele.phoneNumber}>联系电话</Item>
+                            <Item extra={ele.salary}>薪资</Item>
+                            <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
+                            <Item id='p_btn_grp' style={{marginTop:'2em'}}>
+                                <Button type="primary" size="small" inline style={{marginRight:'1em'}}>立即应聘</Button>
+                                <Button type="primary" size="small" inline >转发给朋友</Button>
+                            </Item>
                         </List>
                     </Accordion.Panel>
                 );
@@ -193,9 +169,10 @@ class Positions extends React.Component{
         return(
             <div className='ant-layout'>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>
-                    <div style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
+                    <div id='position' style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
                         <div className='curr-geo' style={{marginBottom:'15px'}}>
-                        <span>当前位置：{addr.split(',').pop()}</span>
+                            <span>当前位置：{addr.split(',').pop()}</span>
+                            <SearchBar placeholder="Search" maxLength={8} />
                         </div>
                         
                         {/*<Accordion>

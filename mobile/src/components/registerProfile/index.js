@@ -242,7 +242,7 @@ class Index extends React.Component {
     let { personal, family, otherInfo, emergency } = this.state.info;
 
     const myStep = isOpenIdObtained ? (
-      <div style={{textAlign:'left'}}>
+      <div id='register' style={{textAlign:'left'}}>
         <Steps current={current} direction="horizontal" style={{marginBottom:'50px'}}>
           {steps.map(item => <Step key={item.title} title={item.title} />)}
         </Steps>
