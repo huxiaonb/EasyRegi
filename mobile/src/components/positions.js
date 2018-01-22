@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 
 import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result, SearchBar} from 'antd-mobile';
+
 import LuckyPacket from './lucky'
 import lapi from './registerProfile/lapi'
 import './less/index.less'
@@ -20,11 +21,14 @@ class Positions extends React.Component{
         positionPanelLists : [],
         isLocationExist: false
     }
+    onSearch(e){
+        console.log(e);
+    }
     constructAddrByLocation(info){
         let addrArr = [], addr = '';
         if(info != null && info != undefined){
             if(info.province != null && info.province != undefined && info.province != '')
-                addrArr.push(info.province);
+                addrArr.push(info.province);    
             if(info.city != null && info.city != undefined && info.city != '')
                 addrArr.push(info.city);
             // if(info.district != null && info.district != undefined && info.district != '')
@@ -172,7 +176,7 @@ class Positions extends React.Component{
                     <div id='position' style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
                         <div className='curr-geo' style={{marginBottom:'15px'}}>
                             <span>当前位置：{addr.split(',').pop()}</span>
-                            <SearchBar placeholder="Search" maxLength={8} />
+                            <InputItem  placeholder='在这里搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
                         </div>
                         
                         {/*<Accordion>

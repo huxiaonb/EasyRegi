@@ -135,6 +135,14 @@ input{
 }
 
 @media only screen and (min-device-width: 360px) {
+  .curr-geo .am-list-item .am-input-control input{
+    text-align: left !important;
+    border : 1px solid #d9d9d9;
+    height: 50px !important;
+    font-size: 30px !important; 
+    border-radius: 5px;
+    padding: 4px 11px;
+  }
   #position .am-accordion .am-accordion-item .am-accordion-header{
     line-height: inherit !important;
     font-size : 40px !important;
@@ -234,6 +242,14 @@ input{
 
 
 @media only screen and (min-device-width: 412px) {
+  .curr-geo .am-list-item .am-input-control input{
+    text-align: left !important;
+    border : 1px solid #d9d9d9;
+    height: 80px !important;
+    font-size: 40px !important; 
+    border-radius: 5px;
+    padding: 4px 11px;
+  }
    #position .am-button{
     width: 3rem;
     font-size: 60px !important;
@@ -373,7 +389,16 @@ input{
 #p_btn_grp .am-list-line .am-list-content{
     text-align: right !important;
 }
-.curr-geo .am-search-input{
-  height : 60px !important;
-  line-height : 60px !important
+
+.curr-geo .am-list-item .am-input-control input:focus{
+    border-color: #40a9ff;
+    outline: 0;
+    -webkit-box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+.curr-geo .am-list-item .am-input-control input:hover{
+    border-color: #40a9ff;
+}
+.curr-geo .am-list-item.am-input-item{
+    height : 84px !important;
 }
