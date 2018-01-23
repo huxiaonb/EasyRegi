@@ -1,6 +1,7 @@
 'use strict';
 var config = require('../../../config/config');
 var logger = require('../../../config/lib/logger');
+var async = require('async');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var _ = require('lodash');
@@ -505,162 +506,155 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         return distance;
     }
 
-exports.findNearbyPositions = function(req, res, next){
-  var locationInfo = _.get(req, ['body']);
-  let addrArr = [], addr = '', latLngStr = '';
-  if(locationInfo != null && locationInfo != undefined){
-      if(locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
-          addrArr.push(locationInfo.province);
-      if(locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
-          addrArr.push(locationInfo.city);
-      if(locationInfo.lat != undefined && locationInfo.lng != undefined){
-        latLngStr = locationInfo.lat + ',' + locationInfo.lng;
-      }
-  }
-  addr = addrArr.join(',');
-  if(_.isEmpty(addr)){
-    Position.find({}, function(err, dbPositions){
-      if(err) {
-        logger.info('Error in getting positions', err);
-        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-      } else {
-        res.json({success: true, positions: dbPositions});
-      }
-    });
-  } else {
-    Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
-      if(err1) {
-        logger.info('Error in getting company by address reg', err1);
-        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-      } else if(_.isEmpty(dbCompanies)) {
-        logger.info('no companies found in that area');
-        res.json({success: true, positions: []});
-      } else {
-        var ids = [];
-        var latLngArr = [];
-        var latLngDistances = [];
-        var _this = this;
-        _.forEach(dbCompanies, function(cop){
-          if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
-            ids.push(cop._id);
-          if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
-            latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
-            latLngDistances.push(parseInt(getShortDistance(locationInfo.lng,locationInfo.lat,_.get(cop, ['lng']),_.get(cop, ['lat'])))/1000);
-          }
-        });
-          Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
-              if(err2) {
-                  logger.info('Error in finding positions per id', err2);
-                  res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-              } else {
-               
-                  if(!_.isEmpty(dbPositions)){
-                      var positionGroup = _.groupBy(dbPositions, 'companyId');
-                      var sortedPositions = [],
-                          unsortPositions = [];
-                      _.forEach(latLngArr, function(latLntString, index){
-                        var arr = latLntString.split(',');
-                        var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                        if(!_.isEmpty(cop)){
+exports.findNearbyPositions = function (req, res, next) {
+    var locationInfo = _.get(req, ['body']);
+    var limit = _.get(req, ['query', 'limit'], ''),
+        offset = _.get(req, ['query', 'offset'], '');
+    console.log(limit, offset);
+    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 5;
+    offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
+    console.log(limit, offset);
+    let addrArr = [], addr = '', latLngStr = '';
+    if (locationInfo != null && locationInfo != undefined) {
+        if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
+            addrArr.push(locationInfo.province);
+        if (locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
+            addrArr.push(locationInfo.city);
+        if (locationInfo.lat != undefined && locationInfo.lng != undefined) {
+            latLngStr = locationInfo.lat + ',' + locationInfo.lng;
+        }
+    }
+    addr = addrArr.join(',');
+    Company.find({}, function (err1, dbCompanies) {
+        if (err1) {
+            logger.info('Error in getting company by address reg', err1);
+            res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+        } else if (_.isEmpty(dbCompanies)) {
+            logger.info('no companies found in that area');
+            res.json({success: true, positions: []});
+        } else {
+            var ids = [];
+            var latLngArr = [];
+            var latLngDistances = [];
+            var _this = this;
+            _.forEach(dbCompanies, function (cop) {
+                if (!_.isEmpty(cop) && !_.isEmpty(cop._id))
+                    ids.push(cop._id);
+                if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
+                    latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
+                    latLngDistances.push(parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000);
+                }
+            });
+            Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
+                if (err2) {
+                    logger.info('Error in finding positions per id', err2);
+                    res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+                } else {
+
+                    if (!_.isEmpty(dbPositions)) {
+                        var positionGroup = _.groupBy(dbPositions, 'companyId');
+                        var sortedPositions = [],
+                            unsortPositions = [];
+                        _.forEach(latLngArr, function (latLntString, index) {
+                            var arr = latLntString.split(',');
+                            var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
+                            if (!_.isEmpty(cop)) {
+                                var copPositions = positionGroup[cop._id];
+                                var tempPositions = [];
+                                _.forEach(copPositions, function (posi) {
+                                    let ageRangeStart = posi.ageRangeStart || '',
+                                        ageRangeEnd = posi.ageRangeEnd || '',
+                                        salaryStart = posi.salaryStart || '',
+                                        salaryEnd = posi.salaryEnd || '',
+                                        ageRange = '',
+                                        salaryRange = '';
+                                    if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+                                        ageRange = ageRangeStart + '~' + ageRangeEnd;
+                                    }
+                                    if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+                                        salaryRange = salaryStart + '~' + salaryEnd;
+                                    }
+                                    let clonePosi = {
+                                        name: posi.name,
+                                        ageRange: ageRange,
+                                        contactPerson: posi.contactPerson,
+                                        totalRecruiters: posi.totalRecruiters,
+                                        salary: salaryRange,
+                                        welfares: posi.welfares,
+                                        positionDesc: posi.positionDesc,
+                                        _id: posi._id,
+                                        companyId: posi.companyId,
+                                        phoneNumber: posi.phoneNumber,
+                                        companyName: cop.companyName,
+                                        alias: cop.alias,
+                                        distance: Math.floor(latLngDistances[index]),
+                                    };
+                                    var addr = _.get(cop, ['companyAddress'], ''),
+                                        addrArr = addr.split(',');
+                                    clonePosi.city = findCompanyLocatedCity(addrArr);
+
+                                    tempPositions.push(clonePosi);
+                                });
+                                sortedPositions = _.concat(sortedPositions, tempPositions);
+                            }
+                        });
+                        _.forEach(dbCompanies, function (cop) {
                             var copPositions = positionGroup[cop._id];
                             var tempPositions = [];
-                            _.forEach(copPositions, function(posi){
-                              let ageRangeStart = posi.ageRangeStart || '',
-                                ageRangeEnd = posi.ageRangeEnd || '',
-                                salaryStart = posi.salaryStart || '',
-                                salaryEnd = posi.salaryEnd || '',
-                                ageRange = '',
-                                salaryRange = '';
-                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
-                              }
-                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                  salaryRange = salaryStart + '~' + salaryEnd;
-                              }
-                              let clonePosi = {
-                                name : posi.name,
-                                ageRange : ageRange,
-                                contactPerson : posi.contactPerson,
-                                totalRecruiters : posi.totalRecruiters,
-                                salary : salaryRange,
-                                welfares : posi.welfares,
-                                positionDesc : posi.positionDesc,
-                                _id : posi._id,
-                                companyId : posi.companyId,
-                                phoneNumber : posi.phoneNumber,
-                                companyName:cop.companyName,
-                                alias:cop.alias,
-                                distance:Math.floor(latLngDistances[index]),
-                              };
-                              var addr = _.get(cop, ['companyAddress'], ''),
-                                   addrArr = addr.split(',');
-                                clonePosi.city = findCompanyLocatedCity(addrArr);
+                            if (_.isEmpty(cop.lat) || _.isEmpty(cop.lng)) {
+                                _.forEach(copPositions, function (posi) {
+                                    let ageRangeStart = posi.ageRangeStart || '',
+                                        ageRangeEnd = posi.ageRangeEnd || '',
+                                        salaryStart = posi.salaryStart || '',
+                                        salaryEnd = posi.salaryEnd || '',
+                                        ageRange = '',
+                                        salaryRange = '';
+                                    if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+                                        ageRange = ageRangeStart + '~' + ageRangeEnd;
+                                    }
+                                    if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+                                        salaryRange = salaryStart + '~' + salaryEnd;
+                                    }
+                                    let clonePosi = {
+                                        name: posi.name,
+                                        contactPerson: posi.contactPerson,
+                                        totalRecruiters: posi.totalRecruiters,
+                                        ageRange: ageRange,
+                                        salary: salaryRange,
+                                        welfares: posi.welfares,
+                                        positionDesc: posi.positionDesc,
+                                        _id: posi._id,
+                                        companyId: posi.companyId,
+                                        phoneNumber: posi.phoneNumber,
+                                        companyName: cop.companyName,
+                                        alias: cop.alias,
+                                        distance: '-'
+                                        //no distance
+                                    };
+                                    var addr = _.get(cop, ['companyAddress'], ''),
+                                        addrArr = addr.split(',');
+                                    clonePosi.city = findCompanyLocatedCity(addrArr);
+                                    tempPositions.push(clonePosi);
+                                });
+                                unsortPositions = _.concat(unsortPositions, tempPositions);
+                            }
 
-                                tempPositions.push(clonePosi);
-                            });
-                            sortedPositions = _.concat(sortedPositions, tempPositions);
-                        }
-                      });
-                      _.forEach(dbCompanies, function(cop){
-                        var copPositions = positionGroup[cop._id];
-                        var tempPositions = [];
-                        if(_.isEmpty(cop.lat) || _.isEmpty(cop.lng)){
-                          _.forEach(copPositions, function(posi){
-                              let ageRangeStart = posi.ageRangeStart || '',
-                                  ageRangeEnd = posi.ageRangeEnd || '',
-                                  salaryStart = posi.salaryStart || '',
-                                  salaryEnd = posi.salaryEnd || '',
-                                  ageRange = '',
-                                  salaryRange = '';
-                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
-                              }
-                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                  salaryRange = salaryStart + '~' + salaryEnd;
-                              }
-                              let clonePosi = {
-                                  name : posi.name,
-                                  contactPerson : posi.contactPerson,
-                                  totalRecruiters : posi.totalRecruiters,
-                                  ageRange : ageRange,
-                                  salary : salaryRange,
-                                  welfares : posi.welfares,
-                                  positionDesc : posi.positionDesc,
-                                  _id : posi._id,
-                                  companyId : posi.companyId,
-                                  phoneNumber : posi.phoneNumber,
-                                  companyName:cop.companyName,
-                                  alias:cop.alias,
-                                  distance: '-'
-                                  //no distance
-                                };
-                              var addr = _.get(cop, ['companyAddress'], ''),
-                                  addrArr = addr.split(',');
-                              clonePosi.city = findCompanyLocatedCity(addrArr);
-                              tempPositions.push(clonePosi);
-                          });
-                          unsortPositions = _.concat(unsortPositions, tempPositions);
-                        }
+                        });
 
-                      });
-
-                      sortedPositions.sort(function(b, c){
-                        return b.distance > c.distance;
-                      });
-                      sortedPositions = _.concat(sortedPositions, unsortPositions);
-                      logger.info(sortedPositions.length);
-                      res.json({success: true, positions: sortedPositions});
-                  } else {
-                      res.json({success: true, positions: []});
-                  }
-              }
-          });
-       //});
-      }
+                        sortedPositions.sort(function (b, c) {
+                            return b.distance > c.distance;
+                        });
+                        sortedPositions = _.concat(sortedPositions, unsortPositions);
+                        logger.info(sortedPositions.length);
+                        var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
+                        res.json({success: true, positions: pagingPositions});
+                    } else {
+                        res.json({success: true, positions: []});
+                    }
+                }
+            });
+        }
     });
-    
-  }
-  
 }
 
 function findCompanyLocatedCity(addrArr){
@@ -756,5 +750,91 @@ exports.loadPosition = function(req, res) {
             logger.info('Error in finding all postions', err);
             res.status(500).send({success: false, errmsg: '获取职位信息失败', position: {}});
         });
+    }
+}
+
+exports.searchPosition = function(req, res) {
+    var limit = _.get(req, ['query', 'limit'], ''),
+        offset = _.get(req, ['query', 'offset'], ''),
+        keyword = _.get(req, ['query', 'keyword'], '');
+    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 5;
+    offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
+    console.log(limit, offset, keyword);
+    if(_.isEmpty(keyword)){
+        res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+    } else {
+        var searchPositionsTask = [];
+        searchPositionsTask.push(startSearchPositionsByKeyword(keyword, offset, limit));
+        searchPositionsTask.push(searchPositionsFromPositionKeyword());
+        searchPositionsTask.push(searchPositionsByCompanyKeyword());
+        async.waterfall(searchPositionsTask, function(error, result){
+            if(error) {
+                res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+            } else {
+                var dbPositions = _.get(result, ['dbPositions'], []);
+                res.json({success: true, position: dbPositions});
+            }
+        })
+    }
+}
+
+function startSearchPositionsByKeyword(keyword, offset, limit){
+    return function(callback){
+        var result = {
+            keyword: keyword,
+            offset: offset,
+            limit: limit
+        }
+        return callback(null, result);
+    }
+}
+
+function searchPositionsFromPositionKeyword(){
+    return function(result, callback){
+        var limit = _.get(result, ['limit'], ''),
+            offset = _.get(result, ['offset'], ''),
+            keyword = _.get(result, ['keyword'], '');
+        Position.find({name:{$regex:keyword}}).skip(parseInt(offset)).limit(parseInt(limit)).exec(function(err, dbPositions){
+            if(err) {
+                console.error('Error in searching positions from position db', err);
+                return callback(err, null);
+            } else {
+                result.dbPositions = dbPositions;
+                return callback(null, result);
+            }
+        });
+    }
+}
+
+function searchPositionsByCompanyKeyword() {
+    return function(result, callback){
+        var positions = _.get(result, ['dbPositions'], []);
+        if (!_.isEmpty(positions)) {
+            return callback(null, result);
+        } else {
+            var limit = _.get(result, ['limit'], ''),
+                offset = _.get(result, ['offset'], ''),
+                keyword = _.get(result, ['keyword'], '');
+            Company.find({companyName: {$regex: keyword}}).exec(function (err1, dbCompanies) {
+                if (err1) {
+                    console.error('Error in searching positions from company relation', err1);
+                    return callback(err1, null);
+                } else {
+                    console.log('the number of companies ' + dbCompanies.length);
+                    var companiesIds = _.map(dbCompanies, '_id');
+                    Position.find({companyId: {$in: companiesIds}}).exec(function (err2, dbPositions) {
+                        if(err2){
+                            return callback(null, result);
+                        } else {
+                            console.log('the number of positions before pagination:  ' + dbPositions.length);
+                            var pagingPositions = _.slice(dbPositions, offset, offset + limit);
+                            console.log('the number of positions after pagination:  ' + pagingPositions.length);
+                            result.dbPositions = pagingPositions;
+                            return callback(null, result);
+                        }
+                    });
+                }
+            });
+        }
     }
 }
