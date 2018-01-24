@@ -479,6 +479,9 @@ function getAllCompanyNames(req, res, next){
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
+        if(_.isEmpty(lon1) || _.isEmpty(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
+            return 0;
+        }
         var DEF_PI = 3.14159265359; // PI
         var DEF_2PI = 6.28318530712; // 2*PI
         var DEF_PI180 = 0.01745329252; // PI/180.0
@@ -558,84 +561,17 @@ exports.findNearbyPositions = function (req, res, next) {
                         _.forEach(latLngArr, function (latLntString, index) {
                             var arr = latLntString.split(',');
                             var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
+                            var distance = latLngDistances[index];
                             if (!_.isEmpty(cop)) {
                                 var copPositions = positionGroup[cop._id];
-                                var tempPositions = [];
-                                _.forEach(copPositions, function (posi) {
-                                    let ageRangeStart = posi.ageRangeStart || '',
-                                        ageRangeEnd = posi.ageRangeEnd || '',
-                                        salaryStart = posi.salaryStart || '',
-                                        salaryEnd = posi.salaryEnd || '',
-                                        ageRange = '',
-                                        salaryRange = '';
-                                    if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                        ageRange = ageRangeStart + '~' + ageRangeEnd;
-                                    }
-                                    if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                        salaryRange = salaryStart + '~' + salaryEnd;
-                                    }
-                                    let clonePosi = {
-                                        name: posi.name,
-                                        ageRange: ageRange,
-                                        contactPerson: posi.contactPerson,
-                                        totalRecruiters: posi.totalRecruiters,
-                                        salary: salaryRange,
-                                        welfares: posi.welfares,
-                                        positionDesc: posi.positionDesc,
-                                        _id: posi._id,
-                                        companyId: posi.companyId,
-                                        phoneNumber: posi.phoneNumber,
-                                        companyName: cop.companyName,
-                                        alias: cop.alias,
-                                        distance: Math.floor(latLngDistances[index]),
-                                    };
-                                    var addr = _.get(cop, ['companyAddress'], ''),
-                                        addrArr = addr.split(',');
-                                    clonePosi.city = findCompanyLocatedCity(addrArr);
-
-                                    tempPositions.push(clonePosi);
-                                });
+                                var tempPositions = constructPositionVOs(copPositions, cop, distance);
                                 sortedPositions = _.concat(sortedPositions, tempPositions);
                             }
                         });
                         _.forEach(dbCompanies, function (cop) {
                             var copPositions = positionGroup[cop._id];
-                            var tempPositions = [];
                             if (_.isEmpty(cop.lat) || _.isEmpty(cop.lng)) {
-                                _.forEach(copPositions, function (posi) {
-                                    let ageRangeStart = posi.ageRangeStart || '',
-                                        ageRangeEnd = posi.ageRangeEnd || '',
-                                        salaryStart = posi.salaryStart || '',
-                                        salaryEnd = posi.salaryEnd || '',
-                                        ageRange = '',
-                                        salaryRange = '';
-                                    if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                        ageRange = ageRangeStart + '~' + ageRangeEnd;
-                                    }
-                                    if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                        salaryRange = salaryStart + '~' + salaryEnd;
-                                    }
-                                    let clonePosi = {
-                                        name: posi.name,
-                                        contactPerson: posi.contactPerson,
-                                        totalRecruiters: posi.totalRecruiters,
-                                        ageRange: ageRange,
-                                        salary: salaryRange,
-                                        welfares: posi.welfares,
-                                        positionDesc: posi.positionDesc,
-                                        _id: posi._id,
-                                        companyId: posi.companyId,
-                                        phoneNumber: posi.phoneNumber,
-                                        companyName: cop.companyName,
-                                        alias: cop.alias,
-                                        distance: '-'
-                                        //no distance
-                                    };
-                                    var addr = _.get(cop, ['companyAddress'], ''),
-                                        addrArr = addr.split(',');
-                                    clonePosi.city = findCompanyLocatedCity(addrArr);
-                                    tempPositions.push(clonePosi);
-                                });
+                                var tempPositions = constructPositionVOs(copPositions, cop);
                                 unsortPositions = _.concat(unsortPositions, tempPositions);
                             }
 
@@ -758,51 +694,71 @@ exports.loadPosition = function(req, res) {
 exports.searchPosition = function(req, res) {
     var limit = _.get(req, ['query', 'limit'], ''),
         offset = _.get(req, ['query', 'offset'], ''),
-        keyword = _.get(req, ['query', 'keyword'], '');
+        keyword = _.get(req, ['query', 'keyword'], ''),
+        locationInfo = _.get(req, ['body']);
     limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 5;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
     console.log(limit, offset, keyword);
     if(_.isEmpty(keyword)){
-        res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+        res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: [], existFlag: stillExist});
     } else {
         var searchPositionsTask = [];
-        searchPositionsTask.push(startSearchPositionsByKeyword(keyword, offset, limit));
+        searchPositionsTask.push(startSearchPositionsByKeyword(keyword, offset, limit, locationInfo));
         searchPositionsTask.push(searchPositionsFromPositionKeyword());
         searchPositionsTask.push(searchPositionsByCompanyKeyword());
         async.waterfall(searchPositionsTask, function(error, result){
             if(error) {
-                res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: []});
+                res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: [], existFlag: stillExist});
             } else {
                 var dbPositions = _.get(result, ['dbPositions'], []);
-                res.json({success: true, position: dbPositions});
+                var stillExist = _.get(result, ['stillExist'], false);
+                res.json({success: true, position: dbPositions, existFlag: stillExist});
             }
         })
     }
 }
 
-function startSearchPositionsByKeyword(keyword, offset, limit){
+function startSearchPositionsByKeyword(keyword, offset, limit, locationInfo){
     return function(callback){
         var result = {
             keyword: keyword,
             offset: offset,
-            limit: limit
+            limit: limit,
+            locationInfo: locationInfo
         }
         return callback(null, result);
     }
 }
 
+
+
 function searchPositionsFromPositionKeyword(){
     return function(result, callback){
         var limit = _.get(result, ['limit'], ''),
             offset = _.get(result, ['offset'], ''),
-            keyword = _.get(result, ['keyword'], '');
-        Position.find({name:{$regex:keyword}}).skip(parseInt(offset)).limit(parseInt(limit)).exec(function(err, dbPositions){
+            keyword = _.get(result, ['keyword'], ''),
+            locationInfo = _.get(result, ['locationInfo'], {});
+        Position.find({name:{$regex:keyword}}).exec(function(err, dbPositions){
             if(err) {
                 console.error('Error in searching positions from position db', err);
                 return callback(err, null);
             } else {
-                result.dbPositions = dbPositions;
-                return callback(null, result);
+                if(_.isEmpty(dbPositions)){
+                    return callback(null, result);
+                } else {
+                    var companyIds = _.uniq(_.map(dbPositions, 'companyId'));
+                    Company.find({_id: {$in: companyIds}}).exec(function(findCopError, dbCompanies){
+                       if(findCopError || _.isEmpty(dbCompanies)) {
+                           logger.error('Error in find related company by company id', JSON.stringify(companyIds), findCopError);
+                           return callback(findCopError, null);
+                       } else {
+                           var positionResult = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
+                           result.dbPositions = positionResult.dbPositions;
+                           result.stillExist = positionResult.stillExist;
+                           return callback(null, result);
+                       }
+                    });
+                }
             }
         });
     }
@@ -816,22 +772,20 @@ function searchPositionsByCompanyKeyword() {
         } else {
             var limit = _.get(result, ['limit'], ''),
                 offset = _.get(result, ['offset'], ''),
-                keyword = _.get(result, ['keyword'], '');
+                keyword = _.get(result, ['keyword'], ''),
+                locationInfo = _.get(result, ['locationInfo'], {});
             Company.find({companyName: {$regex: keyword}}).exec(function (err1, dbCompanies) {
-                if (err1) {
-                    console.error('Error in searching positions from company relation', err1);
+                if (err1 || _.isEmpty(dbCompanies)) {
+                    console.error('Error in searching company by keyword', err1);
                     return callback(err1, null);
                 } else {
                     console.log('the number of companies ' + dbCompanies.length);
-                    var companiesIds = _.map(dbCompanies, '_id');
-                    Position.find({companyId: {$in: companiesIds}}).exec(function (err2, dbPositions) {
-                        if(err2){
+                    var companyIds = _.map(dbCompanies, '_id');
+                    Position.find({companyId: {$in: companyIds}}).exec(function (err2, dbPositions) {
+                        if(err2 || _.isEmpty(dbPositions)){
                             return callback(null, result);
                         } else {
-                            console.log('the number of positions before pagination:  ' + dbPositions.length);
-                            var pagingPositions = _.slice(dbPositions, offset, offset + limit);
-                            console.log('the number of positions after pagination:  ' + pagingPositions.length);
-                            result.dbPositions = pagingPositions;
+                            result = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
                             return callback(null, result);
                         }
                     });
@@ -839,4 +793,78 @@ function searchPositionsByCompanyKeyword() {
             });
         }
     }
+}
+
+function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit) {
+    var result = {};
+    var positionGroup = _.groupBy(dbPositions, 'companyId');
+    var sortedPositions = [];
+    var unsortedPositions = [];
+    _.forEach(dbCompanies, function (cop) {
+        var copPositions = positionGroup[cop._id];
+        if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
+            //sort distance
+            var distance = parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000;
+            var tempPositions = constructPositionVOs(copPositions, cop, distance);
+            sortedPositions = _.concat(sortedPositions, tempPositions);
+        } else {
+            //cannot calculate distance
+            var tempPositions = constructPositionVOs(copPositions, cop);
+            unsortedPositions = _.concat(unsortedPositions, tempPositions);
+        }
+    });
+    sortedPositions.sort(function (b, c) {
+        return b.distance > c.distance;
+    });
+    sortedPositions = _.concat(sortedPositions, unsortedPositions);
+    console.log('the number of positions before pagination:  ' + sortedPositions.length);
+    var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
+    var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
+    var stillExist = sortedPositions.length > displayedPositions.length;
+    console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
+    result.dbPositions = pagingPositions;
+    result.stillExist = stillExist;
+    return result;
+}
+
+function constructPositionVOs(copPositions, cop, distance) {
+    var distanceStr = '-'; //no distance
+    if(!_.isEmpty(distance) && _.isNumber(distance)){
+        distanceStr = Math.floor(distance);
+    }
+    var tempPositions = [];
+    _.forEach(copPositions, function (posi) {
+        let ageRangeStart = posi.ageRangeStart || '',
+            ageRangeEnd = posi.ageRangeEnd || '',
+            salaryStart = posi.salaryStart || '',
+            salaryEnd = posi.salaryEnd || '',
+            ageRange = '',
+            salaryRange = '';
+        if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+            ageRange = ageRangeStart + '~' + ageRangeEnd;
+        }
+        if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+            salaryRange = salaryStart + '~' + salaryEnd;
+        }
+        let clonePosi = {
+            name: posi.name,
+            ageRange: ageRange,
+            contactPerson: posi.contactPerson,
+            totalRecruiters: posi.totalRecruiters,
+            salary: salaryRange,
+            welfares: posi.welfares,
+            positionDesc: posi.positionDesc,
+            _id: posi._id,
+            companyId: posi.companyId,
+            phoneNumber: posi.phoneNumber,
+            companyName: cop.companyName,
+            alias: cop.alias,
+            distance: distanceStr
+        };
+        var addr = _.get(cop, ['companyAddress'], ''),
+            addrArr = addr.split(',');
+        clonePosi.city = findCompanyLocatedCity(addrArr);
+        tempPositions.push(clonePosi);
+    });
+    return tempPositions;
 }
