@@ -511,7 +511,7 @@ exports.findNearbyPositions = function (req, res, next) {
     var limit = _.get(req, ['query', 'limit'], ''),
         offset = _.get(req, ['query', 'offset'], '');
     console.log(limit, offset);
-    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 5;
+    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
     console.log(limit, offset);
     let addrArr = [], addr = '', latLngStr = '';
@@ -527,11 +527,11 @@ exports.findNearbyPositions = function (req, res, next) {
     addr = addrArr.join(',');
     Company.find({}, function (err1, dbCompanies) {
         if (err1) {
-            logger.info('Error in getting company by address reg', err1);
-            res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+            logger.info('Error in getting company ', err1);
+            res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
         } else if (_.isEmpty(dbCompanies)) {
-            logger.info('no companies found in that area');
-            res.json({success: true, positions: []});
+            logger.info('no companies found');
+            res.json({success: true, positions: [], existFlag: false});
         } else {
             var ids = [];
             var latLngArr = [];
@@ -548,7 +548,7 @@ exports.findNearbyPositions = function (req, res, next) {
             Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
                 if (err2) {
                     logger.info('Error in finding positions per id', err2);
-                    res.status(500).send({success: false, errmsg: '获取职位信息失败'});
+                    res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
                 } else {
 
                     if (!_.isEmpty(dbPositions)) {
@@ -647,9 +647,11 @@ exports.findNearbyPositions = function (req, res, next) {
                         sortedPositions = _.concat(sortedPositions, unsortPositions);
                         logger.info(sortedPositions.length);
                         var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
-                        res.json({success: true, positions: pagingPositions});
+                        var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
+                        var stillExist = sortedPositions.length > displayedPositions.length;
+                        res.json({success: true, positions: pagingPositions, existFlag: stillExist});
                     } else {
-                        res.json({success: true, positions: []});
+                        res.json({success: true, positions: [], existFlag: false});
                     }
                 }
             });
