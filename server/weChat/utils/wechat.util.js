@@ -50,7 +50,7 @@ function getJsApiTicket(accessToken){
         if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(result) && result.errmsg == 'ok'){
             console.log('jsapi_ticket returned ' + JSON.stringify(result));
             var jsApiTicket = _.get(result, ['ticket'], '');
-            if(!_.isEmpty(ticket))
+            if(!_.isEmpty(jsApiTicket))
                 global.jsApiTicket = jsApiTicket;
         } else {
             var errmsg = {errmsg: _.get(result, ['errmsg'], ''), error: error, statusCode: _.get(response, ['statusCode'], 0)};
@@ -115,6 +115,7 @@ function generateNonceString(length){
 
 function getSignature(url){
     var ticket = _.get(global, ['jsApiTicket'], '');
+    console.log('js_api_ticket: ' + ticket);
     var noncestr = generateNonceString(),
         timestamp = Date.now().toString().substr(0,10);
     var str1 = "jsapi_ticket=" + ticket +
