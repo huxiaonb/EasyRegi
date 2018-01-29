@@ -27,8 +27,8 @@ wx.config({
 wx.ready(function(){
     wx.onMenuShareTimeline({
         title: '入职易--我刚找到了一份好工作，你也来试试',
-        link: 'http://www.baidu.com',
-        imgUrl: 'http://avatar.csdn.net/E/B/6/1_frankcheng5143.jpg',
+        link: 'http://www.mfca.com.cn',
+        imgUrl: 'http://www.mfca.com.cn/img/dog.jpg',
         success: function () {
             // 用户确认分享后执行的回调函数
             alert('分享到朋友圈成功');
