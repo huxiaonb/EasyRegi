@@ -875,3 +875,107 @@ exports.testWechatApi = function(req, res){
     console.log('signature obj: ' + JSON.stringify(signatureObj));
     res.render('server/weChat/views/wechatApiTest', {openId: 'wechat1234567', signatureObj: JSON.stringify(signatureObj)});
 }
+
+exports.sendRedPack = function(req, res){
+    var wechatRedPackUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';
+    var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var _now = new Date();
+    var nonceStr = wechatUtil.generateNonceString();
+    var mchId = '1481782312';
+    var _date_time = _now.getFullYear()+''+(_now.getMonth()+1)+''+_now.getDate();
+    var _date_no = (_now.getTime() +'').substr(-8);
+    var _random_no = Math.floor(Math.random()*99);
+    var mchBillNo = mchId + _date_time + _date_no + _random_no;
+    var redPackOpt = {
+        'nonce_str': nonceStr,
+        'sign': '',
+        'mch_billno': mchBillNo,
+        'mch_id': mchId,
+        'wxappid': 'wx54e94ab2ab199342',
+        'send_name': '入职易',
+        're_openid': openId,
+        'total_amount': '100',
+        'total_num': '1',
+        'wishing': '恭喜发财',
+        'client_ip': '39.108.136.90',
+        'act_name': '虚拟物品兑奖',
+        'remark': '更多参与，更多回报'
+        // 'scene_id': '',
+        // 'risk_info': '',
+        // 'consume_mch_id': '',
+    };
+    var sign = wechatUtil.sign(redPackOpt);
+    redPackOpt.sign = sign;
+    request.post({
+        url: wechatRedPackUrl,
+        key: fs.readFileSync('resources/certs/apiclient_key.pem'),
+        cert: fs.readFileSync('resources/certs/apiclient_cert.pem'),
+        body: wechatUtil.buildXML(redPackOpt)
+    }, function(error, response, body){
+        if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
+            parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
+                if(err){
+                    logger.info('Failed in sending red pack', err);
+                    res.status(500).send({success: false, errmsg: '发送红包失败'});
+                }else if(result.return_code === 'SUCCESS' && result.result_code === 'SUCCESS'){
+                    res.json({success: true});
+                } else {
+                    var errMsg = {'return_code': result.return_code, 'return_msg': result.return_msg, 'result_code': result.result_code, 'err_code': result.err_code, 'err_code_des': result.err_code_des};
+                    logger.info('Failed in sending red pack as: ', JSON.stringify(errMsg));
+                    res.json({success: false, errmsg: JSON.stringify(errMsg)});
+                }
+            });
+        }
+    });
+}
+
+exports.sendTemplateMessage = function(req, res){
+    var wechatSendTemplateMessageUrl = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' + global.accessToken;
+    var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var title = '尊敬的xxx，您的简历已通过审核';
+    var remark = '邀请您面试并办理入职手续，请尽快带齐您的相关证件前往办理，联系人：XXX，联系电话：XXXXXXX';
+    var templateMessageOpt = {
+        "touser": openId,
+        "template_id": "x5dSWR4FZHkrYo8AMSKHZbByK0tXBXvvni0lLTi6CE4",
+        // "url":"http://weixin.qq.com/download",
+        // "miniprogram":{
+        //     "appid":"xiaochengxuappid12345",
+        //     "pagepath":"index?foo=bar"
+        // },
+        "data":{
+            "first": {
+                "value": title,
+                "color": "#000000"
+            },
+            "job":{
+                "value": "宠物营养师",
+                "color": "#000000"
+            },
+            "company": {
+                "value": "农大立德宠物医院",
+                "color": "#000000"
+            },
+            "time": {
+                "value": "2018年01月22日",
+                "color": "#000000"
+            },
+            "remark":{
+                "value": remark,
+                "color": "#FF4040"
+            }
+        }
+    };
+    request.post({
+        url: wechatSendTemplateMessageUrl,
+        body: templateMessageOpt,
+        json: true
+    }, function(error, response, body){
+        if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
+            console.log('call send template message api with feedback: ', body);
+            res.json({success: true});
+        } else {
+            var errMsg = {error: error, statusCode: _.get(response, ['statusCode'], 0), errMsgFromWechat: _.get(body, ['errmsg'], '')};
+            res.status(500).send({success: false, errmsg: '发送消息失败'});
+        }
+    });
+}

@@ -30,4 +30,6 @@ module.exports = function (app) {
     app.route('/weChat/position/loadPosition').post(weChatController.loadPosition);
     app.route('/weChat/position/search').get(weChatController.searchPosition).post(weChatController.searchPosition);
     app.route('/testWechatApi').get(weChatController.testWechatApi);
+    app.route('/sendRedPack').get(weChatController.sendRedPack);
+    app.route('/sendTemplateMessage').get(weChatController.sendTemplateMessage);
 };
