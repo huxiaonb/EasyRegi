@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result, SearchBar} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
 
 import LuckyPacket from './lucky'
 import lapi from './registerProfile/lapi'
@@ -21,10 +21,27 @@ class Positions extends React.Component{
         positionPanelLists : [],
         isLocationExist: false,
         limit : 5,
-        offset : 5
+        offset : 5,
+        slimit : 5,
+        soffset : 5,
+        kw : ''
     }
-    onSearch(e){
-        console.log(e);
+    async onSearch(kw){
+        console.log(kw);
+        if(kw===''){
+            this.load();
+        }else{
+            let info = this.state.geolocation;
+            let r = await lapi.searchPositions(info, 5, 0, kw);
+            if (r.success) {
+                this.setState({
+                    kw,
+                    nearbyPositions: r.position
+                })
+            } else {
+                console.log(r);
+            }
+        }
     }
     constructAddrByLocation(info){
         let addrArr = [], addr = '';
@@ -68,45 +85,47 @@ class Positions extends React.Component{
             }
         }
     }
-    async componentWillMount(){
+    async load(){
         //console.log('componentWillMount')
         //alert('2');
-        let {limit, offset} = this.state;
         let info = this.props.args;
         //未成功获取位置信息
         //alert(JSON.stringify(this.props.args));
-        if(!info || info.addr === ''){
+        if (!info || info.addr === '') {
             //alert('4');
             this.setState({
-                locationFlag : true
+                locationFlag: true
             });
-        }else{
+        } else {
             //alert('3');
             let re = {};
             let addr = this.constructAddrByLocation(info);
-            if(addr != ''){
+            if (addr != '') {
                 Toast.loading('Loading...', 0);
                 re = await lapi.findNearbyPositions(info);
             }
 
-                // re = await lapi.findAllPositions();
+            // re = await lapi.findAllPositions();
             //alert(JSON.stringify(re));
-            if(info){
+            if (info) {
                 this.setState({
-                    geolocation : info,
+                    geolocation: info,
                     isLocationExist: true
                 });
             }
-            if(re != null && re != undefined && re.positions != null && re.positions != undefined){
+            if (re != null && re != undefined && re.positions != null && re.positions != undefined) {
                 this.setState({
                     nearbyPositions: re.positions,
-                    locationFlag :　false,
+                    noMoreP: !re.existFlag,
+                    locationFlag: 　false,
                 });
                 Toast.hide();
 
             }
         }
-        
+    }
+    componentWillMount(){
+        this.load();
         //get position List
     }
     filterSame(newA=[],old=[]){
@@ -116,9 +135,10 @@ class Positions extends React.Component{
         return newA;
     }
     async loadMore(){
-        if (this.state.noMoreP) return;
-        let { nearbyPositions, geolocation, luckyFlag, limit, offset } = this.state;
-        let r = await lapi.findNearbyPositions(geolocation, limit, offset);
+        let { nearbyPositions,  geolocation, limit, offset, slimit, soffset, noMoreP, kw } = this.state;
+        if (noMoreP) return;
+        let r = kw.length ? await lapi.findNearbyPositions(geolocation, limit, offset) : await lapi.searchPositions(geolocation,slimit,soffset,kw);
+        
         if (r && r.success) {
             this.setState({
                 nearbyPositions: [...nearbyPositions, ...r.positions],
@@ -188,16 +208,14 @@ class Positions extends React.Component{
                             <InputItem  placeholder='在这里搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
                         </div>
                         
-                        <Accordion>
-                            <Accordion.Panel header="对象" className="">api返回对象</Accordion.Panel>
-                        </Accordion>
+                        
                         <Accordion>
                             {list}
                         </Accordion>
                         {noMoreP ? <div className='curr-geo' style={{marginTop:'10px',opacity:0.5}}>
                             <span style={{}}>已列出所有附近职位</span>
                         </div> :
-                        <div style={{marginTop:'10px'}}><Button type='primary' onClick={this.loadMore.bind(this)}>加载更多</Button></div>}
+                        <div style={{marginTop:'10px'}}><Button type='primary' style={{width : 'auto'}} onClick={this.loadMore.bind(this)}>加载更多</Button></div>}
                     </div>
                 </div>
                 <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>

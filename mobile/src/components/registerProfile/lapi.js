@@ -31,6 +31,7 @@ const _request = (url, opt = {}) => {
     delete options.serialize;
     return $.ajax(options)
 }
+let abortHandler;
 export default {
     //api list,
     createApplicant(data){
@@ -101,6 +102,17 @@ export default {
             type: 'POST',
             data : info
         });
+    },
+    searchPositions(info, limit = 5, offset = 0, keyword) {
+        //中断上一次请求后再请求再搜索下一个关键词
+        abortHandler && abortHandler();
+        let re =  _request({
+            url: '../weChat/position/search?limit=' + limit + '&offset=' + offset + '&keyword=' + keyword,
+            type: 'POST',
+            data: info
+        });
+        abortHandler = re.abort;
+        return re
     },
     findAllPositions(){
         return _request({
