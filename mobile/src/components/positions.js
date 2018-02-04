@@ -19,7 +19,9 @@ class Positions extends React.Component{
         geolocation : {},
         nearbyPositions : [],
         positionPanelLists : [],
-        isLocationExist: false
+        isLocationExist: false,
+        limit : 5,
+        offset : 5
     }
     onSearch(e){
         console.log(e);
@@ -38,6 +40,7 @@ class Positions extends React.Component{
         return addr;
     }
     async componentWillReceiveProps(nextProps){
+        let {limit, offset}  = this.state;
         let info = !!nextProps ?　nextProps.args : '';　
         if(!info || info.addr === ''){
             this.setState({
@@ -68,6 +71,7 @@ class Positions extends React.Component{
     async componentWillMount(){
         //console.log('componentWillMount')
         //alert('2');
+        let {limit, offset} = this.state;
         let info = this.props.args;
         //未成功获取位置信息
         //alert(JSON.stringify(this.props.args));
@@ -98,7 +102,6 @@ class Positions extends React.Component{
                     nearbyPositions: re.positions,
                     locationFlag :　false,
                 });
-                this.loadMore();
                 Toast.hide();
 
             }
@@ -106,51 +109,60 @@ class Positions extends React.Component{
         
         //get position List
     }
-    loadMore(){
-        let {nearbyPositions,luckyFlag} = this.state;
-        let waitShowList = nearbyPositions.slice(0, 5);
-        if(waitShowList && waitShowList.length < 5){
-            this.setState({noMoreP : true})
-        }
-
-        let pArr = [...this.state.positionPanelLists];
-        if(waitShowList != null && waitShowList != undefined) {
-            waitShowList.map((ele, idx)=>{
-                //let headerName = ele.name;
-                let accHeader = (
-                    <div >
-                        <p>分享到朋友圈</p>
-                        <p>分享后有<LuckyPacket />奖励</p>
-                    </div>
-                );
-                const positionPanelItem = (
-                    <Accordion.Panel header={accHeader} key={`position_${ele._id}`}>
-                        <List>
-                            <Item extra={ele.companyName}>公司</Item>
-                            <Item extra={ele.totalRecruiters}>招聘人数</Item>
-                            <Item extra={ele.ageRange}>年龄范围</Item>
-                            <Item extra={ele.contactPerson}>联系人</Item>
-                            <Item extra={ele.phoneNumber}>联系电话</Item>
-                            <Item extra={ele.salary}>薪资</Item>
-                            <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
-                            <Item id='p_btn_grp' style={{marginTop:'2em'}}>
-                                <Button type="primary" size="small" inline style={{marginRight:'1em'}}>立即应聘</Button>
-                                <Button type="primary" size="small" inline >转发给朋友</Button>
-                            </Item>
-                        </List>
-                    </Accordion.Panel>
-                );
-                pArr.push(positionPanelItem);
-            });
-        }
-        this.setState({
-            nearbyPositions : nearbyPositions.slice(5),
-            positionPanelLists : pArr
-        });
+    filterSame(newA=[],old=[]){
+        old.map(o=>{
+            newA = newA.filter(a=>(a._id !== o._id));
+        })
+        return newA;
     }
-    render(){
+    async loadMore(){
+        if (this.state.noMoreP) return;
+        let { nearbyPositions, geolocation, luckyFlag, limit, offset } = this.state;
+        let r = await lapi.findNearbyPositions(geolocation, limit, offset);
+        if (r && r.success) {
+            this.setState({
+                nearbyPositions: [...nearbyPositions, ...r.positions],
+                noMoreP: !r.existFlag,
+                offset: r.existFlag ? offset + 5 : offset,
+            })
+        }
+    }
 
-        let {geolocation, nearbyPositions, isLocationExist,locationFlag, waitShowList, positionPanelLists, noMoreP} = this.state;
+        
+    render(){
+        let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, luckyFlag} = this.state;
+            
+        
+            const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
+                return (
+                        <Accordion.Panel header={
+                            <div style={{ display: 'flex' }}>
+                                {luckyFlag ? (<LuckyPacket style={{ marginRight: '.2em',marginTop : '.3em'}} />) : ('')}
+                                <div>
+                                    <span><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></span>
+                                    <p><span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span></p>
+                                </div>
+                            </div>
+                        } 
+                         key={`position_${ele._id}`}
+                         >
+                            <List>
+                                <Item extra={ele.companyName}>公司</Item>
+                                <Item extra={ele.totalRecruiters}>招聘人数</Item>
+                                <Item extra={ele.ageRange}>年龄范围</Item>
+                                <Item extra={ele.contactPerson}>联系人</Item>
+                                <Item extra={ele.phoneNumber}>联系电话</Item>
+                                <Item extra={ele.salary}>薪资</Item>
+                                <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
+                                <Item id='p_btn_grp' style={{ marginTop: '2em' }}>
+                                    <Button type="primary" size="small" inline style={{ marginRight: '1em' }}>立即应聘</Button>
+                                    <Button type="primary" size="small" inline >转发给朋友</Button>
+                                </Item>
+                            </List>
+                        </Accordion.Panel>
+                );
+            }) : null;
+        
         // let location = JSON.stringify(geolocation)
         if(locationFlag){
             return (
@@ -176,11 +188,11 @@ class Positions extends React.Component{
                             <InputItem  placeholder='在这里搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
                         </div>
                         
-                        {/*<Accordion>
-                            <Accordion.Panel header="对象" className="">api返回对象：{location}</Accordion.Panel>
-                        </Accordion>*/}
                         <Accordion>
-                            {positionPanelLists}
+                            <Accordion.Panel header="对象" className="">api返回对象</Accordion.Panel>
+                        </Accordion>
+                        <Accordion>
+                            {list}
                         </Accordion>
                         {noMoreP ? <div className='curr-geo' style={{marginTop:'10px',opacity:0.5}}>
                             <span style={{}}>已列出所有附近职位</span>

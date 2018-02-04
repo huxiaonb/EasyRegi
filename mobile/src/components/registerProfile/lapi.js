@@ -95,9 +95,9 @@ export default {
         })
         
     },
-    findNearbyPositions(info){
+    findNearbyPositions(info,limit=5,offset=0){
         return _request({
-            url: '../weChat/position/findNearbyPositions',
+            url: '../weChat/position/findNearbyPositions?limit=' + limit + '&offset=' + offset,
             type: 'POST',
             data : info
         });
