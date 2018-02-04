@@ -29,4 +29,5 @@ module.exports = function (app) {
     app.route('/weChat/position/findNearbyPositions').post(weChatController.findNearbyPositions);
     app.route('/weChat/position/findAllPositions').get(weChatController.findAllPositions);
     app.route('/weChat/position/loadPosition').post(weChatController.loadPosition);
+    app.route('/weChat/position/search').get(weChatController.searchPosition).post(weChatController.searchPosition);
 };

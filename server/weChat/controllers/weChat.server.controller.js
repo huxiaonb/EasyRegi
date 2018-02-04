@@ -1,6 +1,7 @@
 'use strict';
 var config = require('../../../config/config');
 var logger = require('../../../config/lib/logger');
+var async = require('async');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
 var _ = require('lodash');
@@ -129,8 +130,8 @@ exports.checkIfNeedPay = function(req, res){
 }
 
 exports.createUnifiedOrder = function(req, res) {
-//1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
-//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
+//1.统一下单API � trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
+//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前� timeStamp只能�0� 超过报错
   var opts = {
       appid: 'wx54e94ab2ab199342',
       body : '办理入职手续',
@@ -344,7 +345,7 @@ exports.submitRegisterCompany = function(req, res){
     }).then(applicants => {
       if(_.isEmpty(applicants)){
         logger.info('Applicant does not exist, cannot register company');
-        res.status(500).send({success: false, errmsg: '用户不存在，不能提交简历'});
+        res.status(500).send({success: false, errmsg: '用户不存在，不能提交简�});
       } else {
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
@@ -393,7 +394,7 @@ exports.submitRegisterCompany = function(req, res){
 
           } else {
             logger.info('cannot find company with company id', companyId);
-            res.status(500).send({success: false, errmsg: '找不到指定公司'});
+            res.status(500).send({success: false, errmsg: '找不到指定公�});
           }
         });
       }
@@ -414,7 +415,7 @@ function sendNotificationEmail(dbCompany, callback){
         domainUrl = _.get(config, ['domainUrl'], ''),
         notificationSubject = _.get(config, ['emailConfig', 'applyPositionNotificationSubject'], ''),
         notificationHtmlTemplate = _.get(config, ['emailConfig', 'applyPositionNotificationHtmlTemplate'], ''),
-        dateStr = moment().format('YYYY年MM月DD日');
+        dateStr = moment().format('YYYY年MM月DD�);
     var notificationEmailContent = notificationHtmlTemplate.replace(/\[Domain_Url\]/ig, domainUrl).replace(/\[Login_Username\]/i, companyEmail).replace(/\[Login_Password\]/i, companyPassword).replace(/\[Date_Str\]/i, dateStr);
     var emailOpt = {
         from: adminEmailBanner,
@@ -495,6 +496,9 @@ function getAllCompanyNames(req, res, next){
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
+        if(_.isEmpty(lon1) || _.isEmpty(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
+            return 0;
+        }
         var DEF_PI = 3.14159265359; // PI
         var DEF_2PI = 6.28318530712; // 2*PI
         var DEF_PI180 = 0.01745329252; // PI/180.0
@@ -502,14 +506,14 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         var ew1, ns1, ew2, ns2;
         var dx, dy, dew;
         var distance;
-        // 角度转换为弧度
+        // 角度转换为弧�
         ew1 = lon1 * DEF_PI180;
         ns1 = lat1 * DEF_PI180;
         ew2 = lon2 * DEF_PI180;
         ns2 = lat2 * DEF_PI180;
-        // 经度差
+        // 经度�
         dew = ew1 - ew2;
-        // 若跨东经和西经180 度，进行调整
+        // 若跨东经和西�80 度，进行调整
         if (dew > DEF_PI)
             dew = DEF_2PI - dew;
         else if (dew < -DEF_PI)
@@ -522,187 +526,115 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         return distance;
     }
 
-exports.findNearbyPositions = function(req, res, next){
-  var locationInfo = _.get(req, ['body']);
-  let addrArr = [], addr = '', latLngStr = '';
-  if(locationInfo != null && locationInfo != undefined){
-      if(locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
-          addrArr.push(locationInfo.province);
-      if(locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
-          addrArr.push(locationInfo.city);
-      if(locationInfo.lat != undefined && locationInfo.lng != undefined){
-        latLngStr = locationInfo.lat + ',' + locationInfo.lng;
-      }
-  }
-  addr = addrArr.join(',');
-  if(_.isEmpty(addr)){
-    Position.find({}, function(err, dbPositions){
-      if(err) {
-        logger.info('Error in getting positions', err);
-        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-      } else {
-        res.json({success: true, positions: dbPositions});
-      }
-    });
-  } else {
-    Company.find({companyAddress:{$regex:addr}}, function(err1, dbCompanies){
-      if(err1) {
-        logger.info('Error in getting company by address reg', err1);
-        res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-      } else if(_.isEmpty(dbCompanies)) {
-        logger.info('no companies found in that area');
-        res.json({success: true, positions: []});
-      } else {
-        var ids = [];
-        var latLngArr = [];
-        var latLngDistances = [];
-        var _this = this;
-        _.forEach(dbCompanies, function(cop){
-          if(!_.isEmpty(cop) && !_.isEmpty(cop._id))
-            ids.push(cop._id);
-          if(!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))){
-            latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
-            latLngDistances.push(parseInt(getShortDistance(locationInfo.lng,locationInfo.lat,_.get(cop, ['lng']),_.get(cop, ['lat'])))/1000);
-          }
-        });
-          Position.find({companyId:{$in:ids}}, function(err2, dbPositions){
-              if(err2) {
-                  logger.info('Error in finding positions per id', err2);
-                  res.status(500).send({success: false, errmsg: '获取职位信息失败'});
-              } else {
-               
-                  if(!_.isEmpty(dbPositions)){
-                      var positionGroup = _.groupBy(dbPositions, 'companyId');
-                      var sortedPositions = [],
-                          unsortPositions = [];
-                      _.forEach(latLngArr, function(latLntString, index){
-                        var arr = latLntString.split(',');
-                        var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                        if(!_.isEmpty(cop)){
+exports.findNearbyPositions = function (req, res, next) {
+    var locationInfo = _.get(req, ['body']);
+    var limit = _.get(req, ['query', 'limit'], ''),
+        offset = _.get(req, ['query', 'offset'], '');
+    console.log(limit, offset);
+    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
+    offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
+    console.log(limit, offset);
+    let addrArr = [], addr = '', latLngStr = '';
+    if (locationInfo != null && locationInfo != undefined) {
+        if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
+            addrArr.push(locationInfo.province);
+        if (locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
+            addrArr.push(locationInfo.city);
+        if (locationInfo.lat != undefined && locationInfo.lng != undefined) {
+            latLngStr = locationInfo.lat + ',' + locationInfo.lng;
+        }
+    }
+    addr = addrArr.join(',');
+    Company.find({}, function (err1, dbCompanies) {
+        if (err1) {
+            logger.info('Error in getting company ', err1);
+            res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
+        } else if (_.isEmpty(dbCompanies)) {
+            logger.info('no companies found');
+            res.json({success: true, positions: [], existFlag: false});
+        } else {
+            var ids = [];
+            var latLngArr = [];
+            var latLngDistances = [];
+            var _this = this;
+            _.forEach(dbCompanies, function (cop) {
+                if (!_.isEmpty(cop) && !_.isEmpty(cop._id))
+                    ids.push(cop._id);
+                if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
+                    latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
+                    latLngDistances.push(parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000);
+                }
+            });
+            Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
+                if (err2) {
+                    logger.info('Error in finding positions per id', err2);
+                    res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
+                } else {
+
+                    if (!_.isEmpty(dbPositions)) {
+                        var positionGroup = _.groupBy(dbPositions, 'companyId');
+                        var sortedPositions = [],
+                            unsortPositions = [];
+                        _.forEach(latLngArr, function (latLntString, index) {
+                            var arr = latLntString.split(',');
+                            var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
+                            var distance = latLngDistances[index];
+                            if (!_.isEmpty(cop)) {
+                                var copPositions = positionGroup[cop._id];
+                                var tempPositions = constructPositionVOs(copPositions, cop, distance);
+                                sortedPositions = _.concat(sortedPositions, tempPositions);
+                            }
+                        });
+                        _.forEach(dbCompanies, function (cop) {
                             var copPositions = positionGroup[cop._id];
-                            var tempPositions = [];
-                            _.forEach(copPositions, function(posi){
-                              let ageRangeStart = posi.ageRangeStart || '',
-                                ageRangeEnd = posi.ageRangeEnd || '',
-                                salaryStart = posi.salaryStart || '',
-                                salaryEnd = posi.salaryEnd || '',
-                                ageRange = '',
-                                salaryRange = '';
-                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
-                              }
-                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                  salaryRange = salaryStart + '~' + salaryEnd;
-                              }
-                              let clonePosi = {
-                                name : posi.name,
-                                ageRange : ageRange,
-                                contactPerson : posi.contactPerson,
-                                totalRecruiters : posi.totalRecruiters,
-                                salary : salaryRange,
-                                welfares : posi.welfares,
-                                positionDesc : posi.positionDesc,
-                                _id : posi._id,
-                                companyId : posi.companyId,
-                                phoneNumber : posi.phoneNumber,
-                                companyName:cop.companyName,
-                                alias:cop.alias,
-                                distance:Math.floor(latLngDistances[index]),
-                              };
-                              var addr = _.get(cop, ['companyAddress'], ''),
-                                   addrArr = addr.split(',');
-                                clonePosi.city = findCompanyLocatedCity(addrArr);
+                            if (_.isEmpty(cop.lat) || _.isEmpty(cop.lng)) {
+                                var tempPositions = constructPositionVOs(copPositions, cop);
+                                unsortPositions = _.concat(unsortPositions, tempPositions);
+                            }
 
-                                tempPositions.push(clonePosi);
-                            });
-                            sortedPositions = _.concat(sortedPositions, tempPositions);
-                        }
-                      });
-                      _.forEach(dbCompanies, function(cop){
-                        var copPositions = positionGroup[cop._id];
-                        var tempPositions = [];
-                        if(_.isEmpty(cop.lat) || _.isEmpty(cop.lng)){
-                          _.forEach(copPositions, function(posi){
-                              let ageRangeStart = posi.ageRangeStart || '',
-                                  ageRangeEnd = posi.ageRangeEnd || '',
-                                  salaryStart = posi.salaryStart || '',
-                                  salaryEnd = posi.salaryEnd || '',
-                                  ageRange = '',
-                                  salaryRange = '';
-                              if(!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
-                                  ageRange = ageRangeStart + '~' + ageRangeEnd;
-                              }
-                              if(!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
-                                  salaryRange = salaryStart + '~' + salaryEnd;
-                              }
-                              let clonePosi = {
-                                  name : posi.name,
-                                  contactPerson : posi.contactPerson,
-                                  totalRecruiters : posi.totalRecruiters,
-                                  ageRange : ageRange,
-                                  salary : salaryRange,
-                                  welfares : posi.welfares,
-                                  positionDesc : posi.positionDesc,
-                                  _id : posi._id,
-                                  companyId : posi.companyId,
-                                  phoneNumber : posi.phoneNumber,
-                                  companyName:cop.companyName,
-                                  alias:cop.alias,
-                                  distance: '-'
-                                  //no distance
-                                };
-                              var addr = _.get(cop, ['companyAddress'], ''),
-                                  addrArr = addr.split(',');
-                              clonePosi.city = findCompanyLocatedCity(addrArr);
-                              tempPositions.push(clonePosi);
-                          });
-                          unsortPositions = _.concat(unsortPositions, tempPositions);
-                        }
+                        });
 
-                      });
-
-                      sortedPositions.sort(function(b, c){
-                        return b.distance > c.distance;
-                      });
-                      sortedPositions = _.concat(sortedPositions, unsortPositions);
-                      logger.info(sortedPositions.length);
-                      res.json({success: true, positions: sortedPositions});
-                  } else {
-                      res.json({success: true, positions: []});
-                  }
-              }
-          });
-       //});
-      }
+                        sortedPositions.sort(function (b, c) {
+                            return b.distance > c.distance;
+                        });
+                        sortedPositions = _.concat(sortedPositions, unsortPositions);
+                        logger.info(sortedPositions.length);
+                        var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
+                        var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
+                        var stillExist = sortedPositions.length > displayedPositions.length;
+                        res.json({success: true, positions: pagingPositions, existFlag: stillExist});
+                    } else {
+                        res.json({success: true, positions: [], existFlag: false});
+                    }
+                }
+            });
+        }
     });
-    
-  }
-  
 }
 
 function findCompanyLocatedCity(addrArr){
     if(addrArr.length > 0){
         var city = '';
         switch (addrArr[0]){
-            case '香港特别行政区':
+            case '香港特别行政�:
                 city = '香港';
                 break;
-            case '澳门特别行政区':
+            case '澳门特别行政�:
                 city = '澳门';
                 break;
-            case '台湾省':
+            case '台湾�:
                 city = '台湾';
                 break;
-            case '北京市':
+            case '北京�:
                 city = '北京';
                 break;
-            case '天津市':
+            case '天津�:
                 city = '天津';
                 break;
-            case '重庆市':
+            case '重庆�:
                 city = '重庆';
                 break;
-            case '上海市':
+            case '上海�:
                 city = '上海';
                 break;
             default:
@@ -774,5 +706,183 @@ exports.loadPosition = function(req, res) {
             res.status(500).send({success: false, errmsg: '获取职位信息失败', position: {}});
         });
     }
+}
+
+exports.searchPosition = function(req, res) {
+    var limit = _.get(req, ['query', 'limit'], ''),
+        offset = _.get(req, ['query', 'offset'], ''),
+        keyword = _.get(req, ['query', 'keyword'], ''),
+        locationInfo = _.get(req, ['body']);
+    limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 5;
+    offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
+    console.log(limit, offset, keyword);
+    if(_.isEmpty(keyword)){
+        res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: [], existFlag: stillExist});
+    } else {
+        var searchPositionsTask = [];
+        searchPositionsTask.push(startSearchPositionsByKeyword(keyword, offset, limit, locationInfo));
+        searchPositionsTask.push(searchPositionsFromPositionKeyword());
+        searchPositionsTask.push(searchPositionsByCompanyKeyword());
+        async.waterfall(searchPositionsTask, function(error, result){
+            if(error) {
+                res.status(500).send({success: false, errmsg: '获取职位信息失败', positions: [], existFlag: stillExist});
+            } else {
+                var dbPositions = _.get(result, ['dbPositions'], []);
+                var stillExist = _.get(result, ['stillExist'], false);
+                res.json({success: true, position: dbPositions, existFlag: stillExist});
+            }
+        })
+    }
+}
+
+function startSearchPositionsByKeyword(keyword, offset, limit, locationInfo){
+    return function(callback){
+        var result = {
+            keyword: keyword,
+            offset: offset,
+            limit: limit,
+            locationInfo: locationInfo
+        }
+        return callback(null, result);
+    }
+}
+
+
+
+function searchPositionsFromPositionKeyword(){
+    return function(result, callback){
+        var limit = _.get(result, ['limit'], ''),
+            offset = _.get(result, ['offset'], ''),
+            keyword = _.get(result, ['keyword'], ''),
+            locationInfo = _.get(result, ['locationInfo'], {});
+        Position.find({name:{$regex:keyword}}).exec(function(err, dbPositions){
+            if(err) {
+                console.error('Error in searching positions from position db', err);
+                return callback(err, null);
+            } else {
+                if(_.isEmpty(dbPositions)){
+                    return callback(null, result);
+                } else {
+                    var companyIds = _.uniq(_.map(dbPositions, 'companyId'));
+                    Company.find({_id: {$in: companyIds}}).exec(function(findCopError, dbCompanies){
+                       if(findCopError || _.isEmpty(dbCompanies)) {
+                           logger.error('Error in find related company by company id', JSON.stringify(companyIds), findCopError);
+                           return callback(findCopError, null);
+                       } else {
+                           var positionResult = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
+                           result.dbPositions = positionResult.dbPositions;
+                           result.stillExist = positionResult.stillExist;
+                           return callback(null, result);
+                       }
+                    });
+                }
+            }
+        });
+    }
+}
+
+function searchPositionsByCompanyKeyword() {
+    return function(result, callback){
+        var positions = _.get(result, ['dbPositions'], []);
+        if (!_.isEmpty(positions)) {
+            return callback(null, result);
+        } else {
+            var limit = _.get(result, ['limit'], ''),
+                offset = _.get(result, ['offset'], ''),
+                keyword = _.get(result, ['keyword'], ''),
+                locationInfo = _.get(result, ['locationInfo'], {});
+            Company.find({companyName: {$regex: keyword}}).exec(function (err1, dbCompanies) {
+                if (err1 || _.isEmpty(dbCompanies)) {
+                    console.error('Error in searching company by keyword', err1);
+                    return callback(err1, null);
+                } else {
+                    console.log('the number of companies ' + dbCompanies.length);
+                    var companyIds = _.map(dbCompanies, '_id');
+                    Position.find({companyId: {$in: companyIds}}).exec(function (err2, dbPositions) {
+                        if(err2 || _.isEmpty(dbPositions)){
+                            return callback(null, result);
+                        } else {
+                            result = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
+                            return callback(null, result);
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
+function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit) {
+    var result = {};
+    var positionGroup = _.groupBy(dbPositions, 'companyId');
+    var sortedPositions = [];
+    var unsortedPositions = [];
+    _.forEach(dbCompanies, function (cop) {
+        var copPositions = positionGroup[cop._id];
+        if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
+            //sort distance
+            var distance = parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000;
+            var tempPositions = constructPositionVOs(copPositions, cop, distance);
+            sortedPositions = _.concat(sortedPositions, tempPositions);
+        } else {
+            //cannot calculate distance
+            var tempPositions = constructPositionVOs(copPositions, cop);
+            unsortedPositions = _.concat(unsortedPositions, tempPositions);
+        }
+    });
+    sortedPositions.sort(function (b, c) {
+        return b.distance > c.distance;
+    });
+    sortedPositions = _.concat(sortedPositions, unsortedPositions);
+    console.log('the number of positions before pagination:  ' + sortedPositions.length);
+    var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
+    var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
+    var stillExist = sortedPositions.length > displayedPositions.length;
+    console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
+    result.dbPositions = pagingPositions;
+    result.stillExist = stillExist;
+    return result;
+}
+
+function constructPositionVOs(copPositions, cop, distance) {
+    var distanceStr = '-'; //no distance
+    if(!_.isEmpty(distance) && _.isNumber(distance)){
+        distanceStr = Math.floor(distance);
+    }
+    var tempPositions = [];
+    _.forEach(copPositions, function (posi) {
+        let ageRangeStart = posi.ageRangeStart || '',
+            ageRangeEnd = posi.ageRangeEnd || '',
+            salaryStart = posi.salaryStart || '',
+            salaryEnd = posi.salaryEnd || '',
+            ageRange = '',
+            salaryRange = '';
+        if (!_.isEmpty(ageRangeStart) && !_.isEmpty(ageRangeEnd)) {
+            ageRange = ageRangeStart + '~' + ageRangeEnd;
+        }
+        if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
+            salaryRange = salaryStart + '~' + salaryEnd;
+        }
+        let clonePosi = {
+            name: posi.name,
+            ageRange: ageRange,
+            contactPerson: posi.contactPerson,
+            totalRecruiters: posi.totalRecruiters,
+            salary: salaryRange,
+            welfares: posi.welfares,
+            positionDesc: posi.positionDesc,
+            _id: posi._id,
+            companyId: posi.companyId,
+            phoneNumber: posi.phoneNumber,
+            companyName: cop.companyName,
+            alias: cop.alias,
+            distance: distanceStr
+        };
+        var addr = _.get(cop, ['companyAddress'], ''),
+            addrArr = addr.split(',');
+        clonePosi.city = findCompanyLocatedCity(addrArr);
+        tempPositions.push(clonePosi);
+    });
+    return tempPositions;
 }
 
