@@ -18,11 +18,46 @@
     </script>
     <!--<link href="../dist/mobile/index.css?3213123" rel="stylesheet">-->
     <script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"></script>
+    <style>
+        #shareit {
+            -webkit-user-select: none;
+            display: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            text-align: center;
+            top: 0;
+            left: 0;
+            z-index: 105;
+        }
+        #shareit img {
+            max-width: 100%;
+        }
+        .arrow {
+            position: absolute;
+            right: 10%;
+            top: 5%;
+        }
+        #share-text {
+            margin-top: 400px;
+        }
+        .button{white-space:nowrap;font-size:44px;padding:8px;border:1px solid #adadab;color:#000000;background-color: #e8e8e8;background-image:linear-gradient(to top, #dbdbdb, #f4f4f4);background-image:-webkit-gradient(linear, 0 100%, 0 0, from(#dbdbdb),to(#f4f4f4));box-shadow: 0 1px 1px rgba(0,0,0,0.45), inset 0 1px 1px #efefef; text-shadow: 0.5px 0.5px 1px #ffffff;}
+        .button:active{background-color: #dedede;background-image: linear-gradient(to top, #cacaca, #e0e0e0);background-image:-webkit-gradient(linear, 0 100%, 0 0, from(#cacaca),to(#e0e0e0));}
+        #mess_share{margin:15px 0;}
+        #share_1{float:left;width:49%;}
+        #share_2{float:right;width:49%;}
+        #mess_share img{width:60px;height:60px;vertical-align: middle;}
+        @media only screen and (min-device-width: 320px) and (max-device-width: 568px)
+        and (-webkit-device-pixel-ratio: 2) and (device-aspect-ratio: 40/71){
+            .button{font-size:30px;}
+        }
+    </style>
 </head>
 
 
 <body>
-    <div> 
+    <div>
         <span id='openId' hidden>{{openId}}</span>
     </div>
     <div>
@@ -31,13 +66,26 @@
     <div id='compCntr'>
         
     </div>
-
+    <div id='mess_share'>
+        <div><input type='button' id='shareToTimeline' value='预留按钮' style='height:60px;width:180px;font-size:40px;'></div>
+        <div id='share_2'>
+            <button class='button' id='tipsForShare'>
+            <img src="./img/icon_timeline.png">&nbsp;分享到朋友圈</button>
+        </div>
+    </div>
     </script>
+
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script src="./lib/underscore-min.js"></script>
     <script src="./lib/jquery.min.js"></script>
     <!--<script src="../dist/mobile/index.js?3213123"></script>-->
     <script src="./testWechatApi.js?2324234"></script>
+    <div id="shareit">
+        <img class="arrow" src="http://localhost/img/share-it.png">
+        <a href="#" id="follow">
+            <img id="share-text" src="http://localhost/img/tips.png">
+        </a>
+    </div>
     <script type="text/javascript">
         if(!window.Promise) {
             console.log('no promise')
