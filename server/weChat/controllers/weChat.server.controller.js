@@ -130,8 +130,8 @@ exports.checkIfNeedPay = function(req, res){
 }
 
 exports.createUnifiedOrder = function(req, res) {
-//1.统一下单API � trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
-//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前� timeStamp只能�0� 超过报错
+//1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
+//2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
   var opts = {
       appid: 'wx54e94ab2ab199342',
       body : '办理入职手续',
@@ -345,7 +345,7 @@ exports.submitRegisterCompany = function(req, res){
     }).then(applicants => {
       if(_.isEmpty(applicants)){
         logger.info('Applicant does not exist, cannot register company');
-        res.status(500).send({success: false, errmsg: '用户不存在，不能提交简�});
+        res.status(500).send({success: false, errmsg: '用户不存在，不能提交简历'});
       } else {
         var dbApplicant = applicants[0];
         Company.find({_id: companyId}).then(companies => {
@@ -394,7 +394,7 @@ exports.submitRegisterCompany = function(req, res){
 
           } else {
             logger.info('cannot find company with company id', companyId);
-            res.status(500).send({success: false, errmsg: '找不到指定公�});
+            res.status(500).send({success: false, errmsg: '找不到指定公司'});
           }
         });
       }
@@ -415,7 +415,7 @@ function sendNotificationEmail(dbCompany, callback){
         domainUrl = _.get(config, ['domainUrl'], ''),
         notificationSubject = _.get(config, ['emailConfig', 'applyPositionNotificationSubject'], ''),
         notificationHtmlTemplate = _.get(config, ['emailConfig', 'applyPositionNotificationHtmlTemplate'], ''),
-        dateStr = moment().format('YYYY年MM月DD�);
+        dateStr = moment().format('YYYY年MM月DD日');
     var notificationEmailContent = notificationHtmlTemplate.replace(/\[Domain_Url\]/ig, domainUrl).replace(/\[Login_Username\]/i, companyEmail).replace(/\[Login_Password\]/i, companyPassword).replace(/\[Date_Str\]/i, dateStr);
     var emailOpt = {
         from: adminEmailBanner,
@@ -506,14 +506,14 @@ function getShortDistance(lon1, lat1, lon2, lat2) {
         var ew1, ns1, ew2, ns2;
         var dx, dy, dew;
         var distance;
-        // 角度转换为弧�
+        // 角度转换为弧度
         ew1 = lon1 * DEF_PI180;
         ns1 = lat1 * DEF_PI180;
         ew2 = lon2 * DEF_PI180;
         ns2 = lat2 * DEF_PI180;
-        // 经度�
+        // 经度差
         dew = ew1 - ew2;
-        // 若跨东经和西�80 度，进行调整
+        // 若跨东经和西经180 度，进行调整
         if (dew > DEF_PI)
             dew = DEF_2PI - dew;
         else if (dew < -DEF_PI)
@@ -616,25 +616,25 @@ function findCompanyLocatedCity(addrArr){
     if(addrArr.length > 0){
         var city = '';
         switch (addrArr[0]){
-            case '香港特别行政�:
+            case '香港特别行政区':
                 city = '香港';
                 break;
-            case '澳门特别行政�:
+            case '澳门特别行政':
                 city = '澳门';
                 break;
-            case '台湾�:
+            case '台湾省':
                 city = '台湾';
                 break;
-            case '北京�:
+          case '北京市':
                 city = '北京';
                 break;
-            case '天津�:
+          case '天津市':
                 city = '天津';
                 break;
-            case '重庆�:
+          case '重庆市':
                 city = '重庆';
                 break;
-            case '上海�:
+          case '上海市':
                 city = '上海';
                 break;
             default:

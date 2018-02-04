@@ -118,12 +118,9 @@ class Positions extends React.Component{
             waitShowList.map((ele, idx)=>{
                 //let headerName = ele.name;
                 let accHeader = (
-                    <div style={{display:'flex'}}>
-                        {luckyFlag ? (<LuckyPacket style={{marginRight:'.2em'}}/>) : ('')}
-                        <div>
-                            <span><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></span>
-                            <p><span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span></p>
-                        </div>
+                    <div >
+                        <p>分享到朋友圈</p>
+                        <p>分享后有<LuckyPacket />奖励</p>
                     </div>
                 );
                 const positionPanelItem = (
