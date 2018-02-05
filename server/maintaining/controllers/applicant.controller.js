@@ -3,6 +3,7 @@ var _ = require('lodash'),
 var config = require('../../../config/config');
 var logger = require('../../../config/lib/logger');
 var async = require('async');
+var request = require('request');
 var moment = require('moment');
 var mongoose = require('mongoose');
 var Applicant = mongoose.model('Applicant');
