@@ -2,11 +2,18 @@ var _ = require('lodash'),
     ExcelExporter = require('excel-export');
 var config = require('../../../config/config');
 var logger = require('../../../config/lib/logger');
+var async = require('async');
+var moment = require('moment');
 var mongoose = require('mongoose');
 var Applicant = mongoose.model('Applicant');
+var Position = mongoose.model('Position');
+var Company = mongoose.model('Company');
 
 exports.renderPreviewPage = renderPreviewPage;
 exports.exportApplicants = exportApplicants;
+exports.sendResumeFeedbackMessage = sendResumeFeedbackMessage;
+exports.sendResumeHasBeenCheckedMessage = sendResumeHasBeenCheckedMessage;
+exports.sendInterviewMessage = sendInterviewMessage;
 
 function dateFormat(date){
     var month = date.getMonth() + 1,
@@ -492,3 +499,225 @@ function constructEmergencyContactSheet(app, conf){
     conf.rows.push(appRow);
 }
 
+function sendResumeFeedbackMessage(req, res){
+    var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var positionId = !_.isEmpty(_.get(req, ['query', 'positionId'], '')) ? _.get(req, ['query', 'positionId'], '') : "59ede2e6c969da2b48238fe6"
+    console.log(openId, positionId);
+    var findApplicantInfoTask = [];
+    findApplicantInfoTask.push(startSearchApplicantInfoTask(openId, positionId));
+    findApplicantInfoTask.push(findApplicant());
+    findApplicantInfoTask.push(findPosition());
+    async.waterfall(findApplicantInfoTask, function(error, result){
+        if(error){
+            logger.error('Error in find applicant info: ', error);
+            res.status(500).send({success: false, errmsg: '发送消息失败'});
+        } else {
+            var title = '尊敬的' + _.get(result, ['dbApplicant', 'name'], '用户') + '，您的简历已通过审核';
+            var remark = '邀请您面试并办理入职手续，请尽快带齐您的相关证件前往办理，联系人：' + _.get(result, ['dbPosition', 'contactPerson'], '') + '，联系电话：' + _.get(result, ['dbPosition', 'phoneNumber'], '');
+            var companyId = _.get(result, ['dbPosition', 'companyId'], '');
+            var registeredCompany = _.find(_.get(result, ['dbApplicant', 'registeredCompanies'], {}), {'companyId': companyId});
+            var templateMessageOpt = {
+                "touser": openId,
+                "template_id": "x5dSWR4FZHkrYo8AMSKHZbByK0tXBXvvni0lLTi6CE4",
+                // "url":"http://weixin.qq.com/download",
+                "data":{
+                    "first": {
+                        "value": title,
+                        "color": "#000000"
+                    },
+                    "job":{
+                        "value": _.get(result, ['dbPosition', 'name'], ''),
+                        "color": "#000000"
+                    },
+                    "company": {
+                        "value": _.get(registeredCompany, ['companyName'], ''),
+                        "color": "#000000"
+                    },
+                    "time": {
+                        "value": "2018年01月22日",
+                        "color": "#000000"
+                    },
+                    "remark":{
+                        "value": remark,
+                        "color": "#FF4040"
+                    }
+                }
+            };
+            sendTemplateMessage(templateMessageOpt, function(sendErr, returnedBody){
+                if(sendErr){
+                    logger.error('Error in send template message', sendErr);
+                    res.status(500).send({success: false, errmsg: '发送消息失败'});
+                } else {
+                    logger.info('call send template message api with feedback: ', returnedBody);
+                    res.json({success: true});
+                }
+            });
+        }
+    });
+}
+
+function sendResumeHasBeenCheckedMessage(req, res){
+    var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
+    var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+    var now = moment().format('YYYY-MM-DD');
+    var welcomeMessage = '尊敬的' + applicantName + '，很荣幸地通知您，有企业关注到您的简历';
+    var remark = companyName + '请您补充【详细个人简历】，以便为您安排合适的职位';
+    var templateMessageOpt = {
+        "touser": openId,
+        "template_id": "7LzhoVYeJ7G8Qbqofvh0XrLBkm88iCNko8z8mVxDycY",
+        // "url":"http://weixin.qq.com/download",
+        "data":{
+            "first": {
+                "value": welcomeMessage,
+                "color": "#000"
+            },
+            "keyword1":{
+                "value": companyName,
+                "color": "#000"
+            },
+            "keyword2": {
+                "value": now,
+                "color": "#000"
+            },
+            "remark":{
+                "value": remark,
+                "color": "#FF4040"
+            }
+        }
+    };
+    sendTemplateMessage(templateMessageOpt, function(sendErr, returnedBody){
+        if(sendErr){
+            logger.error('Error in send template message', sendErr);
+            res.status(500).send({success: false, errmsg: '发送消息失败'});
+        } else {
+            logger.info('call send template message api with feedback: ', returnedBody);
+            res.json({success: true});
+        }
+    });
+}
+
+function sendInterviewMessage(req, res){
+    var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
+    var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+    var interviewDate = !_.isEmpty(_.get(req, ['body', 'interviewDate'], '')) ? _.get(req, ['body', 'interviewDate'], '') : '待定';
+    var welcomeMessage = '尊敬的' + applicantName + '，很荣幸地通知您，有企业邀请您投递简历参加面试';
+    var remark = companyName + '邀请您面试并办理入职手续，请您在【周边招聘】中向该企业投递您的简历，若您的个人简历不完整，请维护【详细个人简历】';
+    var templateMessageOpt = {
+        "touser": openId,
+        "template_id": "9p5kn2Er2ldfQtc9aSTMcJHRo7Cj7aIOglKUj88007Y",
+        // "url":"http://weixin.qq.com/download",
+        "data":{
+            "first": {
+                "value": welcomeMessage,
+                "color": "#000"
+            },
+            "keyword1":{
+                "value": companyName,
+                "color": "#000"
+            },
+            "keyword2": {
+                "value": interviewDate,
+                "color": "#000"
+            },
+            "remark":{
+                "value": remark,
+                "color": "#FF4040"
+            }
+        }
+    };
+    sendTemplateMessage(templateMessageOpt, function(sendErr, returnedBody){
+        if(sendErr){
+            logger.error('Error in send template message', sendErr);
+            res.status(500).send({success: false, errmsg: '发送消息失败'});
+        } else {
+            logger.info('call send template message api with feedback: ', returnedBody);
+            res.json({success: true});
+        }
+    });
+}
+
+function startSearchApplicantInfoTask(openId, positionId){
+    return function(callback){
+        var result = {
+            openId: openId,
+            positionId: positionId
+        };
+        return callback(null, result);
+    }
+}
+
+function findApplicant(){
+    return function(result, callback){
+        var openId = _.get(result, ['openId'], '');
+        if(_.isEmpty(openId)){
+            return callback('open id is empty', null);
+        } else {
+            Applicant.findOne({wechatOpenId: openId}, function(error, dbApplicant) {
+                if (error || _.isEmpty(dbApplicant)) {
+                    logger.error('Error in finding applicant for openid:', openId, error);
+                    return callback('Error in finding applicant for openid', null);
+                } else {
+                    result.dbApplicant = dbApplicant;
+                    return callback(null, result);
+                }
+            });
+        }
+    }
+}
+
+function findPosition(){
+    return function(result, callback){
+        var positionId = _.get(result, ['positionId'], '');
+        if(_.isEmpty(positionId)){
+            return callback('position id is empty', null);
+        } else {
+            Position.findOne({'_id': positionId}, function(error, dbPosition){
+                if (error || _.isEmpty(dbPosition)) {
+                    logger.error('Error in finding position for positionId:', positionId, error);
+                    return callback('Error in finding position for positionId', null);
+                } else {
+                    console.log(JSON.stringify(dbPosition))
+                    result.dbPosition = dbPosition;
+                    return callback(null, result);
+                }
+            });
+        }
+    }
+}
+
+function findCompany(){
+    return function (result, callback) {
+        var companyId = _.get(result, ['dbPosition', 'companyId'], '');
+        if(_.isEmpty(companyId)){
+            return callback('company id is empty', null);
+        } else {
+            Company.findOne({'_id': companyId}, function(error, dbCompany){
+                if(error || _.isEmpty(dbCompany)){
+                    logger.error('Error in finding company for companyId:', companyId, error);
+                    return callback('Error in finding company for companyId', null);
+                } else {
+                    result.dbCompany = dbCompany;
+                    return callback(null, result);
+                }
+            });
+        }
+    }
+}
+
+function sendTemplateMessage(templateMessageBody, callback){
+    var wechatSendTemplateMessageUrl = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' + global.accessToken;
+    request.post({
+        url: wechatSendTemplateMessageUrl,
+        body: templateMessageBody,
+        json: true
+    }, function(error, response, body){
+        if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
+            return callback(null, body)
+        } else {
+            var errMsg = {error: error, statusCode: _.get(response, ['statusCode'], 0), errMsgFromWechat: _.get(body, ['errmsg'], '')};
+            return callback(JSON.stringify(errMsg), null);
+        }
+    });
+}
