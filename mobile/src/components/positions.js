@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-
+import {wepay} from './utils'
 import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
 
 import LuckyPacket from './lucky'
@@ -88,7 +88,7 @@ class Positions extends React.Component{
     async load(){
         //console.log('componentWillMount')
         //alert('2');
-        let info = this.props.args;
+        let info = this.props.args.position;
         //未成功获取位置信息
         //alert(JSON.stringify(this.props.args));
         if (!info || info.addr === '') {
@@ -125,10 +125,11 @@ class Positions extends React.Component{
         }
     }
     componentWillMount(){
+        this.props;
         this.load();
         //get position List
     }
-    filterSame(newA=[],old=[]){
+    filterSameItems(newA=[],old=[]){
         old.map(o=>{
             newA = newA.filter(a=>(a._id !== o._id));
         })
@@ -147,10 +148,26 @@ class Positions extends React.Component{
             })
         }
     }
-
+    async apply(id){
+        console.log(id);
+        if (!this.props.args.isComplete){
+            let r = await wepay({ openId: this.props.args.openId, selectCompanyId: id })
+            if (r){
+                this.setState({
+                    sflag : true,
+                    stitle : '提交成功'
+                })
+            }else{
+                Toast.error('error');
+                Toast.hide();
+            }
+        }else{
+            Toast.info('请完善个人简历！');
+        }
+    }
         
     render(){
-        let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, luckyFlag} = this.state;
+        let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, luckyFlag, sflag} = this.state;
             
         
             const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
@@ -175,7 +192,7 @@ class Positions extends React.Component{
                                 <Item extra={ele.salary}>薪资</Item>
                                 <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
                                 <Item id='p_btn_grp' style={{ marginTop: '2em' }}>
-                                    <Button type="primary" size="small" inline style={{ marginRight: '1em' }}>立即应聘</Button>
+                                    <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即应聘</Button>
                                     <Button type="primary" size="small" inline >转发给朋友</Button>
                                 </Item>
                             </List>
@@ -198,7 +215,17 @@ class Positions extends React.Component{
         if(geolocation != null && geolocation != undefined)
             addr =  geolocation.nation + ',' + geolocation.province + ',' + geolocation.city + ',' +  geolocation.district + ',' + geolocation.addr;
         ;
-        
+        if (sflag) {
+            return(
+                <div className="result-example">
+                    <Result style={{ height: '500px', marginTop: '30%' }}
+                        img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
+                        title='操作成功'
+                        message="简历已提交"
+                    />
+                </div>
+            );
+        }
         return(
             <div className='ant-layout'>
                 <div className='ant-layout-content' style={{ margin: '24px 16px 0' }}>

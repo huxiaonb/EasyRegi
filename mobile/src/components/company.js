@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-
+import {wepay} from './utils'
 import {Flex, Accordion, List, InputItem, Picker, Checkbox, Button, WhiteSpace, Result, Icon, Toast} from 'antd-mobile'
 
 
@@ -36,67 +36,76 @@ class Company extends React.Component{
     async subm(){
         let that = this;
         Toast.loading('Loading...', 0);
-        let params = {
+        let data = {
             openId: openId,
             selectCompanyId: this.state.selectCompId
         };
-        let checkResult = await lapi.checkIfNeedPay(params);
-
-        let data = {
-            openId: openId,
-            companyId: this.state.selectCompId
+        if(wepay(data)){
+            this.setState({
+                payFlag : true,
+                resultPageTitle: '提交成功'
+            });
         }
+        // let checkResult = await lapi.checkIfNeedPay(params);
 
-        if(checkResult && checkResult.success){
-            if(checkResult.needPay){
-                let res = await lapi.pay();
-                if(res){
+        // let data = {
+        //     openId: openId,
+        //     companyId: this.state.selectCompId
+        // }
 
-                    if(res.return_code === 'SUCCESS'){
-                        // alert(JSON.stringify(res));
-                        //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
-                        WeixinJSBridge.invoke(
-                            'getBrandWCPayRequest', {
-                                "appId":res.appid,     //公众号名称，由商户传入
-                                "timeStamp":res.timeStamp,         //时间戳，自1970年以来的秒数
-                                "nonceStr":res.nonce_str, //随机串
-                                "package":"prepay_id=" + res.prepay_id,
-                                "signType":"MD5",         //微信签名方式：
-                                "paySign":res.paySign //微信签名
-                            },
-                            async function(res){
+        // if(checkResult && checkResult.success){
+        //     if(checkResult.needPay){
+        //         wepay(lapi.pay, async function(res) {
+        //             if (res.err_msg == "get_brand_wcpay_request:ok") {
+        //                 data.payDate = new Date();
+        //                 let r = await lapi.submitSelectComp(data);
+        //                 that.setState({
+        //                     payFlag: true,
+        //                     resultPageTitle: '付款成功'
+        //                 });
+        //                 Toast.hide();
+        //             } else {
+        //                 Toast.hide();
+        //             } // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
 
-                                // alert(JSON.stringify(res));
-                                if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                                    data.payDate = new Date();
-                                    let r = await lapi.submitSelectComp(data);
-                                    that.setState({
-                                        payFlag : true,
-                                        resultPageTitle: '付款成功'
-                                    });
-                                    Toast.hide();
-                                }else{
-                                    Toast.hide();
-                                }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+        //         })
+        //         // let res = await lapi.pay();
+        //         // if(res){
 
-                            }
-                        );
-                    }
-                } else {
-                    Toast.hide();
-                }
+        //         //     if(res.return_code === 'SUCCESS'){
+        //         //         // alert(JSON.stringify(res));
+        //         //         //console.log(res.appid,Date.now().toString(),res.nonce_str,"prepay_id=" + res.prepay_id,res.sign);
+        //         //         WeixinJSBridge.invoke(
+        //         //             'getBrandWCPayRequest', {
+        //         //                 "appId":res.appid,     //公众号名称，由商户传入
+        //         //                 "timeStamp":res.timeStamp,         //时间戳，自1970年以来的秒数
+        //         //                 "nonceStr":res.nonce_str, //随机串
+        //         //                 "package":"prepay_id=" + res.prepay_id,
+        //         //                 "signType":"MD5",         //微信签名方式：
+        //         //                 "paySign":res.paySign //微信签名
+        //         //             },
+        //         //             async function(res){
 
-            } else {
-                let submResult = await lapi.submitSelectComp(data);
-                this.setState({
-                    payFlag : true,
-                    resultPageTitle: '提交成功'
-                });
-                Toast.hide();
-            }
-        } else {
-            Toast.hide();
-        }
+        //         //                 // alert(JSON.stringify(res));
+                                
+        //         //             }
+        //         //         );
+        //         //     }
+        //         // } else {
+        //         //     Toast.hide();
+        //         // }
+
+        //     } else {
+        //         let submResult = await lapi.submitSelectComp(data);
+        //         this.setState({
+        //             payFlag : true,
+        //             resultPageTitle: '提交成功'
+        //         });
+        //         Toast.hide();
+        //     }
+        // } else {
+        //     Toast.hide();
+        // }
 
         
     }

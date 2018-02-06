@@ -23,7 +23,8 @@
 
 
 <body>
-
+    <span id='openId' hidden>{{openId}}</span>
+    <span id='isComplete' hidden>{{isComplete}}</span>
     <div id='location'>
         
     </div>
@@ -43,8 +44,11 @@
         $(_.once(function(){
             var geolocation = new qq.maps.Geolocation("HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ", "location");
             geolocation.getLocation(function(position){
-                var location = JSON.stringify(position)
-                Lego('#location').nearByPositions(position);
+                //var location = JSON.stringify(position)
+                var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
+                var isComplete = $('#isComplete').text() === ''? undefined : $('#isComplete').text();
+                
+                Lego('#location').nearByPositions({position : position, openId : openId, isComplete : isComplete});
             },function(){
                 Lego('#location').nearByPositions(false);
             });
