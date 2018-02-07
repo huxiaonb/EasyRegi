@@ -37,6 +37,10 @@ var PositionSchema = new Schema({
         type: String,
         default:''
     },
+    luckyFlag: {
+        type: Boolean,
+        default: false,
+    },
     salaryStart: String,
     salaryEnd: String,
     contactPerson: String,

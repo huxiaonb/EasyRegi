@@ -41,7 +41,7 @@ exports.detailPosition = function(req, res) {
 }
 
 exports.saveBasicInfo = function(req, res) {
-    req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var openId = _.get(req, ['session', 'openId'], ''),
         clonedApplicant = _.clone(_.get(req, ['body'], {}));
     if(_.isEmpty(openId)){
@@ -72,7 +72,7 @@ exports.saveBasicInfo = function(req, res) {
     }
 }
 
-exports.register = function(req, res) {
+exports.register = function(req, res) {//req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
   logger.info('render register page with open id', _.get(req, ['session', 'openId'], ''));
   res.render('server/weChat/views/register', {openId: _.get(req, ['session', 'openId'], '')});
 }
@@ -82,7 +82,24 @@ exports.maintain = function(req, res) {
 }
 
 exports.positions = function(req, res) {
-  res.render('server/weChat/views/positions');
+  //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+  var openId = _.get(req, ['session', 'openId'], '');
+  if (_.isEmpty(openId)){
+    console.log('缺少所需参数');
+    res.json({ success: false, errmsg: '缺少所需参数' });
+  }else{
+    Applicant.find({
+      wechatOpenId: openId
+    }).then(applicants=>{
+      console.log(JSON.stringify(applicants));
+      if (_.isEmpty(applicants)) {
+        res.status(500).send({ success: false, errmsg: '查找用户出错' });
+      }else{
+        var applicant = _.get(applicants, ['0'], {});
+        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete});
+      }
+    })
+  }
 }
 
 exports.checkIfNeedPay = function(req, res){
@@ -105,7 +122,7 @@ exports.checkIfNeedPay = function(req, res){
                     cop = _.find(registeredCops, {'companyId': selectCompanyId});
                 if(_.isEmpty(cop)){
                     console.log('not registered, need pay.');
-                    res.json({success: true, needPay: true});
+                    res.json({success: true, needPay: true});//
                 } else {
                     var paymentDate = _.get(cop, ['paymentDate']);
                     if(_.isUndefined(paymentDate) || !_.isDate(paymentDate)){
@@ -308,6 +325,7 @@ exports.submitRegisterInformation = function(req, res, next){
 }
 
 exports.renderRegisterCompanyPage = function(req, res){
+  //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
   var openId = _.get(req, ['session', 'openId'], '');
   if(_.isEmpty(openId)){
     logger.info('openId does not exist, cannot access register company page');
@@ -329,10 +347,11 @@ exports.renderRegisterCompanyPage = function(req, res){
 
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
-      companyId = _.get(req, ['body', 'companyId', '0'], ''),
+      companyId = _.get(req, ['body', 'companyId'], ''),
       payDate = _.get(req, ['body', 'payDate']);
   var current = new Date();
   console.log('payDate:', payDate);
+  
   if(_.isEmpty(openId)){
     logger.info('openId does not exist, cannot submit register company');
     res.status(500).send({success: false, errmsg: '用户代码为空'});
@@ -348,12 +367,15 @@ exports.submitRegisterCompany = function(req, res){
         res.status(500).send({success: false, errmsg: '用户不存在，不能提交简历'});
       } else {
         var dbApplicant = applicants[0];
+        
         Company.find({_id: companyId}).then(companies => {
+          console.log('payDate:', companies);
           if(!_.isEmpty(companies)){
             var dbCompany = companies[0],
                 registeredCompanies = _.get(dbApplicant, ['registeredCompanies'], []),
                 dbRegisteredCompany = _.find(registeredCompanies, {'companyId': companyId});
             if(_.isEmpty(dbRegisteredCompany)){
+             
               var registeredCompany = {
                 companyName: _.get(dbCompany, ['companyName'], ''),
                 companyId: _.get(dbCompany, ['_id'], ''),
@@ -373,6 +395,7 @@ exports.submitRegisterCompany = function(req, res){
                   dbRegisteredCompany.paymentDate = new Date(payDate);
               }
             }
+            
             logger.info(JSON.stringify(dbApplicant.registeredCompanies));
             Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
             .exec(function(error, persistedObj){

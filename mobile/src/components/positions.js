@@ -13,7 +13,6 @@ const Brief = Item.Brief;
 
 class Positions extends React.Component{
     state = {
-        luckyFlag : true,
         noMoreP : false,
         locationFlag : false,
         geolocation : {},
@@ -167,14 +166,14 @@ class Positions extends React.Component{
     }
         
     render(){
-        let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, luckyFlag, sflag} = this.state;
+        let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
             
         
             const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
                 return (
                         <Accordion.Panel header={
                             <div style={{ display: 'flex' }}>
-                                {luckyFlag ? (<LuckyPacket style={{ marginRight: '.2em',marginTop : '.3em'}} />) : ('')}
+                            {ele.luckyFlag ? (<LuckyPacket style={{ marginRight: '.2em',marginTop : '.3em'}} />) : ('')}
                                 <div>
                                     <span><b>{ele.city} {ele.alias} 招聘 {ele.name}</b></span>
                                     <p><span>距离：{ele.distance}公里</span>  <span>招聘人数：{ele.totalRecruiters}</span></p>
@@ -223,6 +222,7 @@ class Positions extends React.Component{
                         title='操作成功'
                         message="简历已提交"
                     />
+                    <Button type='primary' style={{ width: 'auto' }} onClick={this.bindTimelineData.bind(this)}>转发到朋友圈</Button>
                 </div>
             );
         }

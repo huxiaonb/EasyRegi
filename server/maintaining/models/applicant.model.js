@@ -101,6 +101,10 @@ var applicantSchema = new Schema({
     nativePlace: String,
     highestDegree : String,//基本信息填入的最高学历
     skill : String,//基本洗洗填入的经验技能
+    isComplete: {
+        type: Boolean,
+        default: false
+    },
     familyMembers: [familyMemberSchema],
     educationHistories: [educationHistorySchema],
     workExperiences: [workExperienceSchema],
