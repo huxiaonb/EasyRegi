@@ -1,6 +1,6 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Slider} from 'antd'
+import { Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Col, Slider, Radio} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 
@@ -26,6 +26,8 @@ import './style/components.less';
 const {RangePicker } = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
 const salaryMarks = {
   1000: '1000 CNY',
   30000 : {
@@ -319,7 +321,7 @@ class PositionManage extends React.Component{
             <div>
             <div className='search-bar-container'>
                 <div className='search-title'>
-                    招聘职位管理<span title='新增职位' style={{marginLeft:'10px'}}><Button shape="circle" type='primary' icon='plus' onClick={this.createForm.bind(this)} /></span>
+                        招聘职位管理<span title='新增职位' style={{ marginLeft: '10px' }}><Button type='primary' onClick={this.createForm.bind(this)}>新增招聘职位</Button></span>
                 </div>
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
@@ -358,7 +360,7 @@ class PositionManage extends React.Component{
                 </div>
                 
                 <Modal
-                    title="添加新职位"
+                    title={<p style={{ fontSize: 20, color:'#555'}}>添加新职位</p>}
                     visible={pFlag}
                     onOk={this.handleOk.bind(this)}
                     onCancel={this.toggleP.bind(this)}
@@ -419,20 +421,103 @@ class PositionManage extends React.Component{
                                 <Input />
                             )}
                         </FormItem>
-                        <FormItem
-                            label='年龄'
-                            name='p_age'
-                            labelCol={{ span: 5 }}
-                            wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} value={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
+                        
+                        <FormItem label='年龄' labelCol={{ span: 5 }}>
+                            <Col span={7} offset={1}>
+                            <FormItem>
+                                    <Select defaultValue="16"  >
+                                        {ageStart}
+                                    </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span={2}>
+                            <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                -
+                            </span>
+                        </Col>
+                        <Col span={7} >
+                            <FormItem>
+                                    <Select defaultValue="45"  >
+                                        {ageEnd}
+                                    </Select>
+                            </FormItem>
+                        </Col>
+                        </FormItem>
+                        <FormItem label='有效期' labelCol={{ span: 5 }}>
+                            <Col span={7} offset={1}>
+                                <FormItem>
+                                    <DatePicker />
+                                </FormItem>
+                            </Col>
+                            <Col span={2}>
+                                <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                    -
+                            </span>
+                            </Col>
+                            <Col span={7} >
+                                <FormItem>
+                                    <DatePicker />
+                                </FormItem>
+                            </Col>
                         </FormItem>
                         <FormItem
-                            label='薪资'
-                            name='p_salary'
+                            label='招聘人数'
+                            name='p_total'
                             labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} value={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
                         </FormItem>
+                            
+                        <Col offset={1}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" onChange={this.changeSalary.bind(this)}>
+                                <RadioButton value="a">月薪</RadioButton>
+                                <RadioButton value="b">时薪</RadioButton>
+                            </RadioGroup>
+                            <FormItem label={<span>薪资</span>} labelCol={{ span: 4 }}>
+                                <Col span={7} offset={1}>
+                                    <FormItem>
+                                        <Select defaultValue="1000"  >
+                                            {lowSalary}
+                                        </Select>
+                                    </FormItem>
+                                </Col>
+                                <Col span={2}>
+                                    <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                        -
+                            </span>
+                                </Col>
+                                <Col span={7} >
+                                    <FormItem >
+                                        <Select defaultValue="5000"  >
+                                            {highSalary}
+                                        </Select>
+                                    </FormItem>
+                                </Col>
+                            </FormItem>
+                        </Col>
+                        
+                        <Col offset={1}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" onChange={this.changeRedPackage.bind(this)}>
+                                <RadioButton value="a">普通红包</RadioButton>
+                                <RadioButton value="b">随机红包</RadioButton>
+                            </RadioGroup>
+                            <FormItem label={<span>红包</span>} labelCol={{ span: 4 }}>
+                                <Col span={7} offset={1}>
+                                    <FormItem label='总金额'>
+                                        <Input />
+                                    </FormItem>
+                                </Col>
+                                <Col span={2}>
+                                    <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                        -
+                            </span>
+                                </Col>
+                                <Col span={7} >
+                                    <FormItem label='红包个数'>
+                                        <InputNumber max={500} min={1} default={10}/>
+                                    </FormItem>
+                                </Col>
+                            </FormItem>
+                        </Col>
                         
                        
                          <FormItem
