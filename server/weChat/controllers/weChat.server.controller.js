@@ -895,6 +895,7 @@ function constructPositionVOs(copPositions, cop, distance) {
             _id: posi._id,
             companyId: posi.companyId,
             phoneNumber: posi.phoneNumber,
+            luckyFlag: _.isUndefined(posi.luckyFlag) ? false : posi.luckyFlag,
             companyName: cop.companyName,
             alias: cop.alias,
             distance: distanceStr
