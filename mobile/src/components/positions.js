@@ -137,7 +137,7 @@ class Positions extends React.Component{
     async loadMore(){
         let { nearbyPositions,  geolocation, limit, offset, slimit, soffset, noMoreP, kw } = this.state;
         if (noMoreP) return;
-        let r = kw.length ? await lapi.findNearbyPositions(geolocation, limit, offset) : await lapi.searchPositions(geolocation,slimit,soffset,kw);
+        let r = kw.length ? await lapi.searchPositions(geolocation, slimit, soffset, kw) : await lapi.findNearbyPositions(geolocation, limit, offset);
         
         if (r && r.success) {
             this.setState({
