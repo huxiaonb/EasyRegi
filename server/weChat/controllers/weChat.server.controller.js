@@ -96,7 +96,10 @@ exports.positions = function(req, res) {
         res.status(500).send({ success: false, errmsg: '查找用户出错' });
       }else{
         var applicant = _.get(applicants, ['0'], {});
-        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete});
+        var url = 'http://www.mfca.com.cn/testWechatApi';
+        var signatureObj = wechatUtil.getSignature(url);
+        console.log('signature obj: ' + JSON.stringify(signatureObj));
+        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj)});
       }
     })
   }

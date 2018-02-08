@@ -25,6 +25,7 @@
 <body>
     <span id='openId' hidden>{{openId}}</span>
     <span id='isComplete' hidden>{{isComplete}}</span>
+    <span id='signatureObj' hidden>{{signatureObj}}</span>
     <div id='location'>
         
     </div>
@@ -33,6 +34,7 @@
 
     </script>
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script src="./lib/underscore-min.js"></script>
     <script src="./lib/jquery.min.js"></script>
     <script src="../dist/mobile/index.js?54346789"></script>
@@ -47,8 +49,9 @@
                 //var location = JSON.stringify(position)
                 var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
                 var isComplete = $('#isComplete').text() === ''? undefined : $('#isComplete').text();
+                var signatureObj = $('#signatureObj').text() === '' ? {} : JSON.parse($('#signatureObj').text());
                 
-                Lego('#location').nearByPositions({position : position, openId : openId, isComplete : isComplete});
+                Lego('#location').nearByPositions({position : position, openId : openId, isComplete : isComplete, signatureObj: signatureObj});
             },function(){
                 Lego('#location').nearByPositions(false);
             });
