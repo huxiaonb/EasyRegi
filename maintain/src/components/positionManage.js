@@ -3,7 +3,7 @@ import { render } from 'react-dom'
 import { Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Col, Slider, Radio} from 'antd'
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
-
+import './style/position.less'
 // import Form from 'antd/lib/form'
 // import Table from 'antd/lib/table'
 // import Modal from 'antd/lib/modal'
@@ -28,19 +28,11 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-const salaryMarks = {
-  1000: '1000 CNY',
-  30000 : {
-    style: {
-      color: '#f50',
-    },
-    label: <strong>30000CNY</strong>,
-  },
-};
-const ageMarks = {
-  16 : '16',
-  60 : '60'
-};
+
+const MAX_SALARY=10000;
+const MAX_HOUR_SALARY=40
+const MAX_AGE = 60;
+const welfs = ['准时发薪','年底双薪', '包吃', '包住', '包吃包住', '购买社保', '五险一金', '带薪休假', '年度体检', '年度旅游', '坐着工作', '周末双休', '宿舍24小时热水', '空调工作环境', '宿舍有空调', '妹子多', '伙食好', '伙食津贴', '免穿防静电服', '提供交通补助', '夜班津贴', '年资津贴']
 class PositionManage extends React.Component{
     static contextTypes = {
         comp: PropTypes.object
@@ -55,17 +47,15 @@ class PositionManage extends React.Component{
         rowValue : {},
         ageRange : [20,50],
         salaryRange : [3000,6000],
+        ageStart : undefined,
+        lowSalary : undefined,
         newFlag :false
         
     }
-    onAgeSliderChange(value){
+    ageStartChange(val){
+        debugger;
         this.setState({
-            ageRange : value
-        })
-    }
-    onSalarySliderChange(value){
-        this.setState({
-            salaryRange : value
+            ageStart : val
         })
     }
     posiNameChange(e){
@@ -243,8 +233,13 @@ class PositionManage extends React.Component{
        await this.searchPosi(); 
     }
     render(){
-        let {pFlag} = this.state;
+        let {pFlag, ageStart} = this.state;
         let {getFieldDecorator} = this.props.form;
+        let  ageEnd, highSalary = []
+        for(let i = ageStart+1;ageStart<i<=MAX_AGE;I++){
+            ageEnd.push(<Option value={i}>{i}</Option>)
+        }
+        
         const columns = [{
             title: '名称',
             dataIndex: 'name',
@@ -317,6 +312,7 @@ class PositionManage extends React.Component{
         //let list = [{name:'123',phoneNumber:'123',totalRecuriters:'123',salary:'123',welfares:'123',jobRequire:'123',positionDesc:'1231'}]
         let list = this.state.results;
         let {createF, loading} = this.state
+        
         return(
             <div>
             <div className='search-bar-container'>
@@ -425,7 +421,7 @@ class PositionManage extends React.Component{
                         <FormItem label='年龄' labelCol={{ span: 5 }}>
                             <Col span={7} offset={1}>
                             <FormItem>
-                                    <Select defaultValue="16"  >
+                                    <Select defaultValue="16" onChange={this.ageStartChange.bind(this, val)} >
                                         {ageStart}
                                     </Select>
                             </FormItem>
@@ -460,19 +456,14 @@ class PositionManage extends React.Component{
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        <FormItem
-                            label='招聘人数'
-                            name='p_total'
-                            labelCol={{ span: 5 }}
-                            wrapperCol={{ span: 16, offset: 1 }}>
-                        </FormItem>
+
                             
-                        <Col offset={1}>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" onChange={this.changeSalary.bind(this)}>
+                        <Col id='psalary' offset={1}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a">
                                 <RadioButton value="a">月薪</RadioButton>
                                 <RadioButton value="b">时薪</RadioButton>
                             </RadioGroup>
-                            <FormItem label={<span>薪资</span>} labelCol={{ span: 4 }}>
+                            <FormItem label='薪资' labelCol={{ span: 4 }}>
                                 <Col span={7} offset={1}>
                                     <FormItem>
                                         <Select defaultValue="1000"  >
@@ -495,15 +486,16 @@ class PositionManage extends React.Component{
                             </FormItem>
                         </Col>
                         
-                        <Col offset={1}>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" onChange={this.changeRedPackage.bind(this)}>
+                        <Col offset={1} id='pred'>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" >
                                 <RadioButton value="a">普通红包</RadioButton>
                                 <RadioButton value="b">随机红包</RadioButton>
                             </RadioGroup>
-                            <FormItem label={<span>红包</span>} labelCol={{ span: 4 }}>
-                                <Col span={7} offset={1}>
-                                    <FormItem label='总金额'>
-                                        <Input />
+                            <FormItem label='hb' labelCol={{ span: 4 }}
+                            wrapperCol={{ span: 18, offset: 1 }}>
+                                <Col span={7}>
+                                    <FormItem>
+                                        <Input placeholder='总金额' />
                                     </FormItem>
                                 </Col>
                                 <Col span={2}>
@@ -512,13 +504,15 @@ class PositionManage extends React.Component{
                             </span>
                                 </Col>
                                 <Col span={7} >
-                                    <FormItem label='红包个数'>
-                                        <InputNumber max={500} min={1} default={10}/>
+                                    <FormItem labelCol={{ span: 1 }}>
+                                        <InputNumber placeholder='红包个数' max={1000} min={1} default={10}/>
                                     </FormItem>
                                 </Col>
                             </FormItem>
                         </Col>
-                        
+                        <div style={{marginTop : '-25px', marginBottom : 15}}>
+                            附赠转发红包可让本职位在微信上快速传播
+                        </div>
                        
                          <FormItem
                             label='福利'
@@ -531,10 +525,7 @@ class PositionManage extends React.Component{
                                 }]
                             })(
                                 <Select mode='multiple' placeholder='请选择...'>
-                                    <Option value='五险一金'>五险一金</Option>
-                                    <Option value='带薪年假'>带薪年假</Option>
-                                    <Option value='年度旅游'>年度旅游</Option>
-                                    <Option value='商业保险'>商业保险</Option>                                    
+                                    {welfs.map(w=>(<Option value={w}>{w}</Option>))}                                    
                                 </Select>
                             )}
                         </FormItem>
