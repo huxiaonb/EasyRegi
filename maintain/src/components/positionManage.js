@@ -1,6 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Col, Slider, Radio} from 'antd'
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
 import './style/position.less'
@@ -34,6 +35,8 @@ const MAX_HOUR_SALARY=40
 const MAX_AGE = 60;
 const welfs = ['准时发薪','年底双薪', '包吃', '包住', '包吃包住', '购买社保', '五险一金', '带薪休假', '年度体检', '年度旅游', '坐着工作', '周末双休', '宿舍24小时热水', '空调工作环境', '宿舍有空调', '妹子多', '伙食好', '伙食津贴', '免穿防静电服', '提供交通补助', '夜班津贴', '年资津贴']
 const ages = [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60]
+const salary = [2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 100000];
+const hour_salary = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 class PositionManage extends React.Component{
     static contextTypes = {
         comp: PropTypes.object
@@ -46,17 +49,44 @@ class PositionManage extends React.Component{
         resultTotal : 0,
         pFlag : false,
         rowValue : {},
-        ageRange : [20,50],
-        salaryRange : [3000,6000],
         ageStart : undefined,
         lowSalary : undefined,
-        newFlag :false
-        
+        newFlag :false,
+        salaryRadio : 'month'
+    }
+    dateStartChange(d){
+        this.setState({
+            startDate : d
+        })
+    }
+    dateEndChange(d){
+        this.setState({
+            endDate: d
+        })
+    }
+    disabledDate(d){
+        let { startDate} = this.state;
+        return d < startDate.valueOf();
+    }
+    changePacketType(val){
+        this.setState({
+            red_type : val
+        })
     }
     ageStartChange(val){
         debugger;
         this.setState({
             ageStart : val
+        })
+    }
+    onLowSalaryChange(val){
+        this.setState({
+            lowSalary : val
+        })
+    }
+    onSalaryRadioChange(val){
+        this.setState({
+            salaryRadio : val
         })
     }
     posiNameChange(e){
@@ -234,12 +264,9 @@ class PositionManage extends React.Component{
        await this.searchPosi(); 
     }
     render(){
-        let {pFlag, ageStart} = this.state;
+        let { pFlag, ageStart, lowSalary, salaryRadio} = this.state;
         let {getFieldDecorator} = this.props.form;
         let  ageEnd, highSalary = []
-        for(let i = ageStart+1;ageStart<i<=MAX_AGE;I++){
-            ageEnd.push(<Option value={i}>{i}</Option>)
-        }
         
         const columns = [{
             title: '名称',
@@ -422,8 +449,8 @@ class PositionManage extends React.Component{
                         <FormItem label='年龄' labelCol={{ span: 5 }}>
                             <Col span={7} offset={1}>
                             <FormItem>
-                                    <Select defaultValue="16" onChange={this.ageStartChange.bind(this, val)} >
-                                        {ageStart}
+                                    <Select defaultValue="16" onChange={this.ageStartChange.bind(this)} >
+                                        {ages.map(a=>(<Option value={a}>{a}</Option>))}
                                     </Select>
                             </FormItem>
                         </Col>
@@ -435,7 +462,7 @@ class PositionManage extends React.Component{
                         <Col span={7} >
                             <FormItem>
                                     <Select defaultValue="45"  >
-                                        {ageEnd}
+                                        {ages.map(a=>(a>ageStart ? <Option value={a}>{a}</Option> : null))}
                                     </Select>
                             </FormItem>
                         </Col>
@@ -443,7 +470,10 @@ class PositionManage extends React.Component{
                         <FormItem label='有效期' labelCol={{ span: 5 }}>
                             <Col span={7} offset={1}>
                                 <FormItem>
-                                    <DatePicker />
+                                    <DatePicker 
+                                    placeholder='YYYY-MM-DD'
+                                    format="YYYY-MM-DD"
+                                    onChange={this.dateStartChange.bind(this)}/>
                                 </FormItem>
                             </Col>
                             <Col span={2}>
@@ -453,22 +483,27 @@ class PositionManage extends React.Component{
                             </Col>
                             <Col span={7} >
                                 <FormItem>
-                                    <DatePicker />
+                                    <DatePicker 
+                                        placeholder='YYYY-MM-DD'
+                                        format="YYYY-MM-DD"
+                                        onChange={this.dateEndChange.bind(this)}
+                                        disabledDate={this.disabledDate.bind(this)}
+                                    />
                                 </FormItem>
                             </Col>
                         </FormItem>
 
                             
                         <Col id='psalary' offset={1}>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a">
-                                <RadioButton value="a">月薪</RadioButton>
-                                <RadioButton value="b">时薪</RadioButton>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="month" onChange={this.onSalaryRadioChange.bind(this)}>
+                                <RadioButton value="month">月薪</RadioButton>
+                                <RadioButton value="hour">时薪</RadioButton>
                             </RadioGroup>
                             <FormItem label='薪资' labelCol={{ span: 4 }}>
                                 <Col span={7} offset={1}>
                                     <FormItem>
-                                        <Select defaultValue="1000"  >
-                                            {lowSalary}
+                                        <Select defaultValue="1000"  onChnage={this.onLowSalaryChange.bind(this)}>
+                                            {salaryRadio === 'hour' ? hour_salary.map(h => (<Option value={h}>{h}</Option>)) : salary.map(s => (<Option value={s}>{s}</Option>))}
                                         </Select>
                                     </FormItem>
                                 </Col>
@@ -480,7 +515,7 @@ class PositionManage extends React.Component{
                                 <Col span={7} >
                                     <FormItem >
                                         <Select defaultValue="5000"  >
-                                            {highSalary}
+                                            {salaryRadio === 'hour' ? hour_salary.map(h => (h>lowSalary ? (<Option value={h}>{h}</Option>):null)) : salary.map(s => (s>lowSalary? (<Option value={s}>{s}</Option>): null))}
                                         </Select>
                                     </FormItem>
                                 </Col>
@@ -488,14 +523,14 @@ class PositionManage extends React.Component{
                         </Col>
                         
                         <Col offset={1} id='pred'>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="a" >
-                                <RadioButton value="a">普通红包</RadioButton>
-                                <RadioButton value="b">随机红包</RadioButton>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="normal" onChange={this.changePacketType.bind(this)}>
+                                <RadioButton value="normal">普通红包</RadioButton>
+                                <RadioButton value="rand">随机红包</RadioButton>
                             </RadioGroup>
                             <FormItem label='hb' labelCol={{ span: 4 }}
                             wrapperCol={{ span: 18, offset: 1 }}>
                                 <Col span={7}>
-                                    <FormItem>
+                                    <FormItem name='red_sum'>
                                         <Input placeholder='总金额' />
                                     </FormItem>
                                 </Col>
@@ -505,7 +540,7 @@ class PositionManage extends React.Component{
                             </span>
                                 </Col>
                                 <Col span={7} >
-                                    <FormItem labelCol={{ span: 1 }}>
+                                    <FormItem name='red_total'>
                                         <InputNumber placeholder='红包个数' max={1000} min={1} default={10}/>
                                     </FormItem>
                                 </Col>
