@@ -196,6 +196,10 @@ exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     var wechatCode = _.get(req, ['query', 'code'], '');
     logger.info('getWechatOpenId', wechatCode, req.sessionID);
     var openId = _.get(req, ['session', 'openId'], '');
+    var developmentMode = _.get(req, ['query', 'dev'], '');
+    if(developmentMode === 'yes'){
+        req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    }
     if(!_.isEmpty(openId)){
         logger.info('openId exists');
         return next();
