@@ -191,6 +191,7 @@ class Positions extends React.Component{
 
     initWechatJsSdk = () => {
         let self = this;
+        let {signatureObj, wx} = this.props.args;
         wx.config({
             debug: true,
             appId: 'wx54e94ab2ab199342',
@@ -221,6 +222,7 @@ class Positions extends React.Component{
 
     shareToTimeLine = (title, link, imgUrl) =>{
         let currentPosition = this.state.currentPosition;
+        let wx = this.props.args.wx;
         wx.onMenuShareTimeline({
             title: title,
             link: link,
