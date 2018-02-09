@@ -1,1 +1,0 @@
-{"version":3,"sources":["_@alicloud_mns@1.0.0-beta5@@alicloud/mns/index.js"],"names":["module","exports","require"],"mappings":"AAAA;;AAEAA,OAAOC,OAAP,GAAiBC,QAAQ,cAAR,CAAjB","file":"_@alicloud_mns@1.0.0-beta5@@alicloud/mns/index.js","sourcesContent":["'use strict';\n\nmodule.exports = require('./lib/client');\n"],"sourceRoot":"/source/"}
