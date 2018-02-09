@@ -925,7 +925,8 @@ exports.testWechatApi = function(req, res){
 
 exports.sendRedPack = function(req, res){
     var wechatRedPackUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';
-    var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    // var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var openId = _.get(req, ['session', 'openId'], '');
     var _now = new Date();
     var nonceStr = wechatUtil.generateNonceString();
     var mchId = '1481782312';
@@ -953,27 +954,33 @@ exports.sendRedPack = function(req, res){
     };
     var sign = wechatUtil.sign(redPackOpt);
     redPackOpt.sign = sign;
-    request.post({
-        url: wechatRedPackUrl,
-        key: fs.readFileSync('resources/certs/apiclient_key.pem'),
-        cert: fs.readFileSync('resources/certs/apiclient_cert.pem'),
-        body: wechatUtil.buildXML(redPackOpt)
-    }, function(error, response, body){
-        if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
-            parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
-                if(err){
-                    logger.info('Failed in sending red pack', err);
-                    res.status(500).send({success: false, errmsg: '发送红包失败'});
-                }else if(result.return_code === 'SUCCESS' && result.result_code === 'SUCCESS'){
-                    res.json({success: true});
-                } else {
-                    var errMsg = {'return_code': result.return_code, 'return_msg': result.return_msg, 'result_code': result.result_code, 'err_code': result.err_code, 'err_code_des': result.err_code_des};
-                    logger.info('Failed in sending red pack as: ', JSON.stringify(errMsg));
-                    res.json({success: false, errmsg: JSON.stringify(errMsg)});
-                }
-            });
-        }
-    });
+
+    if(_.isEmpty(openId)){
+        logger.info('OpenId is empty, system will not send red pack');
+        res.status(500).send({success: false, errmsg: '发送红包失败'});
+    } else {
+        request.post({
+            url: wechatRedPackUrl,
+            key: fs.readFileSync('resources/certs/apiclient_key.pem'),
+            cert: fs.readFileSync('resources/certs/apiclient_cert.pem'),
+            body: wechatUtil.buildXML(redPackOpt)
+        }, function(error, response, body){
+            if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
+                parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
+                    if(err){
+                        logger.info('Failed in sending red pack', err);
+                        res.status(500).send({success: false, errmsg: '发送红包失败'});
+                    }else if(result.return_code === 'SUCCESS' && result.result_code === 'SUCCESS'){
+                        res.json({success: true});
+                    } else {
+                        var errMsg = {'return_code': result.return_code, 'return_msg': result.return_msg, 'result_code': result.result_code, 'err_code': result.err_code, 'err_code_des': result.err_code_des};
+                        logger.info('Failed in sending red pack as: ', JSON.stringify(errMsg));
+                        res.json({success: false, errmsg: JSON.stringify(errMsg)});
+                    }
+                });
+            }
+        });
+    }
 }
 
 exports.sendTemplateMessage = function(req, res){

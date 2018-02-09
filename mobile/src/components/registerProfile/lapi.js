@@ -161,5 +161,11 @@ export default {
             data: f.data,
             });
         
+    },
+    sendRedPack() {
+        return _request({
+            url: '../sendRedPack',
+            method: 'get'
+        });
     }
 }

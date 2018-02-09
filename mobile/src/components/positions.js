@@ -221,6 +221,7 @@ class Positions extends React.Component{
     }
 
     shareToTimeLine = (title, link, imgUrl) =>{
+        let self = this;
         let currentPosition = this.state.currentPosition;
         let wx = this.props.args.wx;
         wx.onMenuShareTimeline({
@@ -229,17 +230,28 @@ class Positions extends React.Component{
             imgUrl: imgUrl,
             success: function () {
                 // 用户确认分享后执行的回调函数
-                if(currentPosition.luckyFlag){
-                    alert('发送红包成功')
+                var currentPosition1 = self.state.currentPosition;
+                if(currentPosition1.luckyFlag){
+                    Toast.info('分享到朋友圈成功');
+                    self.sendRedPack();
                 } else {
-                    alert('分享到朋友圈成功');
+                    Toast.info('该职位不是红包职位');
                 }
             },
             cancel: function () {
                 // 用户取消分享后执行的回调函数
-                alert('你没有分享到朋友圈');
+                Toast.info('你没有分享到朋友圈');
             }
         });
+    }
+    async sendRedPack(){
+        let r = await lapi.sendRedPack();
+        if(r && r.success){
+            Toast.info('发送红包成功');
+        } else {
+            Toast.error('发送红包失败');
+            Toast.hide();
+        }
     }
         
     render(){
