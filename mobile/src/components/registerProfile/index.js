@@ -90,9 +90,9 @@ class Index extends React.Component {
       let personalCopy = Object.assign({},personal);
       // let pdate = Object.assign(personalCopy.birthDate,{});
       let appi = Object.assign({},personalCopy,{
-        birthDate : personalCopy.birthDate.toDate(),
-        validFrom: personalCopy.validFrom.toDate(),
-        validTo: personalCopy.validTo.toDate()
+        birthDate : personalCopy.birthDate,
+        validFrom: personalCopy.validFrom,
+        validTo: personalCopy.validTo
       });
 
       //紧急联系人
@@ -112,8 +112,8 @@ class Index extends React.Component {
           companyName : wk.companyName,
           title : wk.title,
           salaryRange : wk.salaryRange,
-          startedAt : wdate[0].toDate(),
-          endedAt : wdate[1].toDate(),
+          startedAt : wdate[0],
+          endedAt : wdate[1],
           resignReason : wk.resignReason,
           guarantorName : wk.guarantorName,
           guarantorPhoneNumber : wk.guarantorPhoneNumber,
@@ -128,8 +128,8 @@ class Index extends React.Component {
           major : ed.major,
           isGraduated : ed.isGraduated,
           degree: ed.degree,
-          startedAt : edate[0].toDate(),
-          endedAt : edate[1].toDate()
+          startedAt : edate[0],
+          endedAt : edate[1],
         };
         educationHistories.push(em);
       });
@@ -173,16 +173,16 @@ class Index extends React.Component {
         let wkeys=[],ekeys=[],fkeys=[],tkeys=[];
         info.workExperiences.map((wk,idx)=>{
             wkeys.push(idx);
-            wk.startedAt = moment(wk.startedAt);
-            wk.endedAt = moment(wk.endedAt);
+            wk.startedAt = moment(wk.startedAt).toDate();
+            wk.endedAt = moment(wk.endedAt).toDate();
             info.workExperiences[idx].date = [wk.startedAt,wk.endedAt];
           });
          info.educationHistories.map((ed,idx)=>{
             if(idx){
                 ekeys.push(idx);
             }
-            ed.startedAt = moment(ed.startedAt);
-            ed.endedAt = moment(ed.endedAt);
+           ed.startedAt = moment(ed.startedAt).toDate();
+           ed.endedAt = moment(ed.endedAt).toDate();
             info.educationHistories[idx].date = [ed.startedAt,ed.endedAt];
           });
           console.log(info.workExperiences,info.educationHistories);
@@ -199,12 +199,12 @@ class Index extends React.Component {
               name : info.name,
               gender : info.gender,
               folk : info.folk,
-              date : moment(info.birthDate),
+              date: moment(info.birthDate).toDate(),
               healthState : info.healthState,
               marriageState : info.marriageState,
               idCardNumber : info.idCardNumber,
-              validFrom: moment(info.validFrom),
-              validTo: moment(info.validTo),
+              validFrom: moment(info.validFrom).toDate(),
+              validTo: moment(info.validTo).toDate(),
               issuingAuthority: info.issuingAuthority,
               nativePlace: info.nativePlace,
               homeAddress : info.homeAddress,

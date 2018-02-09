@@ -30,13 +30,13 @@ import lapi from './lapi'
 // import 'antd/lib/upload/style/index.less';
 // import 'antd/lib/modal/style/index.less';
 var today = new Date();
-const currentDate = moment().utcOffset(8);
-// const currentDate = moment('1997-07-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const currentDate = moment().toDate();
+// const currentDate = moment('1997-07-01 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
 console.log(currentDate);
-const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
-const minDate = moment('1950-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
-const validityMaxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
-const validityMinDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
+const minDate = moment('1950-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
+const validityMaxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
+const validityMinDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
 const openId = $('#openId').text();
 const FormItem = List.Item;
 //const Option = Select.Option;
@@ -194,8 +194,8 @@ class PersonalInfo extends React.Component {
             if(!!res.result && !!res.result.birth){
                 let birth = res.result.birth;
                 let birthStr = birth.substr(0, 4) + birth.substr(5, 2) + birth.substr(8, 2);
-                let birthMo = moment(birth, 'YYYYMMDD').utcOffset(8);
-                if(birthMo.isValid()){
+                let birthMo = moment(birth, 'YYYYMMDD').utcOffset(8).toDate();
+                if(moment(birthMo).isValid()){
                     form.setFieldsValue({
                         birthDate: birthMo
                     });
