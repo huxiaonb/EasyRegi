@@ -162,9 +162,9 @@ export default {
             });
         
     },
-    sendRedPack() {
+    sendRedPack(positionId) {
         return _request({
-            url: '../sendRedPack',
+            url: '../sendRedPack?positionId=' + positionId,
             method: 'get'
         });
     }

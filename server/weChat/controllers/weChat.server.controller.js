@@ -559,10 +559,8 @@ exports.findNearbyPositions = function (req, res, next) {
     var locationInfo = _.get(req, ['body']);
     var limit = _.get(req, ['query', 'limit'], ''),
         offset = _.get(req, ['query', 'offset'], '');
-    console.log(limit, offset);
     limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
-    console.log(limit, offset);
     let addrArr = [], addr = '', latLngStr = '';
     if (locationInfo != null && locationInfo != undefined) {
         if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
@@ -607,7 +605,7 @@ exports.findNearbyPositions = function (req, res, next) {
                         _.forEach(latLngArr, function (latLntString, index) {
                             var arr = latLntString.split(',');
                             var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                            var distance = latLngDistances[index];
+                            var distance = parseInt(latLngDistances[index]);
                             if (!_.isEmpty(cop)) {
                                 var copPositions = positionGroup[cop._id];
                                 var tempPositions = constructPositionVOs(copPositions, cop, distance);
@@ -875,7 +873,7 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
 
 function constructPositionVOs(copPositions, cop, distance) {
     var distanceStr = '-'; //no distance
-    if(!_.isEmpty(distance) && _.isNumber(distance)){
+    if(!_.isUndefined(distance) && _.isNumber(distance)){
         distanceStr = Math.floor(distance);
     }
     var tempPositions = [];
@@ -924,62 +922,198 @@ exports.testWechatApi = function(req, res){
 }
 
 exports.sendRedPack = function(req, res){
-    var wechatRedPackUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';
-    // var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var positionId = _.get(req, ['query', 'positionId'], '');
     var openId = _.get(req, ['session', 'openId'], '');
-    var _now = new Date();
-    var nonceStr = wechatUtil.generateNonceString();
-    var mchId = '1481782312';
-    var _date_time = _now.getFullYear()+''+(_now.getMonth()+1)+''+_now.getDate();
-    var _date_no = (_now.getTime() +'').substr(-8);
-    var _random_no = Math.floor(Math.random()*99);
-    var mchBillNo = mchId + _date_time + _date_no + _random_no;
-    var redPackOpt = {
-        'nonce_str': nonceStr,
-        'sign': '',
-        'mch_billno': mchBillNo,
-        'mch_id': mchId,
-        'wxappid': 'wx54e94ab2ab199342',
-        'send_name': '入职易',
-        're_openid': openId,
-        'total_amount': '100',
-        'total_num': '1',
-        'wishing': '恭喜发财',
-        'client_ip': '39.108.136.90',
-        'act_name': '虚拟物品兑奖',
-        'remark': '更多参与，更多回报'
-        // 'scene_id': '',
-        // 'risk_info': '',
-        // 'consume_mch_id': '',
-    };
-    var sign = wechatUtil.sign(redPackOpt);
-    redPackOpt.sign = sign;
 
     if(_.isEmpty(openId)){
         logger.info('OpenId is empty, system will not send red pack');
         res.status(500).send({success: false, errmsg: '发送红包失败'});
     } else {
-        request.post({
-            url: wechatRedPackUrl,
-            key: fs.readFileSync('resources/certs/apiclient_key.pem'),
-            cert: fs.readFileSync('resources/certs/apiclient_cert.pem'),
-            body: wechatUtil.buildXML(redPackOpt)
-        }, function(error, response, body){
-            if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
-                parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, result) {
-                    if(err){
-                        logger.info('Failed in sending red pack', err);
-                        res.status(500).send({success: false, errmsg: '发送红包失败'});
-                    }else if(result.return_code === 'SUCCESS' && result.result_code === 'SUCCESS'){
-                        res.json({success: true});
-                    } else {
-                        var errMsg = {'return_code': result.return_code, 'return_msg': result.return_msg, 'result_code': result.result_code, 'err_code': result.err_code, 'err_code_des': result.err_code_des};
-                        logger.info('Failed in sending red pack as: ', JSON.stringify(errMsg));
-                        res.json({success: false, errmsg: JSON.stringify(errMsg)});
-                    }
-                });
-            }
+        var sendRedPackTasks = [];
+        sendRedPackTasks.push(startSendRedPackTask(positionId, openId));
+        sendRedPackTasks.push(findPositionById());
+        sendRedPackTasks.push(calculateRedPack());
+        sendRedPackTasks.push(sendRedPackToUser());
+        sendRedPackTasks.push(updateRedPackSendList());
+        async.waterfall(sendRedPackTasks, function(sendRedPackError, sendRedPackResult){
+           if(sendRedPackError) {
+               logger.error('Error in calculating red pack amount', sendRedPackError);
+               res.status(500).send({success: false, errmsg: '发送红包失败'});
+           } else if(_.get(sendRedPackResult, ['sendRedPackSuccess'], false)){
+               res.json({success: true, info: '发送红包成功'});
+           } else if(!_.get(sendRedPackResult, ['needSendRedPack'], false)){
+               res.json({success: true, info: '无需发送红包'});
+           } else {
+               res.status(500).send({success: false, errmsg: '发送红包失败'});
+           }
         });
+
+    }
+}
+
+function checkIfNeedSendRedPack(dbPosition, openId){
+    var needSendRedPack = false;
+    var luckyFlag = _.get(dbPosition, ['luckyFlag'], false),
+        redPackSendList = _.get(dbPosition, ['redPackSendList'], []),
+        redPackCount = _.get(dbPosition, ['redPackCount'], 0);
+    console.log('send list', JSON.stringify(_.find(redPackSendList, {'openId': openId})));
+    console.log(_.isEmpty(_.find(redPackSendList, {'openId': openId})))
+    if(luckyFlag && _.isEmpty(_.find(redPackSendList, {'openId': openId})) && redPackCount > 0 && redPackSendList.length < redPackCount){
+        needSendRedPack = true;
+    } else {
+        logger.info('system will not send red pack for position id:', _.get(dbPosition, ['_id'], ''), openId);
+    }
+    return needSendRedPack;
+}
+
+function calculateRedPackAmount(dbPosition){
+    var redPackType = _.get(dbPosition, ['redPackType'], ''),
+        redPackSum = parseFloat(_.get(dbPosition, ['redPackSum'], '0')),
+        redPackCount = parseInt(_.get(dbPosition, ['redPackCount'], '1')),
+        redPackSendList = _.get(dbPosition, ['redPackSendList'], []),
+        redPackAmount = 0;
+    if(redPackType === 'normal'){
+        redPackAmount = Math.floor(redPackSum / redPackCount * 100) / 100;
+    } else if(redPackType === 'rand') {
+        var redPackAmountAlreadySent = 0;
+        _.forEach(redPackSendList, function(redPack){
+           redPackAmountAlreadySent += parseFloat(_.get(redPack, ['redPackAmount'], 0));
+        });
+        var remainedAmount = redPackSum - redPackAmountAlreadySent;
+        if((redPackCount - redPackSendList.length) == 1) {
+            redPackAmount = remainedAmount;
+        } else {
+            var factor = remainedAmount / (redPackCount - redPackSendList.length) * 2;
+            redPackAmount = Math.floor((Math.random() * factor + 1) * 100) / 100;
+        }
+    }
+    return redPackAmount;
+}
+
+function startSendRedPackTask(positionId, openId){
+    return function(callback){
+        var result = {
+            positionId: positionId,
+            openId: openId
+        };
+        return callback(null, result);
+    }
+}
+
+function findPositionById(){
+    return function(result, callback){
+        var positionId = _.get(result, ['positionId'], '');
+        if(_.isEmpty(positionId)){
+            return callback('position id is empty', null);
+        } else {
+            Position.findOne({_id: positionId}, function(error, dbPosition){
+                if(error || _.isEmpty(dbPosition)){
+                    return callback('Error in finding position', null);
+                } else {
+                    result.dbPosition = dbPosition;
+                    return callback(null, result);
+                }
+            });
+        }
+    }
+}
+
+function calculateRedPack(){
+    return function (result, callback) {
+        var dbPosition = _.get(result, ['dbPosition'], {}),
+            openId = _.get(result, ['openId'], '');
+        if(_.isEmpty(dbPosition)){
+            result.needSendRedPack = false;
+            return callback(null, result);
+        } else {
+            result.needSendRedPack = checkIfNeedSendRedPack(dbPosition, openId);
+            result.redPackAmount = calculateRedPackAmount(dbPosition);
+            return callback(null, result);
+        }
+    }
+}
+
+function sendRedPackToUser(){
+    return function(result, callback) {
+        if(!_.get(result, ['needSendRedPack'], false)){
+            return callback(null, result);
+        } else {
+            var wechatRedPackUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack';
+            // var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+            var openId = _.get(result, ['openId'], '');
+            var redPackAmount = _.get(result, ['redPackAmount'], 0);
+            var _now = new Date();
+            var nonceStr = wechatUtil.generateNonceString();
+            var mchId = '1481782312';
+            var _date_time = _now.getFullYear()+''+(_now.getMonth()+1)+''+_now.getDate();
+            var _date_no = (_now.getTime() +'').substr(-8);
+            var _random_no = Math.floor(Math.random()*99);
+            var mchBillNo = mchId + _date_time + _date_no + _random_no;
+            var redPackOpt = {
+                'nonce_str': nonceStr,
+                'sign': '',
+                'mch_billno': mchBillNo,
+                'mch_id': mchId,
+                'wxappid': 'wx54e94ab2ab199342',
+                'send_name': '入职易',
+                're_openid': openId,
+                'total_amount': redPackAmount * 100,
+                'total_num': '1',
+                'wishing': '恭喜发财',
+                'client_ip': '39.108.136.90',
+                'act_name': '虚拟物品兑奖',
+                'remark': '更多参与，更多回报'
+                // 'scene_id': '',
+                // 'risk_info': '',
+                // 'consume_mch_id': '',
+            };
+            var sign = wechatUtil.sign(redPackOpt);
+            redPackOpt.sign = sign;
+
+            request.post({
+                url: wechatRedPackUrl,
+                key: fs.readFileSync('resources/certs/apiclient_key.pem'),
+                cert: fs.readFileSync('resources/certs/apiclient_cert.pem'),
+                body: wechatUtil.buildXML(redPackOpt)
+            }, function(error, response, body){
+                if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
+                    parseString(body,{ trim:true, explicitArray:false, explicitRoot:false }, function (err, sendResult) {
+                        if(err){
+                            logger.info('Failed in sending red pack', err);
+                            return callback('Failed in sending red pack', null);
+                        }else if(sendResult.return_code === 'SUCCESS' && sendResult.result_code === 'SUCCESS'){
+                            result.sendRedPackSuccess = true;
+                            return callback(null, result);
+                        } else {
+                            var errMsg = {'return_code': sendResult.return_code, 'return_msg': sendResult.return_msg, 'result_code': sendResult.result_code, 'err_code': sendResult.err_code, 'err_code_des': sendResult.err_code_des};
+                            logger.info('Failed in sending red pack as: ', JSON.stringify(errMsg));
+                            return callback(JSON.stringify(errMsg), null);
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
+function updateRedPackSendList(){
+    return function(result, callback){
+        if(_.get(result, ['sendRedPackSuccess'], false)){
+            var openId = _.get(result, ['openId'], {}),
+                redPackSendList = _.get(result, ['dbPosition', 'redPackSendList'], []),
+                redPackAmount = _.get(result, ['redPackAmount'], 0);
+            redPackSendList.push({'openId': openId, 'redPackAmount': redPackAmount.toString()});
+            Position.update({'_id': _.get(result, ['dbPosition', '_id'])}, {$set: {'redPackSendList': redPackSendList}}, {upsert: false}, function(error, updateResult){
+                if(error) {
+                    logger.info('Error in updating red pack send list', error);
+                    return callback('Error in updating red pack send list', null);
+                } else {
+                    return callback(null, result);
+                }
+            });
+        } else {
+            return callback(null, result);
+        }
     }
 }
 

@@ -245,7 +245,8 @@ class Positions extends React.Component{
         });
     }
     async sendRedPack(){
-        let r = await lapi.sendRedPack();
+        let currentPosition = this.state.currentPosition;
+        let r = await lapi.sendRedPack(currentPosition._id);
         if(r && r.success){
             Toast.info('发送红包成功');
         } else {
