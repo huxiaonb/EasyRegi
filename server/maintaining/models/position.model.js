@@ -41,10 +41,11 @@ var PositionSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    envelopeSum : String,
-    envelopeCount : String,
-    beginDate : Date,
-    endDate : Date,
+    envelopeType :String,//红包类型 normal/rand
+    envelopeSum : String,//总金额
+    envelopeCount : String,//红包数
+    beginDate : Date,//有效期起
+    endDate: Date,//有效期止
     salaryStart: String,
     salaryEnd: String,
     contactPerson: String,

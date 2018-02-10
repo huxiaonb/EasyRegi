@@ -84,12 +84,19 @@ class PositionManage extends React.Component{
         })
     }
     onLowSalaryChange(val){
-        debugger;
         this.setState({
             lowSalary : val
         })
     }
     onSalaryRadioChange(val){
+        let { form } = this.props;
+        val.target.value==='hour'? form.setFieldsValue({
+            'salary_start': 100,
+            'salary_end': 500
+        }) : form.setFieldsValue({
+            'salary_start': 1000,
+            'salary_end': 5000
+        });
         this.setState({
             salaryRadio : val.target.value
         })
@@ -570,7 +577,7 @@ class PositionManage extends React.Component{
                                 </Col>
                             </FormItem>
                         </Col>
-                        <div className='ant-col-offset-6' style={{marginTop : '-25px', marginBottom : 15}}>
+                        <div className='ant-col-offset-6' style={{marginTop : '-23px', marginBottom : 15}}>
                             附赠转发红包可让本职位在微信上快速传播
                         </div>
                        
