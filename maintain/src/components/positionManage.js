@@ -1,9 +1,10 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Slider} from 'antd'
+import { Button, Input, DatePicker, Table, Modal, message, Form, Select, InputNumber, Col, Slider, Radio} from 'antd'
+import moment from 'moment';
 import PropTypes from 'prop-types';
 import api from '../apiCollect'
-
+import './style/position.less'
 // import Form from 'antd/lib/form'
 // import Table from 'antd/lib/table'
 // import Modal from 'antd/lib/modal'
@@ -26,19 +27,16 @@ import './style/components.less';
 const {RangePicker } = DatePicker;
 const FormItem = Form.Item;
 const Option = Select.Option;
-const salaryMarks = {
-  1000: '1000 CNY',
-  30000 : {
-    style: {
-      color: '#f50',
-    },
-    label: <strong>30000CNY</strong>,
-  },
-};
-const ageMarks = {
-  16 : '16',
-  60 : '60'
-};
+const RadioButton = Radio.Button;
+const RadioGroup = Radio.Group;
+
+const MAX_SALARY=10000;
+const MAX_HOUR_SALARY=40
+const MAX_AGE = 60;
+const welfs = ['准时发薪','年底双薪', '包吃', '包住', '包吃包住', '购买社保', '五险一金', '带薪休假', '年度体检', '年度旅游', '坐着工作', '周末双休', '宿舍24小时热水', '空调工作环境', '宿舍有空调', '妹子多', '伙食好', '伙食津贴', '免穿防静电服', '提供交通补助', '夜班津贴', '年资津贴']
+const ages = [16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60]
+const salary = [2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 100000];
+const hour_salary = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
 class PositionManage extends React.Component{
     static contextTypes = {
         comp: PropTypes.object
@@ -51,19 +49,56 @@ class PositionManage extends React.Component{
         resultTotal : 0,
         pFlag : false,
         rowValue : {},
-        ageRange : [20,50],
-        salaryRange : [3000,6000],
-        newFlag :false
-        
+        ageStart : undefined,
+        lowSalary : undefined,
+        newFlag :false,
+        salaryRadio : 'month'
     }
-    onAgeSliderChange(value){
+    changePacket(val){
         this.setState({
-            ageRange : value
+            luckyFlag : val
         })
     }
-    onSalarySliderChange(value){
+    dateStartChange(d){
         this.setState({
-            salaryRange : value
+            startDate : d
+        })
+    }
+    dateEndChange(d){
+        this.setState({
+            endDate: d
+        })
+    }
+    disabledDate(d){
+        let { startDate} = this.state;
+        return d < startDate.valueOf();
+    }
+    changePacketType(val){
+        this.setState({
+            red_type :  val.target.value
+        })
+    }
+    ageStartChange(val){
+        this.setState({
+            ageStart : val
+        })
+    }
+    onLowSalaryChange(val){
+        this.setState({
+            lowSalary : val
+        })
+    }
+    onSalaryRadioChange(val){
+        let { form } = this.props;
+        val.target.value==='hour'? form.setFieldsValue({
+            'salary_start': 100,
+            'salary_end': 500
+        }) : form.setFieldsValue({
+            'salary_start': 1000,
+            'salary_end': 5000
+        });
+        this.setState({
+            salaryRadio : val.target.value
         })
     }
     posiNameChange(e){
@@ -122,14 +157,13 @@ class PositionManage extends React.Component{
                  contactPerson : form.getFieldValue('p_contact'),
                  phoneNumber : form.getFieldValue('p_phone'),
                  totalRecruiters : form.getFieldValue('p_total'),
-                 salary : form.getFieldValue('p_salary'),
                  welfares : form.getFieldValue('p_welfare'),
                  positionDesc : form.getFieldValue('p_desc'),
                  jobRequire : form.getFieldValue('p_require'),
-                 salaryStart : salaryRange[0],
-                 salaryEnd : salaryRange[1],
-                 ageRangeStart : ageRange[0],
-                 ageRangeEnd : ageRange[1],
+                 salaryStart : form.getFieldValue('salary_start'),
+                 salaryEnd : form.getFieldValue('salary_end'),
+                 ageRangeStart : form.getFieldValue('age_start'),
+                 ageRangeEnd : form.getFieldValue('age_end'),
              });
              if(!this.state.newFlag){
                  try{
@@ -167,8 +201,10 @@ class PositionManage extends React.Component{
                 'p_contact' :'',
                 'p_phone' : '',
                 'p_total' : '',
-                'p_salary' : [],
-                'p_welfare' : [],
+                'age_start' : 16,
+                'age_end' : 45,
+                'salary_start' : 1000,
+                'salary_end' : 5000,
                 'p_desc' : '',
                 'p_require' : ''
             });
@@ -241,8 +277,10 @@ class PositionManage extends React.Component{
        await this.searchPosi(); 
     }
     render(){
-        let {pFlag} = this.state;
+        let { pFlag, ageStart, lowSalary, salaryRadio} = this.state;
         let {getFieldDecorator} = this.props.form;
+        let  ageEnd, highSalary = []
+        
         const columns = [{
             title: '名称',
             dataIndex: 'name',
@@ -306,20 +344,15 @@ class PositionManage extends React.Component{
             key: 'mobile',
             className: 'log-result-noWrap',
         }*/];
-        //mock datasource 
-        /*let list = [
-        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
-        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
-        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'},
-        {positionName:'GDGDGDG',gender:'male',submittedAt:'2014-12-24',mobile:'1231231312'}]*/
-        //let list = [{name:'123',phoneNumber:'123',totalRecuriters:'123',salary:'123',welfares:'123',jobRequire:'123',positionDesc:'1231'}]
+        
         let list = this.state.results;
         let {createF, loading} = this.state
+        
         return(
             <div>
             <div className='search-bar-container'>
                 <div className='search-title'>
-                    招聘职位管理<span title='新增职位' style={{marginLeft:'10px'}}><Button shape="circle" type='primary' icon='plus' onClick={this.createForm.bind(this)} /></span>
+                        招聘职位管理<span title='新增职位' style={{ marginLeft: '10px' }}><Button type='primary' onClick={this.createForm.bind(this)}>新增招聘职位</Button></span>
                 </div>
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>
@@ -358,7 +391,7 @@ class PositionManage extends React.Component{
                 </div>
                 
                 <Modal
-                    title="添加新职位"
+                    title={<p style={{ fontSize: 20, color:'#555'}}>添加新职位</p>}
                     visible={pFlag}
                     onOk={this.handleOk.bind(this)}
                     onCancel={this.toggleP.bind(this)}
@@ -419,21 +452,134 @@ class PositionManage extends React.Component{
                                 <Input />
                             )}
                         </FormItem>
-                        <FormItem
-                            label='年龄'
-                            name='p_age'
-                            labelCol={{ span: 5 }}
-                            wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={ageMarks} min={16} max={60} step={1} value={this.state.ageRange} onChange={this.onAgeSliderChange.bind(this)} />
-                        </FormItem>
-                        <FormItem
-                            label='薪资'
-                            name='p_salary'
-                            labelCol={{ span: 5 }}
-                            wrapperCol={{ span: 16, offset: 1 }}>
-                            <Slider range={true} marks={salaryMarks} min={1000} max={30000} step={1000} value={this.state.salaryRange} onChange={this.onSalarySliderChange.bind(this)} />
-                        </FormItem>
                         
+                        <FormItem label='年龄' labelCol={{ span: 5 }}>
+                            <Col span={7} offset={1}>
+                            <FormItem name='age_start'>
+                            {getFieldDecorator('age_start')(
+                                    <Select onChange={this.ageStartChange.bind(this)} >
+                                        {ages.map(a=>(<Option key={a.toString()} value={a}>{a}</Option>))}
+                                    </Select>
+                            )}
+                            </FormItem>
+                        </Col>
+                        <Col span={2}>
+                            <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                -
+                            </span>
+                        </Col>
+                        <Col span={7} >
+                            <FormItem name='age_end'>
+                                {getFieldDecorator('age_end')(
+                                    <Select>
+                                        {ages.map(a=>(a>ageStart && <Option key={a.toString()} value={a}>{a}</Option>))}
+                                    </Select>
+                                )}
+                            </FormItem>
+                        </Col>
+                        </FormItem>
+                        <FormItem label='有效期' labelCol={{ span: 5 }}>
+                            <Col span={7} offset={1}>
+                                <FormItem>
+                                    {getFieldDecorator('date_start')(
+                                        <DatePicker 
+                                            placeholder='YYYY-MM-DD'
+                                            format="YYYY-MM-DD"
+                                            onChange={this.dateStartChange.bind(this)}/>
+                                    )}
+                                </FormItem>
+                            </Col>
+                            <Col span={2}>
+                                <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                    -
+                            </span>
+                            </Col>
+                            <Col span={7} >
+                                <FormItem>
+                                {getFieldDecorator('date_end')(
+                                    <DatePicker 
+                                        placeholder='YYYY-MM-DD'
+                                        format="YYYY-MM-DD"
+                                        onChange={this.dateEndChange.bind(this)}
+                                        disabledDate={this.disabledDate.bind(this)}
+                                    />
+                                )}
+                                </FormItem>
+                            </Col>
+                        </FormItem>
+
+                            
+                        <Col id='psalary' offset={1}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="month" onChange={this.onSalaryRadioChange.bind(this)}>
+                                <RadioButton value="month">月薪</RadioButton>
+                                <RadioButton value="hour">时薪</RadioButton>
+                            </RadioGroup>
+                            <FormItem label='薪资' labelCol={{ span: 4 }}>
+                                <Col span={7} offset={1}>
+                                    <FormItem name='salary_start'>
+                                    {getFieldDecorator('salary_start')(
+                                        <Select onChange={this.onLowSalaryChange.bind(this)}>
+                                            {salaryRadio === 'hour' ? hour_salary.map(h => (<Option key={h.toString()} value={h}>{h}</Option>)) : salary.map(s => (<Option key={s.toString()} value={s}>{s}</Option>))}
+                                        </Select>
+                                    )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={2}>
+                                    <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                        -
+                            </span>
+                                </Col>
+                                <Col span={7} >
+                                    <FormItem name='salary_end'>
+                                    {getFieldDecorator('salary_end')(
+                                        <Select>
+                                            {salaryRadio === 'hour' ?   hour_salary.map(h => (h > lowSalary && (<Option key={h.toString()} value={h}>{h}</Option>))) : salary.map(s => (s>lowSalary && (<Option key={s.toString()} value={s}>{s}</Option>)))}
+                                        </Select>
+                                    )}
+                                    </FormItem>
+                                </Col>
+                            </FormItem>
+                        </Col>
+                        <FormItem name='luckyflag' label='红包职位' labelCol={{ span: 5 }}
+                            wrapperCol={{ span: 16, offset: 1 }}>
+                            {getFieldDecorator('luckyflag')(
+                                <RadioGroup style={{ marginBottom: 15 }}  onChange={this.changePacket.bind(this)}>
+                                <Radio value="1">是</Radio>
+                                <Radio value="0">否</Radio>
+                            </RadioGroup>
+                            )}
+                        </FormItem>
+                        <Col offset={1} id='pred'>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="normal" onChange={this.changePacketType.bind(this)}>
+                                <RadioButton value="normal">普通红包</RadioButton>
+                                <RadioButton value="rand">随机红包</RadioButton>
+                            </RadioGroup>
+                            <FormItem label='红包' labelCol={{ span: 4 }}
+                                wrapperCol={{ span: 18, offset: 1 }}>
+                                <Col span={7}>
+                                    <FormItem name='red_sum'>
+                                    {getFieldDecorator('red_sum')(
+                                        <Input placeholder='总金额' />
+                                    )}
+                                    </FormItem>
+                                </Col>
+                                <Col span={2}>
+                                    <span style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}>
+                                        -
+                            </span>
+                                </Col>
+                                <Col span={7} >
+                                    <FormItem name='red_total'>
+                                    {getFieldDecorator('red_total')(
+                                        <InputNumber placeholder='红包个数' max={1000} min={1} default={10}/>
+                                    )}
+                                    </FormItem>
+                                </Col>
+                            </FormItem>
+                        </Col>
+                        <div className='ant-col-offset-6' style={{marginTop : '-23px', marginBottom : 15}}>
+                            附赠转发红包可让本职位在微信上快速传播
+                        </div>
                        
                          <FormItem
                             label='福利'
@@ -446,10 +592,7 @@ class PositionManage extends React.Component{
                                 }]
                             })(
                                 <Select mode='multiple' placeholder='请选择...'>
-                                    <Option value='五险一金'>五险一金</Option>
-                                    <Option value='带薪年假'>带薪年假</Option>
-                                    <Option value='年度旅游'>年度旅游</Option>
-                                    <Option value='商业保险'>商业保险</Option>                                    
+                                    {welfs.map(w=>(<Option key={w.toString()} value={w}>{w}</Option>))}                                    
                                 </Select>
                             )}
                         </FormItem>

@@ -27,8 +27,8 @@ import  '../../less/index.less';
 
 
 const FormItem = List.Item;
-const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8);
-const minDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8);
+const maxDate = moment('2050-12-31 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
+const minDate = moment('1970-01-01 +0800', 'YYYY-MM-DD Z').utcOffset(8).toDate();
 const degreeOpt = [{value: '小学', label: '小学'},{value: '初中', label: '初中'},{value: '高中', label: '高中'},{value: '中专', label: '中专'},{value: '大专', label: '大专'},{value: '本科', label: '本科'},{value: '硕士', label: '硕士'},{value: '博士', label: '博士'}];
 
 let uuid = 0;

@@ -24,6 +24,8 @@ import Login from './components/login'
 import CompInfo from './components/compInfo';
 import ApplicantManage from './components/applicantManage';
 import PositionManage from './components/positionManage';
+import Resume from './components/resume';
+import Charge from './components/charge';
 
 import './index.less'
 import api from './apiCollect'
@@ -104,17 +106,23 @@ class Index extends React.Component {
                   <Link to='/comp' className="nav-text"><Icon type="info-circle-o" />公司信息</Link>
                 </Menu.Item>
                 <Menu.Item key="2" style={{marginTop: '10px'}}>
-                  <Link to='/applicant' className="nav-text"><Icon type="solution" />入职员工</Link>
+                  <Link to='/applicant' className="nav-text"><Icon type="idcard" />入职员工</Link>
                 </Menu.Item>
                 <Menu.Item key="3" style={{marginTop: '10px'}}>
                   <Link to='/position' className="nav-text"><Icon type="file" />在招职位</Link>
+                </Menu.Item>
+                 <Menu.Item key="4" style={{marginTop: '10px'}}>
+                  <Link to='/resume' className="nav-text"><Icon type="file-text" />简历池</Link>
+                </Menu.Item>
+                <Menu.Item key="5" style={{marginTop: '10px'}}>
+                  <Link to='/charge' className="nav-text"><Icon type="red-envelope" />充值</Link>
                 </Menu.Item>
               </Menu>
             </Sider>
           <Layout style={{position:'relative'}}>
             <Menu mode="horizontal">
               <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{companyInfo.alias}</span>}>
-                <Menu.Item key="setting:1"><span onClick={this.logout.bind(this)}>退出</span></Menu.Item>
+                <Menu.Item key="setting:1" onClick={this.logout.bind(this)}>退出</Menu.Item>
               </SubMenu>
             </Menu>
             <Content style={{ margin: '24px 16px 0px', background: '#fff' }}>
@@ -141,6 +149,8 @@ render((
             <Route path="comp" component={CompInfo} />
             <Route path="applicant" component={ApplicantManage} />
             <Route path="position" component={PositionManage} />
+            <Route path="resume" component={Resume} />
+            <Route path="charge" component={Charge} />
         </Route>
     </Router>
 ), document.getElementById('app'));
