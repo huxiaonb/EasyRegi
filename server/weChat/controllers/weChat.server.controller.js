@@ -195,7 +195,7 @@ exports.createUnifiedOrder = function(req, res) {
 
 exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     var wechatCode = _.get(req, ['query', 'code'], '');
-    logger.info('getWechatOpenId', wechatCode, req.sessionID);
+    logger.info('getWechatOpenId', wechatCode);
     var openId = _.get(req, ['session', 'openId'], '');
     var developmentMode = _.get(req, ['query', 'dev'], '');
     if(developmentMode === 'yes'){
@@ -983,8 +983,9 @@ function calculateRedPackAmount(dbPosition){
         if((redPackCount - redPackSendList.length) == 1) {
             redPackAmount = remainedAmount;
         } else {
-            var factor = remainedAmount / (redPackCount - redPackSendList.length) * 2;
-            redPackAmount = Math.floor((Math.random() * factor + 1) * 100) / 100;
+            var baseAmount = 1;
+            var factor = remainedAmount - (redPackCount - redPackSendList.length) * baseAmount;
+            redPackAmount = baseAmount + Math.floor((Math.random() * factor) * 100) / 100;
         }
     }
     return redPackAmount;
