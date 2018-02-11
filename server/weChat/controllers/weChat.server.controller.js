@@ -149,7 +149,43 @@ exports.checkIfNeedPay = function(req, res){
         });
     }
 }
+exports.userDefinedCharge = function (req, res) {
+    var fee = _.get(req, ['body', 'total_fee'], '');
+    if(_.isEmpty(fee)) {
+        console.log('xxxxx');
+    }else {
+        var opts = {
+            appid: 'wx54e94ab2ab199342',
+            body: '入职易系统充值',
+            mch_id: '1481782312',
+            nonce_str: wechatUtil.generateNonceString(),
+            notify_url: 'http://www.mfca.com.cn/',
+            openid: _.get(req, ['session', 'openId'], ''),
+            out_trade_no: Date.now().toString() + Math.random().toString().substr(2, 10),
+            product_id: 'AAAA88888888',
+            spbill_create_ip: '39.108.136.90',
+            total_fee: fee * 100,
+            trade_type: 'NATIVE',
+        }
+        opts.sign = wechatUtil.sign(opts);
+        request({
+            url: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+            method: 'POST',
+            body: wechatUtil.buildXML(opts),
+        }, function (err, response, body) {
+            parseString(body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+                if (err) {
+                    logger.info(err);
+                    res.json({ success: false, errmsg: 'wechat code is rubbish' });
+                } else if (result.return_code === 'SUCCESS') {
+                    console.log(result.code_url);
+                    res.json({ success: true, code_url: result.code_url });
+                }
+            });
+        });
 
+    }
+}
 exports.createUnifiedOrder = function(req, res) {
 //1.统一下单API 中  trade_type 默认为Native 用于源生扫码支付  公众号网页调用要使用JSAPI 并传openid
 //2.前端吊起支付需要后端生成好timeStamp并重新用md5加密为paySign返回给前端  timeStamp只能是10位  超过报错
