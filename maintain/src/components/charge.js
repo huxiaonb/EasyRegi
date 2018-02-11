@@ -10,7 +10,7 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
-        let r = await weCharege(this.state.money);
+        let r = await api.weCharege(this.state.money);
         let res = await r.json();
         if (res.success) {
             Modal.info({
