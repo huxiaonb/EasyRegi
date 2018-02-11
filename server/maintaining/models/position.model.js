@@ -9,6 +9,11 @@ var welfareSchema = new Schema({
 
 });
 
+var redPackSchema = new Schema({
+   openId: String,
+   redPackAmount: String
+});
+
 var PositionSchema = new Schema({
     name: {
         type: String,
@@ -41,9 +46,10 @@ var PositionSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    envelopeType :String,//红包类型 normal/rand
-    envelopeSum : String,//总金额
-    envelopeCount : String,//红包数
+    redPackType :String,//红包类型 normal/rand
+    redPackSum : String,//总金额
+    redPackCount : String,//红包数
+    redPackSendList: [redPackSchema],
     beginDate : Date,//有效期起
     endDate: Date,//有效期止
     salaryStart: String,

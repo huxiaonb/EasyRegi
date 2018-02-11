@@ -25,6 +25,8 @@
 <body>
     <span id='openId' hidden>{{openId}}</span>
     <span id='isComplete' hidden>{{isComplete}}</span>
+    <span id='signatureObj' hidden>{{signatureObj}}</span>
+    <span id='developmentMode' hidden>{{developmentMode}}</span>
     <div id='location'>
         
     </div>
@@ -33,6 +35,7 @@
 
     </script>
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script src="./lib/underscore-min.js"></script>
     <script src="./lib/jquery.min.js"></script>
     <script src="../dist/mobile/index.js?54346789"></script>
@@ -43,16 +46,28 @@
         }
         $(_.once(function(){
             var geolocation = new qq.maps.Geolocation("HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ", "location");
-            geolocation.getLocation(function(position){
-                //var location = JSON.stringify(position)
-                var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
-                var isComplete = $('#isComplete').text() === ''? undefined : $('#isComplete').text();
-                
-                Lego('#location').nearByPositions({position : position, openId : openId, isComplete : isComplete});
-            },function(){
-                Lego('#location').nearByPositions(false);
-            });
-            
+            //var location = JSON.stringify(position)
+            var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
+            var isComplete = $('#isComplete').text() === ''? undefined : $('#isComplete').text();
+            var signatureObj = $('#signatureObj').text() === '' ? {} : JSON.parse($('#signatureObj').text());
+            var developmentMode = $('#developmentMode').text() === 'yes' ? true : false;
+            if(developmentMode) {
+                var fakePosition = {
+                    lat: '22.26666',
+                    lng: '113.54342',
+                    province: '广东省',
+                    city: '珠海市',
+                    addr: '广东省珠海市'
+                };
+                Lego('#location').nearByPositions({position : fakePosition, openId : openId, isComplete : isComplete, signatureObj: signatureObj, wx: wx});
+            } else {
+                geolocation.getLocation(function(position){
+                    Lego('#location').nearByPositions({position : position, openId : openId, isComplete : isComplete, signatureObj: signatureObj, wx: wx});
+                },function(){
+                    Lego('#location').nearByPositions(false);
+                });
+            }
+
         }))
     </script>
 </html>

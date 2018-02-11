@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var SMSClient = require('../../../build/_@alicloud_sms-sdk@1.0.3@@alicloud/sms-sdk/index.js');
+var SMSClient = require('@alicloud/sms-sdk');
 var config = require('../../../config/config');
 var logger = require('../../../config/lib/logger');
 var EmailUtil = require('../utils/email.util.js');

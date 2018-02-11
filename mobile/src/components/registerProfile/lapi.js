@@ -161,5 +161,11 @@ export default {
             data: f.data,
             });
         
+    },
+    sendRedPack(positionId) {
+        return _request({
+            url: '../sendRedPack?positionId=' + positionId,
+            method: 'get'
+        });
     }
 }

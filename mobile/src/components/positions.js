@@ -23,7 +23,8 @@ class Positions extends React.Component{
         offset : 5,
         slimit : 5,
         soffset : 5,
-        kw : ''
+        kw : '',
+        currentPosition: {}
     }
     async onSearch(kw){
         console.log(kw);
@@ -125,6 +126,7 @@ class Positions extends React.Component{
     }
     componentWillMount(){
         this.props;
+        this.initWechatJsSdk();
         this.load();
         //get position List
     }
@@ -164,6 +166,94 @@ class Positions extends React.Component{
             Toast.info('请完善个人简历！');
         }
     }
+    onPositionChange = (key) => {
+        if(key !== undefined) {
+            console.log(key);
+            let nearbyPositions = this.state.nearbyPositions;
+            var keyArray = key.split('_');
+            var title = '入职易--我刚找到了一份好工作，你也来试试',
+                link = '',
+                imgUrl = 'http://www.mfca.com.cn/img/dog.jpg';
+            if(keyArray.length > 1 && keyArray[1] !== undefined){
+                let currentPosition = nearbyPositions.filter((pos) => {return pos._id === keyArray[1];});
+                console.log(currentPosition[0]);
+                if(currentPosition.length > 0)
+                    this.setState({currentPosition: currentPosition[0]});
+                link = 'http://www.mfca.com.cn/details/' + keyArray[1];
+            } else {
+                link = 'http://www.mfca.com.cn/positions';
+            }
+            console.log(title, link, imgUrl);
+
+            this.shareToTimeLine(title, link, imgUrl);
+        }
+    }
+
+    initWechatJsSdk = () => {
+        let self = this;
+        let {signatureObj, wx} = this.props.args;
+        wx.config({
+            debug: false,
+            appId: 'wx54e94ab2ab199342',
+            timestamp: signatureObj.timestamp,//Date.now().toString().substr(0,10),
+            nonceStr: signatureObj.noncestr,//generateNonceString(),
+            signature: signatureObj.signature,
+            jsApiList: [
+                'checkJsApi',
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage',
+                'hideOptionMenu',
+                'showOptionMenu',
+                'hideMenuItems',
+                'showMenuItems',
+                'hideAllNonBaseMenuItem',
+                'showAllNonBaseMenuItem',
+                'closeWindow'
+            ]
+        });
+
+        wx.ready(function(){
+            var title = '入职易--我刚找到了一份好工作，你也来试试',
+                link = 'http://www.mfca.com.cn',
+                imgUrl = 'http://www.mfca.com.cn/img/dog.jpg';
+            self.shareToTimeLine(title, link, imgUrl);
+        });
+    }
+
+    shareToTimeLine = (title, link, imgUrl) =>{
+        let self = this;
+        let currentPosition = this.state.currentPosition;
+        let wx = this.props.args.wx;
+        wx.onMenuShareTimeline({
+            title: title,
+            link: link,
+            imgUrl: imgUrl,
+            success: function () {
+                // 用户确认分享后执行的回调函数
+                var currentPosition1 = self.state.currentPosition;
+                if(currentPosition1.luckyFlag){
+                    Toast.info('分享到朋友圈成功');
+                    self.sendRedPack();
+                } else {
+                    Toast.info('该职位不是红包职位');
+                }
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+                Toast.info('你没有分享到朋友圈');
+            }
+        });
+    }
+    async sendRedPack(){
+        let currentPosition = this.state.currentPosition;
+        let r = await lapi.sendRedPack(currentPosition._id);
+        if(r && r.success){
+            Toast.info('发送红包成功');
+        } else {
+            Toast.error('发送红包失败');
+            Toast.hide();
+        }
+    }
         
     render(){
         let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
@@ -180,7 +270,7 @@ class Positions extends React.Component{
                                 </div>
                             </div>
                         } 
-                         key={`position_${ele._id}`}
+                         key={`position_${ele._id}_${ele.name}`}
                          >
                             <List>
                                 <Item extra={ele.companyName}>公司</Item>
@@ -234,9 +324,9 @@ class Positions extends React.Component{
                             <span>当前位置：{addr.split(',').pop()}</span>
                             <InputItem  placeholder='在这里搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
                         </div>
-                        
-                        
-                        <Accordion>
+
+
+                        <Accordion accordion onChange={this.onPositionChange}>
                             {list}
                         </Accordion>
                         {noMoreP ? <div className='curr-geo' style={{marginTop:'10px',opacity:0.5}}>
