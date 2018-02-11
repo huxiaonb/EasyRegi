@@ -40,6 +40,17 @@ export default class ApplicantManage extends React.Component{
             appiName : e.target.value
         })
     }
+    async invite(rec, e){
+        //需控制频率
+        e.stopPropagation();
+        let companyName = this.context.comp.companyName;
+        let applicantName = rec.name;
+        let r = await api.sendResumeFeedbackMessage({companyName:companyName, applicantName : applicantName});
+        let res = await r.json();
+        if(res.success){
+            message.success('已发送面试邀请！');
+        }
+    }
     onSearch(){
         let {date} = this.state;
         let query = {
@@ -109,6 +120,16 @@ export default class ApplicantManage extends React.Component{
             dataIndex: 'mobile',
             key: 'mobile',
             className: 'log-result-noWrap',
+        },{
+            title: '操作',
+            dataIndex: 'action',
+            key: 'action',
+            className: 'log-result-noWrap',
+            render: (text, record) => (
+				<span>
+					<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>录用</a>
+				</span>
+			)
         }];
         //mock datasource 
         /*let list = [

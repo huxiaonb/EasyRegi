@@ -53,7 +53,8 @@ export default class ApplicantManage extends React.Component{
         let companyName = this.context.comp.companyName;
         window.open('../../applicant/preview?id=' + record._id + '&companyName=' + companyName, '_blank');
     }
-    async invite(rec, e){
+    async toCopmleteDetail(rec, e){
+        //需控制频率
         e.stopPropagation();
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
@@ -61,9 +62,18 @@ export default class ApplicantManage extends React.Component{
         let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName});
         let res = await r.json();
         if(res.success){
-            this.setState({
-                results : results.filter(r=>r._id !== rec._id)
-            })
+            message.success('已发送补充简历通知！');
+        }
+    }
+    async invite(rec, e){
+        //需控制频率
+        e.stopPropagation();
+        let {results} = this.state;
+        let companyName = this.context.comp.companyName;
+        let applicantName = rec.name;
+        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName});
+        let res = await r.json();
+        if(res.success){
             message.success('已发送面试邀请！');
         }
     }
@@ -105,16 +115,24 @@ export default class ApplicantManage extends React.Component{
             key: 'mobile',
             className: 'log-result-noWrap',
         },{
+            title: '详细简历',
+            dataIndex: 'isComplete',
+            key: 'isComplete',
+            className: 'log-result-noWrap',
+            render: (text, record) => (
+                <span>{text ? '有' : '无'}</span>
+            )
+        },{
             title: '操作',
             dataIndex: 'action',
             key: 'action',
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>
+					{!record.isComplete&& <a className='' href="javascript:;" onClick={this.toCopmleteDetail.bind(this,record)}>完善简历</a>}&nbsp;<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>
 				</span>
 			)
-        },];
+        }];
         
         let list  = this.state.results;
         return(
