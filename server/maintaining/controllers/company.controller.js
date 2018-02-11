@@ -687,6 +687,7 @@ function createPositionForCompany(req, res, next){
                     var positionItem = {
                         name: _.get(positionObj, ['name'], ''),
                         companyId: companyId,
+                        contactPerson :_.get(positionObj, ['phoneNumber'], ''),
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
                         totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
                         salaryStart: _.get(positionObj, ['salaryStart'], ''),
@@ -696,7 +697,14 @@ function createPositionForCompany(req, res, next){
                         welfares: _.get(positionObj, ['welfares'], []),
                         positionDesc: _.get(positionObj, ['positionDesc'], ''),
                         jobRequire:_.get(positionObj, ['jobRequire'], ''),
-                        contactPerson: _.get(positionObj, ['contactPerson'], '')
+                        beginDate: _.get(positionObj, ['beginDate'], ''),
+                        endDate: _.get(positionObj, ['endDate'], ''),
+                        salaryType: _.get(positionObj, ['salaryType'], ''),
+                        redPackType: _.get(positionObj, ['redPackType'], ''),
+                        redPackSum: _.get(positionObj, ['redPackSum'], ''),
+                        redPackCount: _.get(positionObj, ['redPackCount'], ''),
+                        luckyFlag: _.get(positionObj, ['luckyFlag'], ''),
+
                     }
                     var positionEntity = new Position(positionItem);
                     positionEntity.save(function(saveErr, persistedObj){
@@ -884,7 +892,6 @@ function updatePositionModel(positionObj){
             name: _.get(positionObj, ['name'], ''),
             phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
             totalRecruiters: _.get(positionObj, ['totalRecruiters'], 0),
-            salary: _.get(positionObj, ['salary'], ''),
             welfares: _.get(positionObj, ['welfares'], []),
             positionDesc: _.get(positionObj, ['positionDesc'], ''),
             jobRequire:_.get(positionObj, ['jobRequire'], ''),
@@ -892,7 +899,14 @@ function updatePositionModel(positionObj){
             salaryEnd: _.get(positionObj, ['salaryEnd'], ''),
             contactPerson: _.get(positionObj, ['contactPerson'], ''),
             ageRangeStart: _.get(positionObj, ['ageRangeStart'], ''),
-            ageRangeEnd: _.get(positionObj, ['ageRangeEnd'], '')
+            ageRangeEnd: _.get(positionObj, ['ageRangeEnd'], ''),
+            beginDate: _.get(positionObj, ['beginDate'], ''),
+            endDate: _.get(positionObj, ['endDate'], ''),
+            salaryType: _.get(positionObj, ['salaryType'], ''),
+            redPackType: _.get(positionObj, ['redPackType'], ''),
+            redPackSum: _.get(positionObj, ['redPackSum'], ''),
+            redPackCount: _.get(positionObj, ['redPackCount'], ''),
+            luckyFlag: _.get(positionObj, ['luckyFlag'], ''),           
         },
         positionId = _.get(positionObj, ['_id'], '');
         if(_.isEmpty(positionId)){
