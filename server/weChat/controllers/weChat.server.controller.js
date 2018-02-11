@@ -562,7 +562,7 @@ function getAllCompanyNames(req, res, next){
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
         console.log('calculate distanct: ', lon1, lat1, lon2, lat2);
-        if(_.isEmpty(lon1) || _.isEmpty(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
+        if(_.isUndefined(lon1) || _.isUndefined(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
             return 0;
         }
         var DEF_PI = 3.14159265359; // PI
