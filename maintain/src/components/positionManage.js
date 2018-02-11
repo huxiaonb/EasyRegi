@@ -144,7 +144,7 @@ class PositionManage extends React.Component{
     async handleOk(){
         //fetch url edit/create
         let {form} = this.props;
-        if(parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))<0.01 || parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))>200){
+        if(parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))<1 || parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))>200){
             Toast.warning('红包设置不合理,请检查后重试');
             return;
         }  
