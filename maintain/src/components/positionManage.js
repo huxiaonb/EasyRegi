@@ -52,7 +52,8 @@ class PositionManage extends React.Component{
         ageStart : undefined,
         lowSalary : undefined,
         newFlag :false,
-        salaryRadio : 'month'
+        salary_type : 'month',
+        red_type : 'normal'
     }
     changePacket(val){
         this.setState({
@@ -88,17 +89,17 @@ class PositionManage extends React.Component{
             lowSalary : val
         })
     }
-    onSalaryRadioChange(val){
+    onsalary_typeChange(val){
         let { form } = this.props;
         val.target.value==='hour'? form.setFieldsValue({
-            'salary_start': 100,
-            'salary_end': 500
+            'salary_start': 20,
+            'salary_end': 28
         }) : form.setFieldsValue({
             'salary_start': 1000,
             'salary_end': 5000
         });
         this.setState({
-            salaryRadio : val.target.value
+            salary_type : val.target.value
         })
     }
     posiNameChange(e){
@@ -142,9 +143,13 @@ class PositionManage extends React.Component{
     }
     async handleOk(){
         //fetch url edit/create
-            
         let {form} = this.props;
-        let {salaryRange, ageRange} = this.state;
+        if(parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))<1 || parseInt(form.getFieldValue('red_sum'))/parseInt(form.getFieldValue('red_count'))>200){
+            message.warning('红包设置不合理,请检查后重试');
+            return;
+        }  
+        
+        let {salary_type, red_type} = this.state;
         form.validateFieldsAndScroll(async (err, values)=>{
              if (!!err){
                 return;
@@ -164,14 +169,22 @@ class PositionManage extends React.Component{
                  salaryEnd : form.getFieldValue('salary_end'),
                  ageRangeStart : form.getFieldValue('age_start'),
                  ageRangeEnd : form.getFieldValue('age_end'),
+                 luckyFlag : form.getFieldValue('luckyflag'),
+                 redPackSum : form.getFieldValue('red_sum'),
+                 redPackCount : form.getFieldValue('red_count'),
+                 redPackType : red_type,
+                 salaryType : salary_type,
+                 beginDate : form.getFieldValue('date_start'),
+                 endDate : form.getFieldValue('date_end'),
              });
              if(!this.state.newFlag){
                  try{
-                    newP._id = this.state.rowValue._id;
+                    newP._id = this.state.pid;
                     
-                    let res = await api.updatePosition({companyId : this.context.comp._id,position:newP});
+                    let res = await api.updatePosition({companyId : this.context.comp._id, position:newP});
                     let data = await res.json();
                     message.success('操作成功！');
+                    
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
@@ -196,40 +209,13 @@ class PositionManage extends React.Component{
     }
     createForm(){
         let {form} = this.props;
-        form.setFieldsValue({
-                'p_name' : '',
-                'p_contact' :'',
-                'p_phone' : '',
-                'p_total' : '',
-                'age_start' : 16,
-                'age_end' : 45,
-                'salary_start' : 1000,
-                'salary_end' : 5000,
-                'p_desc' : '',
-                'p_require' : ''
-            });
-            this.setState({newFlag : true, pFlag :true});
+        form.resetFields();
+        this.setState({newFlag : true, pFlag :true});
             
     }
     editP(rec){
         let {form} = this.props;
-        if(rec.ageRangeStart && rec.salaryStart){
-            this.setState({
-                rowValue : rec,
-                newFlag : false,
-                ageRange:[rec.ageRangeStart,rec.ageRangeEnd],
-                salaryRange:[rec.salaryStart,rec.salaryEnd],
-                pFlag : true
-            });
-        }else{
-            this.setState({
-                rowValue : rec,
-                newFlag : false,
-                ageRange:[20,50],
-                salaryRange:[3000,6000],
-                pFlag : true
-            });
-        }
+        form.resetFields();
         form.setFieldsValue({
                 'p_name' : rec.name,
                 'p_contact' : rec.contactPerson,
@@ -237,8 +223,18 @@ class PositionManage extends React.Component{
                 'p_total' : rec.totalRecruiters,
                 'p_welfare' : rec.welfares,
                 'p_desc' : rec.positionDesc,
-                'p_require' : rec.jobRequire
+                'p_require' : rec.jobRequire,
+                'salary_start' : rec.salaryStart,
+                'salary_end' : rec.salaryEnd,
+                'age_start' : rec.ageRangeStart,
+                'age_end' : rec.ageRangeEnd,
+                'luckyflag' : rec.luckyFlag,
+                'red_sum' : rec.redPackSum,
+                'red_count':rec.redPackCount,
+                'date_start' : moment(rec.beginDate),
+                'date_end' : moment(rec.endDate)
             });
+            this.setState({newFlag:false,pFlag : true, pid : rec._id})
         
     }
     deleP(rec){
@@ -277,7 +273,7 @@ class PositionManage extends React.Component{
        await this.searchPosi(); 
     }
     render(){
-        let { pFlag, ageStart, lowSalary, salaryRadio} = this.state;
+        let { pFlag, ageStart, lowSalary, salary_type} = this.state;
         let {getFieldDecorator} = this.props.form;
         let  ageEnd, highSalary = []
         
@@ -302,6 +298,12 @@ class PositionManage extends React.Component{
             key : 'totalRecruiters',
             className: 'log-result-noWrap',
         },{
+            title: '职位红包',
+            dataIndex: 'luckyFlag',
+            key : 'luckyFlag',
+            className: 'log-result-noWrap',
+            render:(text,record)=>(<span>{record.luckyFlag === '1'? (record.redPackType==='normal'? '普通红包：' + record.redPackSum + '元/' + record.redPackCount + '个' : '随机红包：' + record.redPackSum + '元/' + record.redPackCount + '个') : '无'}</span>)
+        },{
             title: '年龄',
             key : 'age',
             className: 'log-result-noWrap',
@@ -310,7 +312,7 @@ class PositionManage extends React.Component{
             title: '薪资',
             key : 'salary',
             className: 'log-result-noWrap',
-            render:(text,record)=>(<span>{record.salaryStart}~{record.salaryEnd}</span>)
+            render:(text,record)=>(<span>{record.salaryType==='hour'? '时薪:' : '月薪:'}{record.salaryStart}~{record.salaryEnd}</span>)
         },{
             title: '福利',
             dataIndex: 'welfares',
@@ -456,7 +458,7 @@ class PositionManage extends React.Component{
                         <FormItem label='年龄' labelCol={{ span: 5 }}>
                             <Col span={7} offset={1}>
                             <FormItem name='age_start'>
-                            {getFieldDecorator('age_start')(
+                            {getFieldDecorator('age_start',{initialValue : 16})(
                                     <Select onChange={this.ageStartChange.bind(this)} >
                                         {ages.map(a=>(<Option key={a.toString()} value={a}>{a}</Option>))}
                                     </Select>
@@ -470,7 +472,7 @@ class PositionManage extends React.Component{
                         </Col>
                         <Col span={7} >
                             <FormItem name='age_end'>
-                                {getFieldDecorator('age_end')(
+                                {getFieldDecorator('age_end',{initialValue : 45})(
                                     <Select>
                                         {ages.map(a=>(a>ageStart && <Option key={a.toString()} value={a}>{a}</Option>))}
                                     </Select>
@@ -510,16 +512,18 @@ class PositionManage extends React.Component{
 
                             
                         <Col id='psalary' offset={1}>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="month" onChange={this.onSalaryRadioChange.bind(this)}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} value={this.state.salary_type} onChange={this.onsalary_typeChange.bind(this)}>
                                 <RadioButton value="month">月薪</RadioButton>
                                 <RadioButton value="hour">时薪</RadioButton>
                             </RadioGroup>
                             <FormItem label='薪资' labelCol={{ span: 4 }}>
                                 <Col span={7} offset={1}>
                                     <FormItem name='salary_start'>
-                                    {getFieldDecorator('salary_start')(
+                                    {getFieldDecorator('salary_start', {
+                                        initialValue : 1000
+                                    })(
                                         <Select onChange={this.onLowSalaryChange.bind(this)}>
-                                            {salaryRadio === 'hour' ? hour_salary.map(h => (<Option key={h.toString()} value={h}>{h}</Option>)) : salary.map(s => (<Option key={s.toString()} value={s}>{s}</Option>))}
+                                            {salary_type === 'hour' ? hour_salary.map(h => (<Option key={h.toString()} value={h}>{h}</Option>)) : salary.map(s => (<Option key={s.toString()} value={s}>{s}</Option>))}
                                         </Select>
                                     )}
                                     </FormItem>
@@ -531,9 +535,9 @@ class PositionManage extends React.Component{
                                 </Col>
                                 <Col span={7} >
                                     <FormItem name='salary_end'>
-                                    {getFieldDecorator('salary_end')(
+                                    {getFieldDecorator('salary_end', {initialValue : 5000})(
                                         <Select>
-                                            {salaryRadio === 'hour' ?   hour_salary.map(h => (h > lowSalary && (<Option key={h.toString()} value={h}>{h}</Option>))) : salary.map(s => (s>lowSalary && (<Option key={s.toString()} value={s}>{s}</Option>)))}
+                                            {salary_type === 'hour' ?   hour_salary.map(h => (h > lowSalary && (<Option key={h.toString()} value={h}>{h}</Option>))) : salary.map(s => (s>lowSalary && (<Option key={s.toString()} value={s}>{s}</Option>)))}
                                         </Select>
                                     )}
                                     </FormItem>
@@ -542,7 +546,9 @@ class PositionManage extends React.Component{
                         </Col>
                         <FormItem name='luckyflag' label='红包职位' labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
-                            {getFieldDecorator('luckyflag')(
+                            {getFieldDecorator('luckyflag', {
+                                initialValue : '1'
+                            })(
                                 <RadioGroup style={{ marginBottom: 15 }}  onChange={this.changePacket.bind(this)}>
                                 <Radio value="1">是</Radio>
                                 <Radio value="0">否</Radio>
@@ -550,7 +556,7 @@ class PositionManage extends React.Component{
                             )}
                         </FormItem>
                         <Col offset={1} id='pred'>
-                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} defaultValue="normal" onChange={this.changePacketType.bind(this)}>
+                            <RadioGroup className='ant-col-offset-5' style={{ marginBottom: 15 }} value={this.state.red_type} onChange={this.changePacketType.bind(this)}>
                                 <RadioButton value="normal">普通红包</RadioButton>
                                 <RadioButton value="rand">随机红包</RadioButton>
                             </RadioGroup>
@@ -559,7 +565,7 @@ class PositionManage extends React.Component{
                                 <Col span={7}>
                                     <FormItem name='red_sum'>
                                     {getFieldDecorator('red_sum')(
-                                        <Input placeholder='总金额' />
+                                        <Input placeholder='总金额' addonBefore='$' />
                                     )}
                                     </FormItem>
                                 </Col>
@@ -569,15 +575,15 @@ class PositionManage extends React.Component{
                             </span>
                                 </Col>
                                 <Col span={7} >
-                                    <FormItem name='red_total'>
-                                    {getFieldDecorator('red_total')(
+                                    <FormItem name='red_count'>
+                                    {getFieldDecorator('red_count')(
                                         <InputNumber placeholder='红包个数' max={1000} min={1} default={10}/>
                                     )}
                                     </FormItem>
                                 </Col>
                             </FormItem>
                         </Col>
-                        <div className='ant-col-offset-6' style={{marginTop : '-23px', marginBottom : 15}}>
+                        <div className='ant-col-offset-6' style={{marginTop : '-23px', marginBottom : 15, color : '#ddd'}}>
                             附赠转发红包可让本职位在微信上快速传播
                         </div>
                        

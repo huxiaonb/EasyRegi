@@ -26,10 +26,6 @@ var PositionSchema = new Schema({
         type: String,
         default: ''
     },
-    salary: {
-        type: String,
-        default: ''
-    },
     welfares: {
         type: Array, 
         default: []
@@ -42,16 +38,14 @@ var PositionSchema = new Schema({
         type: String,
         default:''
     },
-    luckyFlag: {
-        type: Boolean,
-        default: false,
-    },
+    luckyFlag: String,
     redPackType :String,//红包类型 normal/rand
     redPackSum : String,//总金额
     redPackCount : String,//红包数
     redPackSendList: [redPackSchema],
     beginDate : Date,//有效期起
     endDate: Date,//有效期止
+    salaryType : String,
     salaryStart: String,
     salaryEnd: String,
     contactPerson: String,

@@ -205,6 +205,80 @@ export default{
              body:JSON.stringify(data)
         })
     },
+    
+    searchResumes(data){
+        //may be url like below format
+        let url = '../api/company/searchResumes';
+        /*
+        var data = {
+            applicantName: '李大力',
+            companyId: '5954ef7dc111d2bb00602cb1', //只有这个是必须的
+            startedAt: '2017-07-02',
+            endedAt: '2017-07-03'
+        } 
+
+        返回值，没有就是[]，有就是applicant的数组
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        })
+    },
+    
+    sendResumeFeedbackMessage(data){
+        //may be url like below format
+        let url = '../api/applicant/sendResumeFeedbackMessage';
+        /*
+         var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
+        var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+
+        返回值，没有就是[]，有就是applicant的数组
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        })
+    },
+    sendResumeHasBeenCheckedMessage(data){
+        //may be url like below format
+        let url = '../api/applicant/sendResumeHasBeenCheckedMessage';
+        /*
+         var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
+        var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+
+        返回值，没有就是[]，有就是applicant的数组
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        })
+    },
+
+    sendInterviewMessage(data){
+        //may be url like below format
+        let url = '../api/applicant/sendInterviewMessage';
+        /*
+         var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
+        var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+
+        返回值，没有就是[]，有就是applicant的数组
+         */
+        return fetch(url,{
+             method:"post",
+             //headers:{},
+             headers:{ 'Content-Type': 'application/json'},
+             body:JSON.stringify(data)
+        })
+    },
     searchPostion(data){
         let url = '../api/company/searchPositions';
         /*
@@ -233,5 +307,13 @@ export default{
         //获取当前公司所有职位信息
         let url = '../account/email/send/test'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
+    },
+    weCharege(total){
+        let url ='../userDefinedCharge';
+        return fetch(url, {
+            method: "post",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ total_fee : total})
+        });
     }
 }

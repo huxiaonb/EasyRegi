@@ -22,6 +22,7 @@ exports.getPositionsAndApplicantsNum = getPositionsAndApplicantsNum;
 exports.getApplicantsByCompanyId = getApplicantsByCompanyId;
 exports.getPositionsByCompanyId = getPositionsByCompanyId;
 exports.searchApplicants = searchApplicants;
+exports.searchResumes = searchResumes;
 exports.login = login;
 exports.logout = logout;
 exports.getCompanyInfo = getCompanyInfo;
@@ -606,7 +607,65 @@ function getAllApplicantsByCompanyId(companyId){
         });
     }
 }
+function searchResumes(req,res,next){
+    var applicantName = _.get(req, ['body', 'applicantName'], ''),
+        startedAt = _.get(req, ['body', 'startedAt'], ''),
+        endedAt = _.get(req, ['body', 'endedAt'], '');
 
+        var queryCriteria = {$and: []};
+        
+        
+        if(!_.isEmpty(applicantName))
+            queryCriteria.$and.push({'name': {'$regex':applicantName, '$options':"$i"}});
+            // queryCriteria.$and.push({'name': applicantName});
+        if(!_.isEmpty(startedAt)){
+            var startDateStr = startedAt + ' 00:00:00.000';
+            var startDate = new Date(startDateStr);
+            logger.info(startDate);
+            if(_.isDate(startDate))
+                queryCriteria.$and.push({'registeredCompanies.registerDate':{$gt: startDate}});
+        }
+
+        if(!_.isEmpty(endedAt)){
+            var endDateStr = endedAt + ' 23:59:59.999';
+            var endDate = new Date(endDateStr);
+            logger.info(endDate);
+            if(_.isDate(endDate))
+                queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
+        }
+        if(_.isEmpty(applicantName) && _.isEmpty(startedAt) && _.isEmpty(endedAt)){
+            Applicant.find({}, function(error, applicants){
+                if(error) {
+                    logger.info('Error in finding applicants', error);
+                    res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
+                } else {
+                    
+                    var result = {
+                        success: true,
+                        errmsg: '',
+                        applicants: applicants
+                    };
+                    res.json(result);
+                }
+            });
+        }else{
+            Applicant.find(queryCriteria, function(error, applicants){
+                if(error) {
+                    logger.info('Error in finding applicants', error);
+                    res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
+                } else {
+                    
+                    var result = {
+                        success: true,
+                        errmsg: '',
+                        applicants: applicants
+                    };
+                    res.json(result);
+                }
+            });
+        }
+        
+}
 function searchApplicants(req, res, next){
     var companyId = _.get(req, ['body', 'companyId'], ''),
         applicantName = _.get(req, ['body', 'applicantName'], ''),
@@ -687,6 +746,7 @@ function createPositionForCompany(req, res, next){
                     var positionItem = {
                         name: _.get(positionObj, ['name'], ''),
                         companyId: companyId,
+                        contactPerson :_.get(positionObj, ['phoneNumber'], ''),
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
                         totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
                         salaryStart: _.get(positionObj, ['salaryStart'], ''),
@@ -696,7 +756,14 @@ function createPositionForCompany(req, res, next){
                         welfares: _.get(positionObj, ['welfares'], []),
                         positionDesc: _.get(positionObj, ['positionDesc'], ''),
                         jobRequire:_.get(positionObj, ['jobRequire'], ''),
-                        contactPerson: _.get(positionObj, ['contactPerson'], '')
+                        beginDate: _.get(positionObj, ['beginDate'], ''),
+                        endDate: _.get(positionObj, ['endDate'], ''),
+                        salaryType: _.get(positionObj, ['salaryType'], ''),
+                        redPackType: _.get(positionObj, ['redPackType'], ''),
+                        redPackSum: _.get(positionObj, ['redPackSum'], ''),
+                        redPackCount: _.get(positionObj, ['redPackCount'], ''),
+                        luckyFlag: _.get(positionObj, ['luckyFlag'], ''),
+
                     }
                     var positionEntity = new Position(positionItem);
                     positionEntity.save(function(saveErr, persistedObj){
@@ -884,7 +951,6 @@ function updatePositionModel(positionObj){
             name: _.get(positionObj, ['name'], ''),
             phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
             totalRecruiters: _.get(positionObj, ['totalRecruiters'], 0),
-            salary: _.get(positionObj, ['salary'], ''),
             welfares: _.get(positionObj, ['welfares'], []),
             positionDesc: _.get(positionObj, ['positionDesc'], ''),
             jobRequire:_.get(positionObj, ['jobRequire'], ''),
@@ -892,7 +958,14 @@ function updatePositionModel(positionObj){
             salaryEnd: _.get(positionObj, ['salaryEnd'], ''),
             contactPerson: _.get(positionObj, ['contactPerson'], ''),
             ageRangeStart: _.get(positionObj, ['ageRangeStart'], ''),
-            ageRangeEnd: _.get(positionObj, ['ageRangeEnd'], '')
+            ageRangeEnd: _.get(positionObj, ['ageRangeEnd'], ''),
+            beginDate: _.get(positionObj, ['beginDate'], ''),
+            endDate: _.get(positionObj, ['endDate'], ''),
+            salaryType: _.get(positionObj, ['salaryType'], ''),
+            redPackType: _.get(positionObj, ['redPackType'], ''),
+            redPackSum: _.get(positionObj, ['redPackSum'], ''),
+            redPackCount: _.get(positionObj, ['redPackCount'], ''),
+            luckyFlag: _.get(positionObj, ['luckyFlag'], ''),           
         },
         positionId = _.get(positionObj, ['_id'], '');
         if(_.isEmpty(positionId)){
