@@ -8,6 +8,6 @@ var wechatUtil = require('./server/weChat/utils/wechat.util.js');
 var nodeSchedule = require('node-schedule');
 app.start();
 
-// wechatUtil.getAccessToken();
+wechatUtil.getAccessToken();
 // nodeSchedule.scheduleJob('*/5 * * * *', wechatUtil.getAccessToken);
-// nodeSchedule.scheduleJob('0 */2 * * *', wechatUtil.getAccessToken);
+nodeSchedule.scheduleJob('0 */2 * * *', wechatUtil.getAccessToken);

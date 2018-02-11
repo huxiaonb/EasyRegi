@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result} from 'antd-mobile';
+import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result, Tag} from 'antd-mobile';
 import lapi from './registerProfile/lapi'
 import './less/detail.less'
 
@@ -17,12 +17,12 @@ class Detail extends React.Component{
         if(data.err){
             Toast.error('职位不存在！')
         }else{
-            this.setState(data)
+            this.setState({data : data})
         }
     }
     render(){
         let {data} = this.state;
-        const welfs = (data.welfares.map((idx,w)=>{
+        const welfs = (data.welfares.map((w,idx)=>{
             return(
                 <Tag selected disabled>{w}</Tag>
             )
@@ -34,7 +34,7 @@ class Detail extends React.Component{
                 <Item extra={data.name}>招聘职位</Item>
                 <Item extra={data.totalRecruiters}>招聘人数</Item>
                 <Item extra={data.salaryStart + '~' + data.salaryEnd}>薪资待遇</Item>
-                <Item>相关福利<Brief><p>123</p><p>123</p><p>123</p></Brief></Item>
+                <Item>相关福利<Brief>{welfs}</Brief></Item>
                 <Item>岗位描述<Brief><p>{data.positionDesc}</p></Brief></Item>
                 <Item extra={data.contactPerson}>联系人</Item>
                 <Item extra={data.phoneNumber}>联系电话</Item>
