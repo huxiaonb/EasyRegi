@@ -231,7 +231,7 @@ exports.createUnifiedOrder = function(req, res) {
 
 exports.getOpenIdAndAuthAccessToken = function(req, res, next){
     var wechatCode = _.get(req, ['query', 'code'], '');
-    logger.info('getWechatOpenId', wechatCode, req.sessionID);
+    logger.info('getWechatOpenId', wechatCode);
     var openId = _.get(req, ['session', 'openId'], '');
     var developmentMode = _.get(req, ['query', 'dev'], '');
     if(developmentMode === 'yes'){
@@ -561,6 +561,7 @@ function getAllCompanyNames(req, res, next){
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
+        console.log('calculate distanct: ', lon1, lat1, lon2, lat2);
         if(_.isEmpty(lon1) || _.isEmpty(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
             return 0;
         }
@@ -597,6 +598,7 @@ exports.findNearbyPositions = function (req, res, next) {
         offset = _.get(req, ['query', 'offset'], '');
     limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
+    console.log(JSON.stringify(locationInfo));
     let addrArr = [], addr = '', latLngStr = '';
     if (locationInfo != null && locationInfo != undefined) {
         if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
@@ -628,6 +630,7 @@ exports.findNearbyPositions = function (req, res, next) {
                     latLngDistances.push(parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000);
                 }
             });
+            console.log('LatLng Distance ', JSON.stringify(latLngDistances));
             Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
                 if (err2) {
                     logger.info('Error in finding positions per id', err2);
@@ -912,6 +915,7 @@ function constructPositionVOs(copPositions, cop, distance) {
     if(!_.isUndefined(distance) && _.isNumber(distance)){
         distanceStr = Math.floor(distance);
     }
+    console.log('distance str: ', distanceStr, 'company name: ', cop.companyName);
     var tempPositions = [];
     _.forEach(copPositions, function (posi) {
         let ageRangeStart = posi.ageRangeStart || '',
@@ -1019,8 +1023,9 @@ function calculateRedPackAmount(dbPosition){
         if((redPackCount - redPackSendList.length) == 1) {
             redPackAmount = remainedAmount;
         } else {
-            var factor = remainedAmount / (redPackCount - redPackSendList.length) * 2;
-            redPackAmount = Math.floor((Math.random() * factor + 1) * 100) / 100;
+            var baseAmount = 1;
+            var factor = remainedAmount - (redPackCount - redPackSendList.length) * baseAmount;
+            redPackAmount = baseAmount + Math.floor((Math.random() * factor) * 100) / 100;
         }
     }
     return redPackAmount;
