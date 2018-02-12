@@ -149,11 +149,54 @@ exports.checkIfNeedPay = function(req, res){
         });
     }
 }
-exports.userDefinedCharge = function (req, res) {
+exports.userDefinedCharge = function(req, res){
+    //到底回不回调
+    console.log('jiiiinnnnn laaaaaaiiiii le')
+    parseString(res.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+                if (err) {
+                    logger.info(err);
+                    res.json({ success: false, errmsg: 'wechat code is rubbish' });
+                } else if (result.return_code === 'SUCCESS') {
+                    console.log(result.code_url);
+                    res.json({ success: true, res:result });
+                }
+    });
+
+}
+
+exports.orderQuery = function(req, res){
+    //不回调我就自己查
+    var bid = _.get(req, ['body', 'bid'], '');
+    console.log(bid);
+    var opts = {
+            appid: 'wx54e94ab2ab199342',
+            mch_id: '1481782312',
+            out_trade_no : bid,
+            nonce_str: wechatUtil.generateNonceString(),
+        }
+        opts.sign = wechatUtil.sign(opts);
+        request({
+            url: "https://api.mch.weixin.qq.com/pay/orderquery",
+            method: 'POST',
+            body: wechatUtil.buildXML(opts),
+        }, function (err, response, body) {
+            parseString(body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+                if (err) {
+                    logger.info(err);
+                    res.json({ success: false, errmsg: 'wechat code is rubbish' });
+                } else if (result.return_code === 'SUCCESS') {
+                    console.log(result.code_url);
+                    res.json({ success: true, res: result });
+                }
+            });
+        });
+}
+exports.charge = function (req, res) {
     var fee = _.get(req, ['body', 'total_fee'], '');
     if(_.isEmpty(fee)) {
         console.log('xxxxx');
     }else {
+        var businessID = Date.now().toString() + Math.random().toString().substr(2, 10);
         var opts = {
             appid: 'wx54e94ab2ab199342',
             body: '入职易系统充值',
@@ -161,10 +204,10 @@ exports.userDefinedCharge = function (req, res) {
             nonce_str: wechatUtil.generateNonceString(),
             notify_url: 'http://www.mfca.com.cn/',
             openid: _.get(req, ['session', 'openId'], ''),
-            out_trade_no: Date.now().toString() + Math.random().toString().substr(2, 10),
+            out_trade_no: businessID,
             product_id: 'AAAA88888888',
             spbill_create_ip: '39.108.136.90',
-            total_fee: fee * 100,
+            total_fee: fee,//fee * 100,
             trade_type: 'NATIVE',
         }
         opts.sign = wechatUtil.sign(opts);
@@ -179,7 +222,7 @@ exports.userDefinedCharge = function (req, res) {
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
                 } else if (result.return_code === 'SUCCESS') {
                     console.log(result.code_url);
-                    res.json({ success: true, code_url: result.code_url });
+                    res.json({ success: true, code_url: result.code_url, bid :businessID });
                 }
             });
         });

@@ -12,6 +12,7 @@ export default class Resume extends React.Component {
     async goToCharge(){
         let r = await api.weCharege(this.state.money);
         let res = await r.json();
+        console.log(res.bid);
         if (res.success) {
             Modal.info({
                 title: '扫码支付',
@@ -26,8 +27,11 @@ export default class Resume extends React.Component {
                         />
                     </div>
                 ),
-                onOk() {
-                    alert('123');
+                async onOk() {
+                    console.log(res.bid);
+                    let r1 = await api.orderQuery(res.bid);
+                    let res1 = await r1.json();
+                    console.log(res1)
                 },
             });
         }

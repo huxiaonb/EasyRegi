@@ -309,11 +309,19 @@ export default{
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
     weCharege(total){
-        let url ='../userDefinedCharge';
+        let url ='../charge';
         return fetch(url, {
             method: "post",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ total_fee : total})
+        });
+    },
+    orderQuery(id){
+        let url ='../orderQuery';
+        return fetch(url, {
+            method: "post",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bid : id})
         });
     }
 }
