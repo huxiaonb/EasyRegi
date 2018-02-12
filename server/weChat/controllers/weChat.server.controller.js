@@ -561,7 +561,6 @@ function getAllCompanyNames(req, res, next){
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
-        console.log('calculate distanct: ', lon1, lat1, lon2, lat2);
         if(_.isUndefined(lon1) || _.isUndefined(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
             return 0;
         }
@@ -610,7 +609,7 @@ exports.findNearbyPositions = function (req, res, next) {
         }
     }
     addr = addrArr.join(',');
-    Company.find({}, function (err1, dbCompanies) {
+    Company.find({active: true}, function (err1, dbCompanies) {
         if (err1) {
             logger.info('Error in getting company ', err1);
             res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
@@ -618,19 +617,8 @@ exports.findNearbyPositions = function (req, res, next) {
             logger.info('no companies found');
             res.json({success: true, positions: [], existFlag: false});
         } else {
-            var ids = [];
-            var latLngArr = [];
-            var latLngDistances = [];
-            var _this = this;
-            _.forEach(dbCompanies, function (cop) {
-                if (!_.isEmpty(cop) && !_.isEmpty(cop._id))
-                    ids.push(cop._id);
-                if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
-                    latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
-                    latLngDistances.push(parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000);
-                }
-            });
-            console.log('LatLng Distance ', JSON.stringify(latLngDistances));
+            var ids = _.map(dbCompanies, '_id');
+
             Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
                 if (err2) {
                     logger.info('Error in finding positions per id', err2);
@@ -639,36 +627,9 @@ exports.findNearbyPositions = function (req, res, next) {
 
                     if (!_.isEmpty(dbPositions)) {
                         var positionGroup = _.groupBy(dbPositions, 'companyId');
-                        var sortedPositions = [],
-                            unsortPositions = [];
-                        _.forEach(latLngArr, function (latLntString, index) {
-                            var arr = latLntString.split(',');
-                            var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                            var distance = parseInt(latLngDistances[index]);
-                            if (!_.isEmpty(cop)) {
-                                var copPositions = positionGroup[cop._id];
-                                var tempPositions = constructPositionVOs(copPositions, cop, distance);
-                                sortedPositions = _.concat(sortedPositions, tempPositions);
-                            }
-                        });
-                        _.forEach(dbCompanies, function (cop) {
-                            var copPositions = positionGroup[cop._id];
-                            if (_.isEmpty(cop.lat) || _.isEmpty(cop.lng)) {
-                                var tempPositions = constructPositionVOs(copPositions, cop);
-                                unsortPositions = _.concat(unsortPositions, tempPositions);
-                            }
-
-                        });
-
-                        sortedPositions.sort(function (b, c) {
-                            return b.distance > c.distance;
-                        });
-                        sortedPositions = _.concat(sortedPositions, unsortPositions);
-                        logger.info(sortedPositions.length);
-                        var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
-                        var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
-                        var stillExist = sortedPositions.length > displayedPositions.length;
-                        res.json({success: true, positions: pagingPositions, existFlag: stillExist});
+                        console.log('db position length: ', dbPositions.length);
+                        var positionResult = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
+                        res.json({success: true, positions: _.get(positionResult, ['dbPositions'], []), existFlag: _.get(positionResult, ['stillExist'], false)});
                     } else {
                         res.json({success: true, positions: [], existFlag: false});
                     }
@@ -896,9 +857,11 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
             unsortedPositions = _.concat(unsortedPositions, tempPositions);
         }
     });
+    console.log('unsorted positions: ', JSON.stringify(sortedPositions));
     sortedPositions.sort(function (b, c) {
-        return b.distance > c.distance;
+        return b.distance - c.distance;
     });
+    console.log('sorted positions: ', JSON.stringify(sortedPositions));
     sortedPositions = _.concat(sortedPositions, unsortedPositions);
     console.log('the number of positions before pagination:  ' + sortedPositions.length);
     var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
@@ -946,6 +909,7 @@ function constructPositionVOs(copPositions, cop, distance) {
             alias: cop.alias,
             distance: distanceStr
         };
+        console.log('distance is number: ', _.isNumber(clonePosi.distance));
         var addr = _.get(cop, ['companyAddress'], ''),
             addrArr = addr.split(',');
         clonePosi.city = findCompanyLocatedCity(addrArr);
