@@ -257,7 +257,7 @@ class Positions extends React.Component{
         
     render(){
         let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
-            
+            nearbyPositions = nearbyPositions.sort((m,n)=>(m.distance>n,distance));
         
             const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
                 return (
