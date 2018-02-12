@@ -151,7 +151,8 @@ class Positions extends React.Component{
     }
     async apply(id){
         console.log(id);
-        if (!this.props.args.isComplete){
+        var completeFlag = this.props.args.isComplete === 'true' ? true: false;
+        if (completeFlag){
             let r = await wepay({ openId: this.props.args.openId, selectCompanyId: id })
             if (r){
                 this.setState({
@@ -254,7 +255,12 @@ class Positions extends React.Component{
             Toast.hide();
         }
     }
-        
+    showTipsForSharingToTimeLine = () => {
+        $("#shareit").show('normal', function(){
+            // console.log('shown');
+        });
+    }
+
     render(){
         let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
             nearbyPositions = nearbyPositions.sort((m,n)=>(m.distance>n,distance));
@@ -282,7 +288,7 @@ class Positions extends React.Component{
                                 <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
                                 <Item id='p_btn_grp' style={{ marginTop: '2em' }}>
                                     <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即应聘</Button>
-                                    <Button type="primary" size="small" inline >转发给朋友</Button>
+                                    <Button type="primary" size="small" inline onClick={this.showTipsForSharingToTimeLine.bind()}>转发给朋友</Button>
                                 </Item>
                             </List>
                         </Accordion.Panel>

@@ -27,7 +27,6 @@ exports.basicInfo = function(req, res) {
 exports.detailPosition = function(req, res) {
   var positionid = _.get(req, ['params', 'positionid'], '') ;
   //positionid = mongoose.Types.ObjectId.isValid(positionid);
-  //console.log(mongoose.Types.ObjectId);
   logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
   Position.find({_id: positionid}).then(positions => {
             if(_.isEmpty(positions)){
@@ -87,13 +86,12 @@ exports.positions = function(req, res) {
   var openId = _.get(req, ['session', 'openId'], '');
   var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
-    console.log('缺少所需参数');
-    res.json({ success: false, errmsg: '缺少所需参数' });
+    console.log('open is is empty');
+    res.json({ success: false, errmsg: '缺少open id' });
   }else{
     Applicant.find({
       wechatOpenId: openId
     }).then(applicants=>{
-      console.log(JSON.stringify(applicants));
       if (_.isEmpty(applicants)) {
         res.status(500).send({ success: false, errmsg: '查找用户出错' });
       }else{
@@ -112,13 +110,12 @@ exports.checkIfNeedPay = function(req, res){
         selectCompanyId = _.get(req, ['body', 'selectCompanyId', '0']);
     logger.info('check if need pay', openId, selectCompanyId);
     if(_.isEmpty(openId) || _.isEmpty(selectCompanyId)){
-        console.log('缺少所需参数');
+        console.log('open id is empty or company id is empty');
         res.json({success: false, errmsg: '缺少所需参数'});
     } else {
         Applicant.find({
             wechatOpenId : openId
         }).then(applicants => {
-            console.log(JSON.stringify(applicants));
             if(_.isEmpty(applicants)){
                 res.status(500).send({success: false, errmsg: '查找用户出错'});
             } else {
@@ -664,7 +661,6 @@ function getAllCompanyNames(req, res, next){
 }
 
 function getShortDistance(lon1, lat1, lon2, lat2) {
-        console.log('calculate distanct: ', lon1, lat1, lon2, lat2);
         if(_.isUndefined(lon1) || _.isUndefined(lat1) || _.isEmpty(lon2) || _.isEmpty(lat2)){
             return 0;
         }
@@ -702,18 +698,7 @@ exports.findNearbyPositions = function (req, res, next) {
     limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
     console.log(JSON.stringify(locationInfo));
-    let addrArr = [], addr = '', latLngStr = '';
-    if (locationInfo != null && locationInfo != undefined) {
-        if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
-            addrArr.push(locationInfo.province);
-        if (locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
-            addrArr.push(locationInfo.city);
-        if (locationInfo.lat != undefined && locationInfo.lng != undefined) {
-            latLngStr = locationInfo.lat + ',' + locationInfo.lng;
-        }
-    }
-    addr = addrArr.join(',');
-    Company.find({}, function (err1, dbCompanies) {
+    Company.find({active: true}, function (err1, dbCompanies) {
         if (err1) {
             logger.info('Error in getting company ', err1);
             res.status(500).send({success: false, errmsg: '获取职位信息失败', existFlag: false});
@@ -721,19 +706,7 @@ exports.findNearbyPositions = function (req, res, next) {
             logger.info('no companies found');
             res.json({success: true, positions: [], existFlag: false});
         } else {
-            var ids = [];
-            var latLngArr = [];
-            var latLngDistances = [];
-            var _this = this;
-            _.forEach(dbCompanies, function (cop) {
-                if (!_.isEmpty(cop) && !_.isEmpty(cop._id))
-                    ids.push(cop._id);
-                if (!_.isEmpty(_.get(cop, ['lat'])) && !_.isEmpty(_.get(cop, ['lng']))) {
-                    latLngArr.push(_.get(cop, ['lat']) + ',' + _.get(cop, ['lng']));
-                    latLngDistances.push(parseInt(getShortDistance(locationInfo.lng, locationInfo.lat, _.get(cop, ['lng']), _.get(cop, ['lat']))) / 1000);
-                }
-            });
-            console.log('LatLng Distance ', JSON.stringify(latLngDistances));
+            var ids = _.map(dbCompanies, '_id');
             Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
                 if (err2) {
                     logger.info('Error in finding positions per id', err2);
@@ -741,37 +714,9 @@ exports.findNearbyPositions = function (req, res, next) {
                 } else {
 
                     if (!_.isEmpty(dbPositions)) {
-                        var positionGroup = _.groupBy(dbPositions, 'companyId');
-                        var sortedPositions = [],
-                            unsortPositions = [];
-                        _.forEach(latLngArr, function (latLntString, index) {
-                            var arr = latLntString.split(',');
-                            var cop = _.find(dbCompanies, {'lat': arr[0], 'lng': arr[1]});
-                            var distance = parseInt(latLngDistances[index]);
-                            if (!_.isEmpty(cop)) {
-                                var copPositions = positionGroup[cop._id];
-                                var tempPositions = constructPositionVOs(copPositions, cop, distance);
-                                sortedPositions = _.concat(sortedPositions, tempPositions);
-                            }
-                        });
-                        _.forEach(dbCompanies, function (cop) {
-                            var copPositions = positionGroup[cop._id];
-                            if (_.isEmpty(cop.lat) || _.isEmpty(cop.lng)) {
-                                var tempPositions = constructPositionVOs(copPositions, cop);
-                                unsortPositions = _.concat(unsortPositions, tempPositions);
-                            }
-
-                        });
-
-                        sortedPositions.sort(function (b, c) {
-                            return b.distance > c.distance;
-                        });
-                        sortedPositions = _.concat(sortedPositions, unsortPositions);
-                        logger.info(sortedPositions.length);
-                        var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
-                        var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
-                        var stillExist = sortedPositions.length > displayedPositions.length;
-                        res.json({success: true, positions: pagingPositions, existFlag: stillExist});
+                        console.log('db position length: ', dbPositions.length);
+                        var positionResult = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
+                        res.json({success: true, positions: _.get(positionResult, ['dbPositions'], []), existFlag: _.get(positionResult, ['stillExist'], false)});
                     } else {
                         res.json({success: true, positions: [], existFlag: false});
                     }
@@ -1000,7 +945,7 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
         }
     });
     sortedPositions.sort(function (b, c) {
-        return b.distance > c.distance;
+        return b.distance - c.distance;
     });
     sortedPositions = _.concat(sortedPositions, unsortedPositions);
     console.log('the number of positions before pagination:  ' + sortedPositions.length);
@@ -1303,7 +1248,7 @@ exports.sendTemplateMessage = function(req, res){
         json: true
     }, function(error, response, body){
         if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
-            console.log('call send template message api with feedback: ', body);
+            logger.info('call send template message api with feedback: ', body);
             res.json({success: true});
         } else {
             var errMsg = {error: error, statusCode: _.get(response, ['statusCode'], 0), errMsgFromWechat: _.get(body, ['errmsg'], '')};

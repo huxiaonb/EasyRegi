@@ -36,7 +36,7 @@ class Basic extends React.Component{
     async updateBasicInfo(){
         Toast.loading('....');
         let {step,basic} = this.state;
-        if(step===3 && basic.tele && basic.idCardNumber && basic.highestDegree){
+        if(step===3 && basic.mobile && basic.idCardNumber && basic.highestDegree){
             let re = await lapi.submitBasicInfo(basic);
             if(re.success){
                 Toast.hide();

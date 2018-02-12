@@ -15,7 +15,7 @@ class Step1 extends React.Component{
         //先检查验证码  再检查信息完整性
         let { form } = this.props;
         let code = form.getFieldValue('code');
-        let tele = form.getFieldValue('mobile');
+        let mobile = form.getFieldValue('mobile');
         let name = form.getFieldValue('name');
         const reg = new RegExp("^[0-9]{4,6}$")
         this.props.nextStep();
@@ -26,7 +26,7 @@ class Step1 extends React.Component{
                     if (!!err) {
                         Toast.info('请确认信息填写正确！');
                     }else{
-                        this.props.nextStep(1,{name,tele});
+                        this.props.nextStep(1,{name,mobile});
                     }
                 })
             }else{
