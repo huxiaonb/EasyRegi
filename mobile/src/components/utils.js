@@ -2,7 +2,7 @@ import React from 'react';
 import { Toast } from 'antd-mobile';
 import lapi from './registerProfile/lapi';
 
-export async function wepay(data){
+export async function wepay(data, callback){
     Toast.loading('Loading...', 0);
     let checkResult = await lapi.checkIfNeedPay(data);
     if (checkResult && checkResult.success) {
@@ -25,14 +25,14 @@ export async function wepay(data){
                                 let r = await lapi.submitSelectComp(data);
                                 if(r.success){
                                     Toast.hide();
-                                    return true;
+                                    return callback(true, 'pay');
                                 }else{
                                     Toast.hide();
-                                    return false; 
+                                    return callback(false); 
                                 }
                                 
                             } else {
-                                Toast.hide();
+                                return callback(false);
                                 Toast.error('error');
                             } 
                         }
@@ -47,11 +47,11 @@ export async function wepay(data){
             
             if(sr.success){
                 Toast.hide();
-                return true;
+                return callback(true, 'sum');
             }else{
                 Toast.hide();
                 Toast.error('error');
-                return false;
+                return callback(false);
             }
             
             

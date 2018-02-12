@@ -10,6 +10,7 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
+        debugger;
         let r = await api.weCharege(this.state.money,this.props.companyInfo._id);
         let res = await r.json();
         console.log(res.bid);
@@ -32,14 +33,10 @@ export default class Resume extends React.Component {
                 ),
                 
                 async onOk() {
-                    console.log(res.bid);
-                    let r1 = await api.orderQuery(res.bid);
-                    let res1 = await r1.json();
-                    console.log(res1)
+                    this.props.getCompInfo();
                 },
                 async onCancel(){
-                    let r1 = await api.orderQuery(res.bid);
-                    let res1 = await r1.json();
+                    this.props.getCompInfo();
                 }
             });
             
@@ -55,8 +52,7 @@ export default class Resume extends React.Component {
             <div className='charge-container'>
                 <div style={{display:'flex'}}><div className='charge-title'></div><h1>充值</h1></div>
                 <div className='charge-item ant-row ant-form-item'>
-                    <span className='ant-form-item-label'>账户余额：</span>
-                    <span>123</span>
+                    <span className='ant-form-item-label'>账户余额：{this.props.companyInfo.balance}</span>
                 </div>
                 <div className='charge-item ant-row ant-form-item'>
                     <span className='ant-form-item-label'>充值金额：</span>

@@ -54,4 +54,6 @@ module.exports = function (app) {
         .get(companyController.getCaptchaCode);
      app.route('/account/resetByCode')
         .post(companyController.resetPasswordByCaptcha);
+     app.route('/api/company/pulishPosition')
+        .post(companyController.pulishPosition);
 };

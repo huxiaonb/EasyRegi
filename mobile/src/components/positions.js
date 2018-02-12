@@ -149,20 +149,21 @@ class Positions extends React.Component{
             })
         }
     }
-    async apply(companyId, positionId){
+    apply(companyId, positionId){
         console.log(companyId, positionId);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
-            let r = await wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: positionId })
-            if (r){
-                this.setState({
-                    sflag : true,
-                    stitle : '提交成功'
-                })
-            }else{
-                Toast.error('error');
-                Toast.hide();
-            }
+            wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: positionId } ,function(flag, type){
+                if (flag) {
+                    this.setState({
+                        sflag: true,
+                        stitle: type==='sum'? '提交成功' : '支付成功'
+                    })
+                } else {
+                    Toast.error('error');
+                    Toast.hide();
+                }
+            });
         }else{
             Toast.info('请完善个人简历！');
         }

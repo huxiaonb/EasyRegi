@@ -124,10 +124,12 @@ class Index extends React.Component {
             <Menu mode="horizontal">
               <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{companyInfo.alias}</span>}>
                 <Menu.Item key="setting:1" onClick={this.logout.bind(this)}>退出</Menu.Item>
+                <Menu.Item key="setting:2"><Link to='/charge' className="nav-text">充值</Link></Menu.Item>
+                  <Menu.Item key="setting:3"><Link style={{ marginLeft: 0}} to='/charge' className="nav-text">余额：{companyInfo.balance}元</Link></Menu.Item>
               </SubMenu>
             </Menu>
             <Content style={{ margin: '24px 16px 0px', background: '#fff' }}>
-                {React.cloneElement(this.props.children, { companyInfo: companyInfo })}
+                {React.cloneElement(this.props.children, { companyInfo: companyInfo, getCompInfo: this.getCompInfo.bind(this) })}
             </Content>
             <Footer style={{ textAlign: 'center',padding:0 }}>
               Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号

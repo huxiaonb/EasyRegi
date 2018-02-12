@@ -323,5 +323,13 @@ export default{
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ bid : id})
         });
+    },
+    publishPosition(ps){
+        let url = '../api/company/pulishPosition';
+        return fetch(url, {
+            method: "post",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ps: ps })
+        });
     }
 }
