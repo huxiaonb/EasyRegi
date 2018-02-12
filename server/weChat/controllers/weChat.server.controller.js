@@ -4,6 +4,7 @@ var logger = require('../../../config/lib/logger');
 var async = require('async');
 var mongoose = require('mongoose');
 var Company = mongoose.model('Company');
+var Trade = mongoose.model('Trade');
 var _ = require('lodash');
 var request = require('request');
 var wechatUtil = require('../utils/wechat.util');
@@ -149,14 +150,16 @@ exports.checkIfNeedPay = function(req, res){
 exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
-    parseString(res.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
-                if (err) {
-                    logger.info(err);
-                    res.json({ success: false, errmsg: 'wechat code is rubbish' });
-                } else if (result.return_code === 'SUCCESS') {
-                    console.log(result.code_url);
-                    res.json({ success: true, res:result });
-                }
+    parseString(req.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+        if (err) {
+            logger.info(err);
+            res.json({ success: false, errmsg: 'wechat code is rubbish' });
+        } else if (result.return_code === 'SUCCESS') {
+            console.log(result.result);
+            //加点逻辑
+            if(result.total_fee)
+            res.json({ success: true, res:result });
+        }
     });
 
 }
@@ -193,13 +196,14 @@ exports.charge = function (req, res) {
     if(_.isEmpty(fee)) {
         console.log('xxxxx');
     }else {
-        var businessID = Date.now().toString() + Math.random().toString().substr(2, 10);
+        var startDateStr = Date.now().toString();
+        var businessID = startDateStr + Math.random().toString().substr(2, 10);
         var opts = {
             appid: 'wx54e94ab2ab199342',
             body: '入职易系统充值',
             mch_id: '1481782312',
             nonce_str: wechatUtil.generateNonceString(),
-            notify_url: 'http://www.mfca.com.cn/',
+            notify_url: 'http://www.mfca.com.cn/userDefinedCharge/',
             openid: _.get(req, ['session', 'openId'], ''),
             out_trade_no: businessID,
             product_id: 'AAAA88888888',
@@ -218,7 +222,12 @@ exports.charge = function (req, res) {
                     logger.info(err);
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
                 } else if (result.return_code === 'SUCCESS') {
-                    console.log(result.code_url);
+                    var tradeEntity = new Trade({bid : businessID, startDate : startDateStr, total_fee_from_client : fee * 100});
+                    tradeEntity.save(function(error, data){
+                            if(error) {
+                                logger.info('Error in saving trade', error)
+                            }
+                    })
                     res.json({ success: true, code_url: result.code_url, bid :businessID });
                 }
             });
