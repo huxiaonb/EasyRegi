@@ -149,11 +149,12 @@ class Positions extends React.Component{
             })
         }
     }
-    apply(companyId, positionId){
-        console.log(companyId, positionId);
+    apply(companyId){
+        let currentPosition = this.state.currentPosition;
+        console.log(companyId, currentPosition._id);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
-            wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: positionId } ,function(flag, type){
+            wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: currentPosition._id } ,function(flag, type){
                 if (flag) {
                     this.setState({
                         sflag: true,
@@ -287,7 +288,7 @@ class Positions extends React.Component{
                                 <Item extra={ele.salary}>薪资</Item>
                                 <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
                                 <Item id='p_btn_grp' style={{ marginTop: '2em' }}>
-                                    <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId, this.ele._id)}style={{ marginRight: '1em' }}>立即应聘</Button>
+                                    <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即应聘</Button>
                                     <Button type="primary" size="small" inline onClick={this.showTipsForSharingToTimeLine.bind()}>转发给朋友</Button>
                                 </Item>
                             </List>
