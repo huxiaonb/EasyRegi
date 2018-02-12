@@ -316,7 +316,7 @@ class Positions extends React.Component{
                 <div className="result-example">
                     <Result style={{ height: '500px', marginTop: '30%' }}
                         img={<Icon type="check-circle" className="icon" style={{ fill: '#1F90E6' }} />}
-                        title='操作成功'
+                        title={this.state.stitle}
                         message="简历已提交"
                     />
                     <Button type='primary' style={{ width: 'auto' }} onClick={this.bindTimelineData.bind(this)}>转发到朋友圈</Button>
