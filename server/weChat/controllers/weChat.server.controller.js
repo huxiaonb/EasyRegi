@@ -26,7 +26,6 @@ exports.basicInfo = function(req, res) {
 exports.detailPosition = function(req, res) {
   var positionid = _.get(req, ['params', 'positionid'], '') ;
   //positionid = mongoose.Types.ObjectId.isValid(positionid);
-  //console.log(mongoose.Types.ObjectId);
   logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
   Position.find({_id: positionid}).then(positions => {
             if(_.isEmpty(positions)){
@@ -86,13 +85,12 @@ exports.positions = function(req, res) {
   var openId = _.get(req, ['session', 'openId'], '');
   var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
-    console.log('缺少所需参数');
-    res.json({ success: false, errmsg: '缺少所需参数' });
+    console.log('open is is empty');
+    res.json({ success: false, errmsg: '缺少open id' });
   }else{
     Applicant.find({
       wechatOpenId: openId
     }).then(applicants=>{
-      console.log(JSON.stringify(applicants));
       if (_.isEmpty(applicants)) {
         res.status(500).send({ success: false, errmsg: '查找用户出错' });
       }else{
@@ -111,13 +109,12 @@ exports.checkIfNeedPay = function(req, res){
         selectCompanyId = _.get(req, ['body', 'selectCompanyId', '0']);
     logger.info('check if need pay', openId, selectCompanyId);
     if(_.isEmpty(openId) || _.isEmpty(selectCompanyId)){
-        console.log('缺少所需参数');
+        console.log('open id is empty or company id is empty');
         res.json({success: false, errmsg: '缺少所需参数'});
     } else {
         Applicant.find({
             wechatOpenId : openId
         }).then(applicants => {
-            console.log(JSON.stringify(applicants));
             if(_.isEmpty(applicants)){
                 res.status(500).send({success: false, errmsg: '查找用户出错'});
             } else {
@@ -641,17 +638,6 @@ exports.findNearbyPositions = function (req, res, next) {
     limit = (!_.isEmpty(limit) && _.isNumber(parseInt(limit))) ? parseInt(limit) : 10;
     offset = (!_.isEmpty(offset) && _.isNumber(parseInt(offset))) ? parseInt(offset) : 0;
     console.log(JSON.stringify(locationInfo));
-    let addrArr = [], addr = '', latLngStr = '';
-    if (locationInfo != null && locationInfo != undefined) {
-        if (locationInfo.province != null && locationInfo.province != undefined && locationInfo.province != '')
-            addrArr.push(locationInfo.province);
-        if (locationInfo.city != null && locationInfo.city != undefined && locationInfo.city != '')
-            addrArr.push(locationInfo.city);
-        if (locationInfo.lat != undefined && locationInfo.lng != undefined) {
-            latLngStr = locationInfo.lat + ',' + locationInfo.lng;
-        }
-    }
-    addr = addrArr.join(',');
     Company.find({active: true}, function (err1, dbCompanies) {
         if (err1) {
             logger.info('Error in getting company ', err1);
@@ -661,7 +647,6 @@ exports.findNearbyPositions = function (req, res, next) {
             res.json({success: true, positions: [], existFlag: false});
         } else {
             var ids = _.map(dbCompanies, '_id');
-
             Position.find({companyId: {$in: ids}}, function (err2, dbPositions) {
                 if (err2) {
                     logger.info('Error in finding positions per id', err2);
@@ -669,7 +654,6 @@ exports.findNearbyPositions = function (req, res, next) {
                 } else {
 
                     if (!_.isEmpty(dbPositions)) {
-                        var positionGroup = _.groupBy(dbPositions, 'companyId');
                         console.log('db position length: ', dbPositions.length);
                         var positionResult = sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, offset, limit);
                         res.json({success: true, positions: _.get(positionResult, ['dbPositions'], []), existFlag: _.get(positionResult, ['stillExist'], false)});
@@ -900,11 +884,9 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
             unsortedPositions = _.concat(unsortedPositions, tempPositions);
         }
     });
-    console.log('unsorted positions: ', JSON.stringify(sortedPositions));
     sortedPositions.sort(function (b, c) {
         return b.distance - c.distance;
     });
-    console.log('sorted positions: ', JSON.stringify(sortedPositions));
     sortedPositions = _.concat(sortedPositions, unsortedPositions);
     console.log('the number of positions before pagination:  ' + sortedPositions.length);
     var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
@@ -952,7 +934,6 @@ function constructPositionVOs(copPositions, cop, distance) {
             alias: cop.alias,
             distance: distanceStr
         };
-        console.log('distance is number: ', _.isNumber(clonePosi.distance));
         var addr = _.get(cop, ['companyAddress'], ''),
             addrArr = addr.split(',');
         clonePosi.city = findCompanyLocatedCity(addrArr);
@@ -1207,7 +1188,7 @@ exports.sendTemplateMessage = function(req, res){
         json: true
     }, function(error, response, body){
         if(!error && _.get(response, ['statusCode'], 0) == 200 && !_.isEmpty(body)){
-            console.log('call send template message api with feedback: ', body);
+            logger.info('call send template message api with feedback: ', body);
             res.json({success: true});
         } else {
             var errMsg = {error: error, statusCode: _.get(response, ['statusCode'], 0), errMsgFromWechat: _.get(body, ['errmsg'], '')};
