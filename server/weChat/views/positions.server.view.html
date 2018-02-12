@@ -17,18 +17,24 @@
     <script type="text/javascript" src="https://3gimg.qq.com/lightmap/components/geolocation/geolocation.min.js"></script>
     <script src="../dist/mobile/antm-viewport.min.js">
     </script>
-    <link href="../dist/mobile/index.css?54346789" rel="stylesheet">
+    <link href="../dist/mobile/index.css?4324234" rel="stylesheet">
     <script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"></script>
 </head>
 
 
-<body>
+<body id='positionsPage'>
     <span id='openId' hidden>{{openId}}</span>
     <span id='isComplete' hidden>{{isComplete}}</span>
     <span id='signatureObj' hidden>{{signatureObj}}</span>
     <span id='developmentMode' hidden>{{developmentMode}}</span>
     <div id='location'>
         
+    </div>
+    <div id="shareit">
+        <img class="curveArrow" src="../img/share-it.png">
+        <a href="#" id="follow">
+            <img id="share-text" src="../img/tips.png">
+        </a>
     </div>
 
 </body>
@@ -38,13 +44,16 @@
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <script src="./lib/underscore-min.js"></script>
     <script src="./lib/jquery.min.js"></script>
-    <script src="../dist/mobile/index.js?54346789"></script>
+    <script src="../dist/mobile/index.js?4324234"></script>
     <script type="text/javascript">
         if(!window.Promise) {
             console.log('no promise')
             document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
         }
         $(_.once(function(){
+            $("#shareit").on("click", function(){
+                $("#shareit").hide();
+            });
             var geolocation = new qq.maps.Geolocation("HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ", "location");
             //var location = JSON.stringify(position)
             var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
