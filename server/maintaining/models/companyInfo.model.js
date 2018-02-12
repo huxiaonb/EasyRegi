@@ -54,7 +54,8 @@ var CompanySchema = new Schema({
     activeTokenExpires: String,
     resetPwdTokenGeneratedTimeStamp: String,
     resetPwdToken: String,
-    resetPwdTokenExpires: String
+    resetPwdTokenExpires: String,
+    balance : String,
 },{
     collection: 'companies',
     timestamps: true

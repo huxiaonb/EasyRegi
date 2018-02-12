@@ -10,8 +10,7 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
-        
-        let r = await api.weCharege(this.state.money);
+        let r = await api.weCharege(this.state.money,this.props.companyInfo._id);
         let res = await r.json();
         console.log(res.bid);
         if (res.success) {
@@ -38,7 +37,7 @@ export default class Resume extends React.Component {
                     let res1 = await r1.json();
                     console.log(res1)
                 },
-                onCancel(){
+                async onCancel(){
                     let r1 = await api.orderQuery(res.bid);
                     let res1 = await r1.json();
                 }

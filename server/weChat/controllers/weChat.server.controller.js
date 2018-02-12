@@ -147,6 +147,28 @@ exports.checkIfNeedPay = function(req, res){
         });
     }
 }
+function updateCompBlance(companyId, fee){
+    Company.find({
+        companyId : companyId
+    }).then(companies => {
+        if(!_.isEmpty(companies)){
+            var company = _.get(companies, ['0'], {});
+            company.balance = company.balance + fee;
+            var companyEn = new Company(company);
+            console.log('yu e', company.balance);
+            Company.update({ companyId: companyId }, { $set: companyEn }, { upsert: true })
+                .exec(function (error, result) {
+                    if (error) {
+                        logger.info('Error in saving company in notify', error)
+                    } else {
+                        logger.info('Updating company balace success for  company id %s', companyId);
+                    }
+                });
+        }else{
+            console.log('find company err');
+        }
+    })
+}
 exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
@@ -157,8 +179,36 @@ exports.userDefinedCharge = function(req, res){
         } else if (result.return_code === 'SUCCESS') {
             console.log(result.result);
             //加点逻辑
-            if(result.total_fee)
-            res.json({ success: true, res:result });
+            Trade.find({
+                bid: result.out_trade_no
+            }).then(trades => {
+                if (!_.isEmpty(trades)){
+                    var trade = _.get(trades, ['0'], {});
+                    var tradeEn = new Trade(trade);
+                    console.log(tradeEn);
+                    if(!trade.result){
+                        tradeEn.result = result.return_code;
+                        tradeEn.time_end = result.time_end;
+                        tradeEn.wechatId = result.openid;
+                        tradeEn.total_fee = result.total_fee;
+                        
+                        Trade.update({ bid: result.out_trade_no }, { $set: tradeEn }, { upsert: true })
+                            .exec(function (error, result) {
+                                if (error) {
+                                    logger.info('Error in saving trade in notify', error)
+                                } else {
+                                    logger.info('Updating trade success for trade id %s', result.out_trade_no);
+                                    var res = { return_code: 'SUCCESS', return_msg: 'OK' };
+                                    res.json(wechatUtil.buildXML(res));
+                                }
+                            });
+                       
+                    }else{
+                        console.log('warining : notify twice');
+                    }
+                }
+            });
+            
         }
     });
 
@@ -193,6 +243,7 @@ exports.orderQuery = function(req, res){
 }
 exports.charge = function (req, res) {
     var fee = _.get(req, ['body', 'total_fee'], '');
+    var companyId = _.get(req, ['body', 'companyId'], '');
     if(_.isEmpty(fee)) {
         console.log('xxxxx');
     }else {
@@ -222,7 +273,7 @@ exports.charge = function (req, res) {
                     logger.info(err);
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
                 } else if (result.return_code === 'SUCCESS') {
-                    var tradeEntity = new Trade({bid : businessID, startDate : startDateStr, total_fee_from_client : fee * 100});
+                    var tradeEntity = new Trade({ companyId:companyId, bid : businessID, startDate : startDateStr, total_fee_from_client : fee * 100});
                     tradeEntity.save(function(error, data){
                             if(error) {
                                 logger.info('Error in saving trade', error)
