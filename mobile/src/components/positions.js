@@ -150,7 +150,6 @@ class Positions extends React.Component{
         }
     }
     async apply(id){
-        console.log(id);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
             let r = await wepay({ openId: this.props.args.openId, selectCompanyId: id })

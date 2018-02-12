@@ -39,6 +39,30 @@ exports.commonErr = commonErr;
 exports.getCaptchaCode = getCaptchaCode;
 exports.resetPasswordByCaptcha = resetPasswordByCaptcha
 
+function updateCompBlance(companyId, fee) {
+    Company.find({
+        _id: companyId
+    }).then(companies => {
+        if (!_.isEmpty(companies)) {
+            var company = _.get(companies, ['0'], {});
+            var balance = company.balance + fee;
+            console.log('yu e', company.balance);
+            console.log('fee',  fee);
+            console.log('final', balance);
+            Company.update({ _id: companyId }, { $set: { balance: balance } }, { upsert: true })
+                .exec(function (error, result) {
+                    if (error) {
+                        logger.info('Error in saving company in notify', error)
+                    } else {
+                        logger.info('Updating company balace success for  company id %s', companyId);
+                    }
+                });
+        } else {
+            console.log('find company err');
+        }
+    })
+}
+
 function companyUserLogin(req, res, next){
     var email = _.get(req, ['body', 'account'], ''),
         pwd = _.get(req, ['body', 'pwd'], '');
@@ -173,6 +197,7 @@ function getCompanyInfo(req, res, next){
                                     if(_.isEmpty(companyItem)){
                                         res.status(500).send({success: false, errmsg: 'no company found by id'});
                                     } else {
+                                        console.log('ccccccooooommmmmpppp',companyItem.balance);
                                         var clonedCompany = {
                                             _id: companyItem._id,
                                             companyName: companyItem.companyName,
@@ -183,6 +208,7 @@ function getCompanyInfo(req, res, next){
                                             phoneNumber: companyItem.phoneNumber,
                                             contactPersonName: companyItem.contactPersonName,
                                             email: companyItem.email,
+                                            balance: companyItem.balance,
                                             description: companyItem.description,
                                             positions: companyItem.positions
                                         };
@@ -517,7 +543,23 @@ function getPositionsAndApplicantsNum(req, res, next){
         });
     }
 }
-
+exports.pulishPosition = function (req, res) {
+    var psObj = _.get(req, ['body', 'ps'], '');
+    if (_.isEmpty(psObj)) {
+        res.status(500).send({ success: false, errmsg: '参数不正确' });
+    } else {
+        Position.update({ _id: psObj._id }, { $set: { isPublish: true } }, { upsert: true })
+            .exec(function (error, result) {
+                if (error) {
+                    logger.info('Error in publish position', error)
+                } else {
+                    console.log(result);
+                    logger.info('publish position success for position id %s', psObj._id);
+                    res.json({success:true});
+                }
+            });
+    }
+}
 function getApplicantsByCompanyId(req, res, next){
     var companyId = _.get(req, ['params', 'companyId'], '');
     // logger.info(companyId);
@@ -765,6 +807,12 @@ function createPositionForCompany(req, res, next){
                         luckyFlag: _.get(positionObj, ['luckyFlag'], ''),
 
                     }
+                    
+                    if (parseInt(_.get(positionObj, ['luckyFlag'], '')) === 1){
+                        console.log('calculate balance');
+                        let compBalance = -1 * parseInt(_.get(positionObj, ['redPackSum'], ''));
+                        updateCompBlance(companyId, compBalance);
+                    }
                     var positionEntity = new Position(positionItem);
                     positionEntity.save(function(saveErr, persistedObj){
                         if(saveErr) {
@@ -894,6 +942,7 @@ function deletePositionForCompany(req, res, next){
                 var newPositions = dbPositions.filter(function(pos){
                     return pos.positionId !== positionId;
                 });
+                
                 Company.update({_id: companyId}, {$set: {positions: newPositions}}, {upsert: false}, function(err, result){
                     if(err) {
                         logger.info('Error in updating company positions for company id', companyId, err);
@@ -918,7 +967,24 @@ function deletePositionForCompany(req, res, next){
         })
     }
 }
-
+function findPositionById(id, callback){
+    if(id){
+        Position.findOne({ _id: id }, function (err, ps) {
+            if(_.isEmpty(ps)){
+                console.log('findPositionById error : position not find')
+            }else{
+                console.log('1111');
+                if(ps.luckyFlag){
+                    console.log('222');
+                    console.log(ps.redPackSum);
+                    return callback(ps.redPackSum)
+                } else {return callback(false)}
+            }
+        })
+    }else{
+        console.log('findPositionById error : id false')
+    }
+}
 function updatePosition(req, res, next){
     var companyId = _.get(req, ['body', 'companyId'], ''),
         positionObj = _.get(req, ['body', 'position'], {}),
@@ -927,6 +993,19 @@ function updatePosition(req, res, next){
         res.status(500).send({success: false, errmsg: 'company id and position id are required', positions: []});
     } else {
         var tasks = [];
+        findPositionById(positionId,function(flag){
+            
+            if (flag) {
+                console.log('money', positionObj.redPackSum);
+                positionObj.luckyFlag ? updateCompBlance(companyId, flag - positionObj.redPackSum) : updateCompBlance(companyId, flag);
+            } else {
+                if (positionObj.luckyFlag) {
+                    updateCompBlance(companyId, -1 * positionObj.redPackSum)
+                }
+            }
+        });
+        
+        
         tasks.push(updatePositionModel(positionObj));
         tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
         async.parallel(tasks, function(error, result){

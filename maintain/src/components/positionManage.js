@@ -131,7 +131,25 @@ class PositionManage extends React.Component{
         })
         console.log('clear');
     }
-    
+    async publish(rec){
+        let that = this;
+        Modal.confirm({
+            title : '确认发布职位吗?',
+            maskClosable: true,
+            async onOk(){
+                let r = await api.publishPosition(rec);
+                let res = await r.json();
+                if (res.success) {
+                    that.searchPosi();
+                    message.success('已成功发布职位,请在公众号查看职位')
+                }
+            },
+            content: (
+                <div>发布后将无法编辑职位</div>
+            ),
+        })
+        
+    }
     toggleP(){
         if(this.state.pFlag){
             this.props.form.resetFields();
@@ -183,7 +201,11 @@ class PositionManage extends React.Component{
                     
                     let res = await api.updatePosition({companyId : this.context.comp._id, position:newP});
                     let data = await res.json();
-                    message.success('操作成功！');
+                    if(data.success){
+                        message.success('操作成功！');
+                        this.props.getCompInfo();
+                    }
+                    
                     
                 }catch(e){
                     message.error('出错请联系管理员');
@@ -193,7 +215,10 @@ class PositionManage extends React.Component{
                  try{
                     let res = await api.createPosition({companyId : this.context.comp._id,position:newP});
                     let data = await res.json();
-                    message.success('操作成功！');
+                     if (data.success) {
+                         message.success('操作成功！');
+                         this.props.getCompInfo();
+                     }
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
@@ -243,6 +268,7 @@ class PositionManage extends React.Component{
             title: '确认删除此职位吗？',
             okText: '确认',
             cancelText: '取消',
+            content : (<div>删除职位不会退回未领取的红包！</div>),
             async onOk() {
                 try{
                     let res = await api.delPosition({companyId:that.context.comp._id, positionId:rec._id});
@@ -337,7 +363,7 @@ class PositionManage extends React.Component{
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					<a style={{marginRight:'5px'}} href="javascript:;" onClick={this.editP.bind(this,record)}>编辑</a><a className='' href="javascript:;" onClick={this.deleP.bind(this,record)}>删除</a>
+                    <a disabled={record.isPublish} style={{ marginRight: '5px' }} href="javascript:;" onClick={this.publish.bind(this, record)}>{record.isPublish ? '已发布' : '发布'}</a>{!record.isPublish && <a style={{ marginRight: '5px' }} href="javascript:;" onClick={this.editP.bind(this, record)}>编辑</a>}<a className='' href="javascript:;" onClick={this.deleP.bind(this,record)}>删除</a>
 				</span>
 			)
         }, /*{

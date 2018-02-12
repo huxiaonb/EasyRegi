@@ -147,16 +147,16 @@ exports.checkIfNeedPay = function(req, res){
         });
     }
 }
+
 function updateCompBlance(companyId, fee){
     Company.find({
         companyId : companyId
     }).then(companies => {
         if(!_.isEmpty(companies)){
             var company = _.get(companies, ['0'], {});
-            company.balance = company.balance + fee;
-            var companyEn = new Company(company);
+            var balance = company.balance + fee;
             console.log('yu e', company.balance);
-            Company.update({ companyId: companyId }, { $set: companyEn }, { upsert: true })
+            Company.update({ companyId: companyId }, { $set: {balance:balance} }, { upsert: true })
                 .exec(function (error, result) {
                     if (error) {
                         logger.info('Error in saving company in notify', error)
@@ -184,15 +184,9 @@ exports.userDefinedCharge = function(req, res){
             }).then(trades => {
                 if (!_.isEmpty(trades)){
                     var trade = _.get(trades, ['0'], {});
-                    var tradeEn = new Trade(trade);
-                    console.log(tradeEn);
+                    console.log(trade);
                     if(!trade.result){
-                        tradeEn.result = result.return_code;
-                        tradeEn.time_end = result.time_end;
-                        tradeEn.wechatId = result.openid;
-                        tradeEn.total_fee = result.total_fee;
-                        
-                        Trade.update({ bid: result.out_trade_no }, { $set: tradeEn }, { upsert: true })
+                        Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
                             .exec(function (error, result) {
                                 if (error) {
                                     logger.info('Error in saving trade in notify', error)

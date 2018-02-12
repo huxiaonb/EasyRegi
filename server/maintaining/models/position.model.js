@@ -38,6 +38,10 @@ var PositionSchema = new Schema({
         type: String,
         default:''
     },
+    isPublish: {
+        type: Boolean,
+        default: false
+    },
     luckyFlag: String,
     redPackType :String,//红包类型 normal/rand
     redPackSum : String,//总金额
