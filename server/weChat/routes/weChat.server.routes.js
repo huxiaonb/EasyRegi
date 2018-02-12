@@ -33,5 +33,7 @@ module.exports = function (app) {
     app.route('/testWechatApi').get(weChatController.testWechatApi);
     app.route('/sendRedPack').get(weChatController.sendRedPack);
     app.route('/userDefinedCharge').post(weChatController.userDefinedCharge);
+    app.route('/charge').post(weChatController.charge);
+    app.route('/orderQuery').post(weChatController.orderQuery);
     app.route('/sendTemplateMessage').get(weChatController.sendTemplateMessage);
 };
