@@ -22,7 +22,7 @@ export async function wepay(data){
                         async function (res) {
                             if (res.err_msg == "get_brand_wcpay_request:ok") {
                                 data.payDate = new Date();
-                                let r = await lapi.submitSelectComp({companyId: data.selectCompanyId});
+                                let r = await lapi.submitSelectComp(data);
                                 if(r.success){
                                     Toast.hide();
                                     return true;
