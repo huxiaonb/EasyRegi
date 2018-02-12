@@ -253,7 +253,7 @@ exports.charge = function (req, res) {
             out_trade_no: businessID,
             product_id: 'AAAA88888888',
             spbill_create_ip: '39.108.136.90',
-            total_fee: fee,//fee * 100,
+            total_fee: fee * 100,
             trade_type: 'NATIVE',
         }
         opts.sign = wechatUtil.sign(opts);
