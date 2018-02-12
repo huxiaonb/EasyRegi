@@ -93,6 +93,7 @@ class Index extends React.Component {
   }
   render() {
     let {companyInfo} = this.state;
+    
     return (
       this.state.login ? 
       (<div>
@@ -126,7 +127,7 @@ class Index extends React.Component {
               </SubMenu>
             </Menu>
             <Content style={{ margin: '24px 16px 0px', background: '#fff' }}>
-              { this.props.children }
+                {React.cloneElement(this.props.children, { companyInfo: companyInfo })}
             </Content>
             <Footer style={{ textAlign: 'center',padding:0 }}>
               Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号

@@ -5,24 +5,45 @@ import { createForm } from 'rc-form';
 import  '../less/basic.less';
 
 const FormItem = List.Item;
-
+const tagStyle = {
+    width : '180px',
+    fontSize : '20px',
+    height : '50px',
+    lineHeight : '50px'
+};
+const tagContet = ['无经验', '电子五金', '模具塑胶', '纺织玩具', '文员行政', '后勤维修', '印刷宣传', '运输装卸', '销售客服', '建筑装潢','财务出纳'];
 class Step3 extends React.Component{
+    state={
+        skill : ['无经验']
+    }
     next(){
         let { form } = this.props;
+        let {skill} = this.state;
         let highestDegree = form.getFieldValue('degree').toString();
         let currentAddress = form.getFieldValue('currentAddress');
         form.validateFields(async (err, values)=>{
             if (!!err) {
                 Toast.info('请确认信息填写正确！');
             }else{
-                this.props.nextStep(3,{highestDegree,currentAddress});
+                this.props.nextStep(3,{highestDegree,currentAddress,skill});
             }
         })
     }
-    onChange(){
-        console.log('123');
+    onChange(count,e){
+        let {skill} = this.state;
+        if(e){
+            this.setState({
+                skill : [...skill, tagContet[count]]
+            })
+        }else{
+            let s = skill.filter(s=>s!=tagContet[count]);
+            this.setState({
+                skill:s
+            })
+        }
     }
     render(){
+        console.log(this.state.skill);
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         return(
             <form key='step3' style={{}}>
@@ -57,19 +78,19 @@ class Step3 extends React.Component{
                     </div>
                     <List.Item arrow="horizontal" name="skill" style={{paddingLeft:15}}>技能&经验
                     <br/>
-                        <Tag onChange={::this.onChange} selected>无经验</Tag>
-                        <Tag onChange={::this.onChange}>电子五金</Tag>
-                        <Tag onChange={::this.onChange}>模具塑胶</Tag>
-                        <Tag onChange={::this.onChange}>纺织玩具</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,0)} selected>无经验</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,1)}>电子五金</Tag>
+                        <Tag style={tagStyle}onChange={this.onChange.bind(this,2)}>模具塑胶</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,3)}>纺织玩具</Tag>
                     <br/>  
-                        <Tag onChange={::this.onChange}>文员行政</Tag>
-                        <Tag onChange={::this.onChange}>后勤维修</Tag>
-                        <Tag onChange={::this.onChange}>印刷宣传</Tag>
-                        <Tag onChange={::this.onChange}>运输装卸</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,4)}>文员行政</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,5)}>后勤维修</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,6)}>印刷宣传</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,7)}>运输装卸</Tag>
                         <br/>
-                        <Tag onChange={::this.onChange}>销售客服</Tag>
-                        <Tag onChange={::this.onChange}>建筑装潢</Tag>
-                        <Tag onChange={::this.onChange}>财务出纳</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,8)}>销售客服</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,9)}>建筑装潢</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,10)}>财务出纳</Tag>
                         <br/>
                     </List.Item>
                         

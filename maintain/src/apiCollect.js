@@ -308,12 +308,12 @@ export default{
         let url = '../account/email/send/test'; //如: ../api/company/getPositionsByCompanyId/5954ef7dc111d2bb00602cb1
         return fetch(url).then(data => data).catch(e => console.log(e));
     },
-    weCharege(total){
+    weCharege(total,id){
         let url ='../charge';
         return fetch(url, {
             method: "post",
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ total_fee : total})
+            body: JSON.stringify({ total_fee : total, companyId : id})
         });
     },
     orderQuery(id){

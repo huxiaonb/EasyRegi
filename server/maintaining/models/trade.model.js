@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
 
 var TradeSchema = new Schema({
     bid :  String,
+    companyId : String,
     total_fee : Number,
     result : String,
     startDate : Date,
