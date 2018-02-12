@@ -43,7 +43,7 @@ export async function wepay(data){
                 Toast.error('error');
             }
         } else {
-            let sr = await lapi.submitSelectComp({ companyId: data.selectCompanyId });
+            let sr = await lapi.submitSelectComp(data);
             
             if(sr.success){
                 Toast.hide();

@@ -491,6 +491,7 @@ exports.renderRegisterCompanyPage = function(req, res){
 exports.submitRegisterCompany = function(req, res){
   var openId = _.get(req, ['session', 'openId'], ''),
       companyId = _.get(req, ['body', 'companyId'], ''),
+      positionId = _.get(req, ['body', 'positionId'], ''),
       payDate = _.get(req, ['body', 'payDate']);
   var current = new Date();
   console.log('payDate:', payDate);
@@ -517,7 +518,6 @@ exports.submitRegisterCompany = function(req, res){
                 registeredCompanies = _.get(dbApplicant, ['registeredCompanies'], []),
                 dbRegisteredCompany = _.find(registeredCompanies, {'companyId': companyId});
             if(_.isEmpty(dbRegisteredCompany)){
-
               var registeredCompany = {
                 companyName: _.get(dbCompany, ['companyName'], ''),
                 companyId: _.get(dbCompany, ['_id'], ''),
@@ -536,6 +536,21 @@ exports.submitRegisterCompany = function(req, res){
               if(!_.isEmpty(payDate)){
                   dbRegisteredCompany.paymentDate = new Date(payDate);
               }
+            }
+
+            var appliedPositions = _.get(dbApplicant, ['appliedPositions'], []),
+                dbAppliedPosition = _.find(appliedPositions, {'positionId': positionId});
+            if(_.isEmpty(dbAppliedPosition)){
+                var appliedPosition = {
+                    'positionId': positionId,
+                    'companyId': companyId,
+                    'submittedAt': current,
+                    'updatedAt': current
+                }
+                appliedPositions.push(appliedPosition);
+                dbApplicant.appliedPositions = appliedPositions;
+            } else {
+                dbAppliedPosition.updatedAt = current;
             }
 
             logger.info(JSON.stringify(dbApplicant.registeredCompanies));
