@@ -10,12 +10,16 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
+        
         let r = await api.weCharege(this.state.money);
         let res = await r.json();
         console.log(res.bid);
         if (res.success) {
             Modal.info({
                 title: '扫码支付',
+                okText : '支付完成',
+                cancelText :'放弃',
+                maskClosable : true,
                 content: (
                     <div style={{ marginTop: 30, marginLeft: 55 }}>
                         <QRCode
@@ -27,13 +31,19 @@ export default class Resume extends React.Component {
                         />
                     </div>
                 ),
+                
                 async onOk() {
                     console.log(res.bid);
                     let r1 = await api.orderQuery(res.bid);
                     let res1 = await r1.json();
                     console.log(res1)
                 },
+                onCancel(){
+                    let r1 = await api.orderQuery(res.bid);
+                    let res1 = await r1.json();
+                }
             });
+            
         }
         
     }

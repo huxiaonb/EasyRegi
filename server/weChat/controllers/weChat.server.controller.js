@@ -152,7 +152,7 @@ exports.checkIfNeedPay = function(req, res){
 exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
-    parseString(res.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+    parseString(req.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
                 if (err) {
                     logger.info(err);
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
@@ -202,7 +202,7 @@ exports.charge = function (req, res) {
             body: '入职易系统充值',
             mch_id: '1481782312',
             nonce_str: wechatUtil.generateNonceString(),
-            notify_url: 'http://www.mfca.com.cn/',
+            notify_url: 'http://www.mfca.com.cn/userDefinedCharge/',
             openid: _.get(req, ['session', 'openId'], ''),
             out_trade_no: businessID,
             product_id: 'AAAA88888888',
