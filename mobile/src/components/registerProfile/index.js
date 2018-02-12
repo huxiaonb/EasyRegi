@@ -135,6 +135,7 @@ class Index extends React.Component {
       });
       appi.workExperiences = workExperiences;
       appi.educationHistories = educationHistories;
+      appi.isComplete = true;
       /*
         set weChat ID
        */
