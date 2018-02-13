@@ -25,6 +25,7 @@ var config = require('../config'),
   ueditor = require('ueditor-nodejs'),
   permission = require('./permission'),
   multipart = require('connect-multiparty');
+  require('body-parser-xml')(bodyParser);
 
 
 
@@ -268,6 +269,14 @@ module.exports.init = function (db) {
   // Initialize express app
   var app = express();
 
+  app.use(bodyParser.xml({
+    limit: '1MB',   // Reject payload bigger than 1 MB 
+    xmlParseOptions: {
+      normalize: true,     // Trim whitespace inside text nodes 
+      normalizeTags: true, // Transform tags to lowercase 
+      explicitArray: false // Only put nodes in array if >1 
+    }
+  }));
   app.use(cors(corsOptions))
 
   // Initialize local variables

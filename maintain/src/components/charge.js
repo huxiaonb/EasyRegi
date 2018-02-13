@@ -10,7 +10,6 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
-        debugger;
         let r = await api.weCharege(this.state.money,this.props.companyInfo._id);
         let res = await r.json();
         console.log(res.bid);
@@ -44,7 +43,7 @@ export default class Resume extends React.Component {
         
     }
     componentWillMount(){
-        //get company 余额
+        this.props.getCompInfo();
     }
     render(){
         return(
@@ -52,12 +51,12 @@ export default class Resume extends React.Component {
             <div className='charge-container'>
                 <div style={{display:'flex'}}><div className='charge-title'></div><h1>充值</h1></div>
                 <div className='charge-item ant-row ant-form-item'>
-                    <span className='ant-form-item-label'>账户余额：{this.props.companyInfo.balance}</span>
+                    <span className='ant-form-item-label'>账户余额：{this.props.companyInfo.balance}元</span>
                 </div>
                 <div className='charge-item ant-row ant-form-item'>
                     <span className='ant-form-item-label'>充值金额：</span>
-                    <Select size='large' style={{width:120}} onChange={(v)=>{this.setState({money : v})}}>
-                            <Option value='1'>1</Option>
+                    <Select size='large' style={{width:120}} defaultValue='10' onChange={(v)=>{this.setState({money : v})}}>
+                        <Option value='1'>1</Option>
                         <Option value='10'>10</Option>
                         <Option value='20'>20</Option>
                         <Option value='50'>50</Option>
