@@ -181,7 +181,7 @@ export default class ApplicantManage extends React.Component{
 
             <div className='search-bar-container'>
                 <div className='search-title'>
-                    简历池
+                    简历浏览
                 </div>
                 <div className='search-bar-row'>
                     <div className='search-bar-item'>

@@ -113,10 +113,10 @@ class Index extends React.Component {
                   <Link to='/position' className="nav-text"><Icon type="file" />在招职位</Link>
                 </Menu.Item>
                  <Menu.Item key="4" style={{marginTop: '10px'}}>
-                  <Link to='/resume' className="nav-text"><Icon type="file-text" />简历池</Link>
+                  <Link to='/resume' className="nav-text"><Icon type="file-text" />简历浏览</Link>
                 </Menu.Item>
                 <Menu.Item key="5" style={{marginTop: '10px'}}>
-                  <Link to='/charge' className="nav-text"><Icon type="red-envelope" />充值</Link>
+                  <Link to='/charge' className="nav-text"><Icon type="red-envelope" />红包充值</Link>
                 </Menu.Item>
               </Menu>
             </Sider>
