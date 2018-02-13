@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var appliedPositionSchema = new Schema({
     positionId: String,
     positionName: String,
+    companyId: String,
     submittedAt: String,
     updatedAt: String
 });

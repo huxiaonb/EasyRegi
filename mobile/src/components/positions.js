@@ -149,10 +149,12 @@ class Positions extends React.Component{
             })
         }
     }
-    apply(id){
+    apply(companyId){
+        let currentPosition = this.state.currentPosition;
+        console.log(companyId, currentPosition._id);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
-            let r = wepay({ openId: this.props.args.openId, selectCompanyId: id } ,function(flag, type){
+            wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: currentPosition._id } ,function(flag, type){
                 if (flag) {
                     this.setState({
                         sflag: true,
@@ -162,8 +164,7 @@ class Positions extends React.Component{
                     Toast.error('error');
                     Toast.hide();
                 }
-            })
-            
+            });
         }else{
             Toast.info('请完善个人简历！');
         }
@@ -264,8 +265,7 @@ class Positions extends React.Component{
 
     render(){
         let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
-            nearbyPositions = nearbyPositions.sort((m,n)=>(m.distance>n.distance));
-        
+
             const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
                 return (
                         <Accordion.Panel header={
