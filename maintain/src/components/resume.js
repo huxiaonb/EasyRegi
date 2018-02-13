@@ -95,6 +95,7 @@ export default class ApplicantManage extends React.Component{
     }
     async toCopmleteDetail(rec, e){
         //需控制频率
+        e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
@@ -107,6 +108,7 @@ export default class ApplicantManage extends React.Component{
     }
     async invite(rec, e){
         //需控制频率
+        e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
@@ -170,7 +172,7 @@ export default class ApplicantManage extends React.Component{
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					{!record.isComplete&& <a className='' href="javascript:;" onClick={this.toCopmleteDetail.bind(this,record)}>完善简历</a>}&nbsp;<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>
+					{!record.isComplete&& <a className=''  href="javascript:;" onClick={this.toCopmleteDetail.bind(this,record)}>完善简历</a>}&nbsp;{!!record.isComplete && <a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>}
 				</span>
 			)
         }];
