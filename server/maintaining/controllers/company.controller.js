@@ -651,12 +651,36 @@ function getAllApplicantsByCompanyId(companyId){
 }
 function searchResumes(req,res,next){
     var applicantName = _.get(req, ['body', 'applicantName'], ''),
+        companyId = _.get(req, ['body', 'companyId'], ''),
         startedAt = _.get(req, ['body', 'startedAt'], ''),
-        endedAt = _.get(req, ['body', 'endedAt'], '');
+        endedAt = _.get(req, ['body', 'endedAt'], ''),
+        district = _.get(req, ['body', 'district'], ''),
+        gender = _.get(req, ['body', 'gender'], ''),
+        ageRangeStart = _.get(req, ['body', 'ageRangeStart'], ''),
+        ageRangeEnd = _.get(req, ['body', 'ageRangeEnd'], '');
 
         var queryCriteria = {$and: []};
         
-        
+        if(!_.isEmpty(companyId)){
+            var notRegisteredCriteria = {$nin: []};
+            notRegisteredCriteria.$nin.push(companyId);
+            queryCriteria.$and.push({'registeredCompanies.companyId': notRegisteredCriteria});
+        }
+        if(!_.isEmpty(district)) {
+            queryCriteria.$and.push({'currentAddress': {'$regex': district, '$options':"$i"}});
+        }
+        if(!_.isEmpty(gender)){
+            queryCriteria.$and.push({'gender': gender});
+        }
+        if(!_.isEmpty(ageRangeStart)){
+            var greaterThanAgeStartCriteria = {'$gte': parseInt(ageRangeStart)};
+            queryCriteria.$and.push({'age': greaterThanAgeStartCriteria});
+        }
+        if(!_.isEmpty(ageRangeEnd)){
+            var lessThanAgeEndCriteria = {'$lte': parseInt(ageRangeEnd)};
+            queryCriteria.$and.push({'age': lessThanAgeEndCriteria});
+        }
+
         if(!_.isEmpty(applicantName))
             queryCriteria.$and.push({'name': {'$regex':applicantName, '$options':"$i"}});
             // queryCriteria.$and.push({'name': applicantName});
@@ -675,7 +699,9 @@ function searchResumes(req,res,next){
             if(_.isDate(endDate))
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
         }
-        if(_.isEmpty(applicantName) && _.isEmpty(startedAt) && _.isEmpty(endedAt)){
+        console.log(JSON.stringify(queryCriteria));
+        if(_.isEmpty(applicantName) && _.isEmpty(startedAt) && _.isEmpty(endedAt)
+            && _.isEmpty(district) && _.isEmpty(gender) && _.isEmpty(ageRangeStart) && _.isEmpty(ageRangeEnd)){
             Applicant.find({}, function(error, applicants){
                 if(error) {
                     logger.info('Error in finding applicants', error);
