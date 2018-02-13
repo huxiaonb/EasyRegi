@@ -700,40 +700,22 @@ function searchResumes(req,res,next){
                 queryCriteria.$and.push({'registeredCompanies.registerDate':{$lt: endDate}});
         }
         console.log(JSON.stringify(queryCriteria));
-        if(_.isEmpty(applicantName) && _.isEmpty(startedAt) && _.isEmpty(endedAt)
-            && _.isEmpty(district) && _.isEmpty(gender) && _.isEmpty(ageRangeStart) && _.isEmpty(ageRangeEnd)){
-            Applicant.find({}, function(error, applicants){
-                if(error) {
-                    logger.info('Error in finding applicants', error);
-                    res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
-                } else {
-                    
-                    var result = {
-                        success: true,
-                        errmsg: '',
-                        applicants: applicants
-                    };
-                    res.json(result);
-                }
-            });
-        }else{
-            Applicant.find(queryCriteria, function(error, applicants){
-                if(error) {
-                    logger.info('Error in finding applicants', error);
-                    res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
-                } else {
-                    
-                    var result = {
-                        success: true,
-                        errmsg: '',
-                        applicants: applicants
-                    };
-                    res.json(result);
-                }
-            });
-        }
-        
+        Applicant.find(queryCriteria, function(error, applicants){
+            if(error) {
+                logger.info('Error in finding applicants', error);
+                res.status(500).send({success: false, errmsg: 'Error in finding applicants', applicants: []});
+            } else {
+
+                var result = {
+                    success: true,
+                    errmsg: '',
+                    applicants: applicants
+                };
+                res.json(result);
+            }
+        });
 }
+
 function searchApplicants(req, res, next){
     var companyId = _.get(req, ['body', 'companyId'], ''),
         applicantName = _.get(req, ['body', 'applicantName'], ''),
