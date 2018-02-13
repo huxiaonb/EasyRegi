@@ -169,10 +169,12 @@ function updateCompBlance(companyId, fee){
         }
     })
 }
-exports.userDefinedCharge = function(msg, req, res){
+exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
-    parseString(msg, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+    console.log(Object.keys(req));
+    console.log(req.body);
+    parseString(req.data, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
         if (err) {
             console.log('jie xi cuo wu')
             logger.info(err);
@@ -230,31 +232,31 @@ exports.orderQuery = function(req, res){
                     logger.info(err);
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
                 } else if (result.return_code === 'SUCCESS') {
-            Trade.find({
-                bid: result.out_trade_no
-            }).then(trades => {
-                if (!_.isEmpty(trades)){
-                    var trade = _.get(trades, ['0'], {});
-                    console.log('ziji cha');
-                    if(!trade.result){
-                        Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
-                            .exec(function (error, result) {
-                                if (error) {
-                                    console.log('ziji cha cuo');
-                                    logger.info('Error in saving trade in notify', error)
-                                } else {
-                                    console.log('ziji cha ok');
-                                    logger.info('Updating trade success for trade id %s', result.out_trade_no);
-                                    var res = { return_code: 'SUCCESS', return_msg: 'OK' };
-                                    res.json(wechatUtil.buildXML(res));
-                                }
-                            });
-                       
-                    }else{
-                        console.log('warining : notify twice');
+                Trade.find({
+                    bid: result.out_trade_no
+                }).then(trades => {
+                    if (!_.isEmpty(trades)){
+                        var trade = _.get(trades, ['0'], {});
+                        console.log('ziji cha');
+                        if(!trade.result){
+                            Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
+                                .exec(function (error, result) {
+                                    if (error) {
+                                        console.log('ziji cha cuo');
+                                        logger.info('Error in saving trade in notify', error)
+                                    } else {
+                                        console.log('ziji cha ok');
+                                        logger.info('Updating trade success for trade id %s', result.out_trade_no);
+                                        var res = { return_code: 'SUCCESS', return_msg: 'OK' };
+                                        res.json(wechatUtil.buildXML(res));
+                                    }
+                                });
+                        
+                        }else{
+                            console.log('warining : notify twice');
+                        }
                     }
-                }
-            });
+                });
                     res.json({ success: true, res: result });
                 }
             });
