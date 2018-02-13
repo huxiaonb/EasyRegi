@@ -173,8 +173,9 @@ exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
     console.log(Object.keys(req));
-    console.log(req.body);
-    parseString(req.data, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
+    console.log('body: ', req.body);
+    console.log('data: ', req.data);
+    parseString(req.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
         if (err) {
             console.log('jie xi cuo wu')
             logger.info(err);
