@@ -172,8 +172,8 @@ function updateCompBlance(companyId, fee){
 exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
-    console.log(Object.keys(req));
-    console.log('body: ', req.body);
+    //console.log(Object.keys(req));
+    //console.log('body: ', req.body);
     var result = req.body.xml;
     console.log(result);
     if(result.return_code === 'SUCCESS') {
@@ -187,16 +187,18 @@ exports.userDefinedCharge = function(req, res){
                     console.log(trade);
                     if(!trade.result){
                         Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
-                            .exec(function (error, result) {
+                            .exec(function (error, tRes) {
                                 if (error) {
                                     logger.info('Error in saving trade in notify', error)
                                 } else {
-                                    logger.info('Updating trade success for trade id %s', result.out_trade_no);
-                                    var res = { return_code: 'SUCCESS', return_msg: 'OK' };
-                                    res.json(wechatUtil.buildXML(res));
+                                    //问题处在这里
+                                    console.log('gengxinjieguo %s',tRes)
+                                    logger.info('Updating trade success for trade id %s', tRes.out_trade_no);
+                                    //var resTowx = { return_code: 'SUCCESS', return_msg: 'OK' };
+                                    var resTowx = { xml : {return_code: 'SUCCESS', return_msg: 'OK'} };
+                                    res.end(wechatUtil.buildXML(resTowx));
                                 }
                             });
-                       
                     }
                 }
             })
