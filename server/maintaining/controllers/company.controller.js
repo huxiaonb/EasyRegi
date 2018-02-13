@@ -208,7 +208,7 @@ function getCompanyInfo(req, res, next){
                                             phoneNumber: companyItem.phoneNumber,
                                             contactPersonName: companyItem.contactPersonName,
                                             email: companyItem.email,
-                                            balance: companyItem.balance,
+                                            balance: companyItem.balance ? companyItem.balance : 0 ,
                                             description: companyItem.description,
                                             positions: companyItem.positions
                                         };
