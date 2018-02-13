@@ -174,13 +174,9 @@ exports.userDefinedCharge = function(req, res){
     console.log('jiiiinnnnn laaaaaaiiiii le')
     console.log(Object.keys(req));
     console.log('body: ', req.body);
-    console.log('data: ', req.data);
-    parseString(req.body, { trim: true, explicitArray: false, explicitRoot: false }, function (err, result) {
-        if (err) {
-            console.log('jie xi cuo wu')
-            logger.info(err);
-            res.json({ success: false, errmsg: 'wechat code is rubbish' });
-        } else if (result.return_code === 'SUCCESS') {
+    var result = req.body.xml;
+    console.log(result);
+    if(result.return_code === 'SUCCESS') {
             console.log(result.result);
             //加点逻辑
             Trade.find({
@@ -201,14 +197,12 @@ exports.userDefinedCharge = function(req, res){
                                 }
                             });
                        
-                    }else{
-                        console.log('warining : notify twice');
                     }
                 }
-            });
-            
-        }
-    });
+            })
+    }else{
+        console.log('warining : notify twice');
+    }
 
 }
 

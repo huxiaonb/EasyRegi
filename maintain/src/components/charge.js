@@ -10,9 +10,10 @@ export default class Resume extends React.Component {
         money : ''
     }
     async goToCharge(){
+        let that =this;
         let r = await api.weCharege(this.state.money,this.props.companyInfo._id);
         let res = await r.json();
-        console.log(res.bid);
+        //console.log(res.bid);
         if (res.success) {
             Modal.info({
                 title: '扫码支付',
@@ -32,10 +33,10 @@ export default class Resume extends React.Component {
                 ),
                 
                 async onOk() {
-                    this.props.getCompInfo();
+                    that.props.getCompInfo();
                 },
                 async onCancel(){
-                    this.props.getCompInfo();
+                    that.props.getCompInfo();
                 }
             });
             
