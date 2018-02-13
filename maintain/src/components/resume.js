@@ -1,12 +1,13 @@
 import React from 'react'
 import { render } from 'react-dom'
-import {Button, Input, DatePicker, Table, message} from 'antd'
+import {Button, Input, DatePicker, Table, message, Select, InputNumber} from 'antd'
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import api from '../apiCollect'
 
 const {RangePicker } = DatePicker;
+const {Option} = Select;
 
 
 export default class ApplicantManage extends React.Component{
@@ -17,6 +18,10 @@ export default class ApplicantManage extends React.Component{
         resultTotal : 0,
         appiName : '',
         date :[],
+        district: '',
+        gender: '',
+        ageRangeStart: '',
+        ageRangeEnd: '',
         results:[]
     }
     onDateChange(value, dateString) {
@@ -29,13 +34,48 @@ export default class ApplicantManage extends React.Component{
             appiName : e.target.value
         })
     }
+    onDistrictChange(e) {
+        this.setState({
+            district: e.target.value
+        });
+    }
+    onGenderChange(value) {
+        this.setState({
+            gender: value
+        });
+    }
+    onAgeStartChange(value) {
+        if(value === undefined || value === null || isNaN(parseInt(value))) {
+            this.setState({
+                ageRangeStart: ''
+            });
+        } else {
+            this.setState({
+                ageRangeStart: value.toString()
+            });
+        }
+    }
+    onAgeEndChange(value) {
+        if(value === undefined || value === null || isNaN(parseInt(value))) {
+            this.setState({
+                ageRangeEnd: ''
+            });
+        } else {
+            this.setState({
+                ageRangeEnd: value.toString()
+            });
+        }
+    }
     onSearch(){
-        let {date} = this.state;
+        let {date, district, gender, ageRangeStart, ageRangeEnd} = this.state;
         let query = {
             applicantName:this.state.appiName,
-            companyId:this.context.comp._id,
             startedAt: date.length>1 ? date[0] :  '',
             endedAt : date.length>1 ? date[1] :  '',
+            district: district,
+            gender: gender,
+            ageRangeStart: ageRangeStart,
+            ageRangeEnd: ageRangeEnd
         }
         console.log(query)
         this.searchResumes(query)
@@ -79,6 +119,7 @@ export default class ApplicantManage extends React.Component{
     }
     async searchResumes(query={}){
         try{
+            query.companyId = this.context.comp._id;
             let res = await api.searchResumes(query);
             let data = await res.json();
             this.setState({
@@ -150,6 +191,25 @@ export default class ApplicantManage extends React.Component{
                     <div className='search-bar-item'>
                         <label className='search-bar-label'>入职日期</label>
                         <RangePicker format="YYYY-MM-DD"  onChange={this.onDateChange.bind(this)}/>
+                    </div>
+                </div>
+                <div className='search-bar-row'>
+                    <div className='search-bar-item'>
+                        <label className='search-bar-label'>地区</label>
+                        <Input className='search-bar-input' onChange={this.onDistrictChange.bind(this)}/>
+                    </div>
+                    <div className='search-bar-item'>
+                        <label className='search-bar-label'>年龄范围</label>
+                        <InputNumber className='search-bar-input' min={1} max={100} step={1} style={{ width: 120 }} onChange={this.onAgeStartChange.bind(this)}/>-
+                        <InputNumber className='search-bar-input' min={1} max={100} step={1} style={{ width: 120 }} onChange={this.onAgeEndChange.bind(this)}/>
+                    </div>
+                    <div className='search-bar-item'>
+                        <label className='search-bar-label'>性别</label>
+                        <Select className='search-bar-input' defaultValue="" style={{ width: 120 }} onChange={this.onGenderChange.bind(this)}>
+                            <Option value="" disabled>无</Option>
+                            <Option value="男">男</Option>
+                            <Option value="女">女</Option>
+                        </Select>
                     </div>
                 </div>
                 <div className='search-bar-row'>

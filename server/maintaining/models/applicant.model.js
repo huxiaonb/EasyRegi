@@ -81,6 +81,7 @@ var applicantSchema = new Schema({
         unique: true
     },
     name: String,
+    age: Number,
     gender: String,
     folk: String,
     birthDate: Date,
