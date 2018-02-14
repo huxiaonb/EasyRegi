@@ -201,12 +201,14 @@ class PositionManage extends React.Component{
                     
                     let res = await api.updatePosition({companyId : this.context.comp._id, position:newP});
                     let data = await res.json();
+                    debugger;
                     if(data.success){
                         message.success('操作成功！');
-                        this.props.getCompInfo();
+                        this.searchPosi();
+                    }else if(!data.success && data.errmsg === 'CHARGE'){
+                        message.warning('充值后重试');
+                        
                     }
-                    
-                    
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
@@ -217,14 +219,18 @@ class PositionManage extends React.Component{
                     let data = await res.json();
                      if (data.success) {
                          message.success('操作成功！');
+                         this.searchPosi();
                          this.props.getCompInfo();
+                     } else if (!data.success && data.errMsg === 'CHARGE') {
+                         message.warning('充值后重试');
+                         
                      }
                 }catch(e){
                     message.error('出错请联系管理员');
                     console.log(e);
                 }
              }
-                this.searchPosi();
+                
                 this.setState({
                     loading : false,
                     pFlag : false
@@ -283,6 +289,7 @@ class PositionManage extends React.Component{
         });
     }
     async searchPosi(query={companyId : this.context.comp._id}){
+        this.props.getCompInfo();
         let res = await api.searchPostion(query);
         let data = await res.json();
         

@@ -154,8 +154,8 @@ function updateCompBlance(companyId, fee) {
     }).then(companies => {
         if (!_.isEmpty(companies)) {
             var company = _.get(companies, ['0'], {});
-            var balance = company.balance ? company.balance : 0;
-            balance = balance + fee;
+            var balance = company.balance ? parseInt(company.balance) : 0;
+            balance = balance + parseInt(fee);
             console.log('yu e', company.balance);
             console.log('fee', fee);
             console.log('final', balance);
@@ -268,8 +268,8 @@ exports.orderQuery = function(req, res){
 exports.charge = function (req, res) {
     var fee = _.get(req, ['body', 'total_fee'], '');
     var companyId = _.get(req, ['body', 'companyId'], '');
-    if(_.isEmpty(fee)) {
-        console.log('xxxxx');
+    if(_.isEmpty(fee) || parseInt(fee) < 0) {
+        res.status(500).send({ success: false, errmsg: 'CHARGE' });
     }else {
         var startDateStr = Date.now().toString();
         var businessID = startDateStr + Math.random().toString().substr(2, 10);
