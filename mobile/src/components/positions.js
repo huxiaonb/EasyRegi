@@ -36,7 +36,7 @@ class Positions extends React.Component{
             if (r.success) {
                 this.setState({
                     kw,
-                    nearbyPositions: r.position
+                    nearbyPositions: r.positions
                 })
             } else {
                 console.log(r);
