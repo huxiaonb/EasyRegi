@@ -190,17 +190,16 @@ exports.userDefinedCharge = function(req, res){
                     console.log(trade);
                     if(!trade.result){
                         Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
-                            .exec(function (error, tRes) {
+                            .exec(function (error) {
                                 if (error) {
                                     logger.info('Error in saving trade in notify', error)
                                 } else {
-                                    //问题处在这里
-                                    console.log('gengxinjieguo %s',tRes)
-                                    logger.info('Updating trade success for trade id %s', tRes.bid);
+                                    //问题处在这里,update 并不会返回更新后的实例
+                                    logger.info('Updating trade success for trade id %s', trade.bid);
                                     //var resTowx = { return_code: 'SUCCESS', return_msg: 'OK' };
-                                    console.log('id : %s', tRes.companyId);
-                                    console.log('id fee : %s', tRes.total_fee);
-                                    updateCompBlance(tRes.companyId,tRes.total_fee);
+                                    console.log('id : %s', trade.companyId);
+                                    console.log('id fee : %s', result.total_fee);
+                                    updateCompBlance(trade.companyId, result.total_fee);
                                     var resTowx = { xml : {return_code: 'SUCCESS', return_msg: 'OK'} };
                                     res.end(wechatUtil.buildXML(resTowx));
                                 }
@@ -249,7 +248,7 @@ exports.orderQuery = function(req, res){
                                         logger.info('Error in saving trade in notify', error)
                                     } else {
                                         console.log('ziji cha ok');
-                                        logger.info('Updating trade success for trade id %s', result.out_trade_no);
+                                        logger.info('Updating trade success for trade id %s', result.bid);
                                         var res = { return_code: 'SUCCESS', return_msg: 'OK' };
                                         res.json(wechatUtil.buildXML(res));
                                     }
