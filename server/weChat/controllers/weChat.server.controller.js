@@ -154,7 +154,8 @@ function updateCompBlance(companyId, fee) {
     }).then(companies => {
         if (!_.isEmpty(companies)) {
             var company = _.get(companies, ['0'], {});
-            var balance = company.balance + fee;
+            var balance = company.balance ? company.balance : 0;
+            balance = balance + fee;
             console.log('yu e', company.balance);
             console.log('fee', fee);
             console.log('final', balance);
@@ -199,7 +200,7 @@ exports.userDefinedCharge = function(req, res){
                                     //var resTowx = { return_code: 'SUCCESS', return_msg: 'OK' };
                                     console.log('id : %s', trade.companyId);
                                     console.log('id fee : %s', result.total_fee);
-                                    updateCompBlance(trade.companyId, result.total_fee);
+                                    updateCompBlance(trade.companyId, parseInt(result.total_fee)/100);
                                     var resTowx = { xml : {return_code: 'SUCCESS', return_msg: 'OK'} };
                                     res.end(wechatUtil.buildXML(resTowx));
                                 }
