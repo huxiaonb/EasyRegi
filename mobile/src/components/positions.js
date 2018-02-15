@@ -195,6 +195,7 @@ class Positions extends React.Component{
     initWechatJsSdk = () => {
         let self = this;
         let {signatureObj, wx} = this.props.args;
+        console.log(JSON.stringify(signatureObj));
         wx.config({
             debug: false,
             appId: 'wx54e94ab2ab199342',

@@ -84,7 +84,7 @@ exports.maintain = function(req, res) {
 exports.positions = function(req, res) {
   //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
   var openId = _.get(req, ['session', 'openId'], '');
-  //var developmentMode = _.get(req, ['query', 'dev'], '');
+  var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
     console.log('open is is empty');
     res.json({ success: false, errmsg: '缺少open id' });
@@ -99,7 +99,7 @@ exports.positions = function(req, res) {
         var url = 'http://www.mfca.com.cn/positions';
         var signatureObj = wechatUtil.getSignature(url);
         console.log('signature obj: ' + JSON.stringify(signatureObj));
-        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj)});
+        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
       }
     })
   }
