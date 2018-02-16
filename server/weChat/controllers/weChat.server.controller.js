@@ -1045,7 +1045,7 @@ function constructPositionVOs(copPositions, cop, distance) {
 }
 
 exports.testWechatApi = function(req, res){
-    var url = 'http://www.mfca.com.cn/testWechatApi';
+    var url = 'http://www.mfca.com.cn/testWechatApi?wechatCode=xxx';
     var signatureObj = wechatUtil.getSignature(url);
     console.log('signature obj: ' + JSON.stringify(signatureObj));
     res.render('server/weChat/views/wechatApiTest', {openId: 'wechat1234567', signatureObj: JSON.stringify(signatureObj)});
