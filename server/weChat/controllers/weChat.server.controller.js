@@ -96,7 +96,9 @@ exports.positions = function(req, res) {
         res.status(500).send({ success: false, errmsg: '查找用户出错' });
       }else{
         var applicant = _.get(applicants, ['0'], {});
-        var url = 'http://www.mfca.com.cn/positions';
+        var originalUrl = _.get(req, ['originalUrl'], '');
+        var url = 'http://www.mfca.com.cn' + originalUrl;
+        consolg.log('set signature for url: ', url);
         var signatureObj = wechatUtil.getSignature(url);
         console.log('signature obj: ' + JSON.stringify(signatureObj));
         res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
@@ -1020,6 +1022,14 @@ function constructPositionVOs(copPositions, cop, distance) {
         if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
             salaryRange = salaryStart + '~' + salaryEnd;
         }
+        var luckyFlag = _.isUndefined(posi.luckyFlag) ? false : posi.luckyFlag,
+            redPackSendList = _.get(posi, ['redPackSendList'], []),
+            redPackCount = _.get(posi, ['redPackCount'], 0);
+        if(luckyFlag) {
+            if(redPackCount <= 0 || redPackSendList.length >= redPackCount) {
+                luckyFlag = false;
+            }
+        }
         let clonePosi = {
             name: posi.name,
             ageRange: ageRange,
@@ -1031,7 +1041,7 @@ function constructPositionVOs(copPositions, cop, distance) {
             _id: posi._id,
             companyId: posi.companyId,
             phoneNumber: posi.phoneNumber,
-            luckyFlag: _.isUndefined(posi.luckyFlag) ? false : posi.luckyFlag,
+            luckyFlag: luckyFlag,
             companyName: cop.companyName,
             alias: cop.alias,
             distance: distanceStr
@@ -1045,6 +1055,9 @@ function constructPositionVOs(copPositions, cop, distance) {
 }
 
 exports.testWechatApi = function(req, res){
+    console.log('path: ', req.path);
+    console.log('original url: ', req.originalUrl);
+    console.log('route: ', req.route);
     var url = 'http://www.mfca.com.cn/testWechatApi?wechatCode=xxx';
     var signatureObj = wechatUtil.getSignature(url);
     console.log('signature obj: ' + JSON.stringify(signatureObj));
