@@ -98,7 +98,7 @@ exports.positions = function(req, res) {
         var applicant = _.get(applicants, ['0'], {});
         var originalUrl = _.get(req, ['originalUrl'], '');
         var url = 'http://www.mfca.com.cn' + originalUrl;
-        consolg.log('set signature for url: ', url);
+        console.log('set signature for url: ', url);
         var signatureObj = wechatUtil.getSignature(url);
         console.log('signature obj: ' + JSON.stringify(signatureObj));
         res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
@@ -1058,7 +1058,7 @@ exports.testWechatApi = function(req, res){
     console.log('path: ', req.path);
     console.log('original url: ', req.originalUrl);
     console.log('route: ', req.route);
-    var url = 'http://www.mfca.com.cn/testWechatApi?wechatCode=xxx';
+    var url = 'http://www.mfca.com.cn' + req.originalUrl;
     var signatureObj = wechatUtil.getSignature(url);
     console.log('signature obj: ' + JSON.stringify(signatureObj));
     res.render('server/weChat/views/wechatApiTest', {openId: 'wechat1234567', signatureObj: JSON.stringify(signatureObj)});
