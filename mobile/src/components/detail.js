@@ -41,7 +41,8 @@ class Detail extends React.Component{
                 <Item extra={data.phoneNumber}>联系电话</Item>
             </List>
             <div className='btn-grp'>
-                    <Link to='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAwODA1NDM5OQ==&scene=124#wechat_redirect'><Button type='primary'>关注入职易查看更多职位</Button></Link>
+                    <a role="button" className="am-button am-button-primary"  href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAwODA1NDM5OQ==&scene=124#wechat_redirect'>关注入职易查看更多职位</a>
+                    
             </div>
         </div>)
     }
