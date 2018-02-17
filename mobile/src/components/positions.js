@@ -197,7 +197,7 @@ class Positions extends React.Component{
         let {signatureObj, wx} = this.props.args;
         console.log(JSON.stringify(signatureObj));
         wx.config({
-            debug: true,
+            debug: false,
             appId: 'wx54e94ab2ab199342',
             timestamp: signatureObj.timestamp,//Date.now().toString().substr(0,10),
             nonceStr: signatureObj.noncestr,//generateNonceString(),
