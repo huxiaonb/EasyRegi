@@ -174,9 +174,9 @@ class Positions extends React.Component{
             console.log(key);
             let nearbyPositions = this.state.nearbyPositions;
             var keyArray = key.split('_');
-            var title = '入职易--我刚找到了一份好工作，你也来试试',
+            var title = '【入职易】赶紧来看看热门招聘职位顺便抢红包……',
                 link = '',
-                imgUrl = 'http://www.mfca.com.cn/img/dog.jpg';
+                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg';
             if(keyArray.length > 1 && keyArray[1] !== undefined){
                 let currentPosition = nearbyPositions.filter((pos) => {return pos._id === keyArray[1];});
                 console.log(currentPosition[0]);
@@ -217,9 +217,9 @@ class Positions extends React.Component{
         });
 
         wx.ready(function(){
-            var title = '入职易--我刚找到了一份好工作，你也来试试',
+            var title = '【入职易】赶紧来看看热门招聘职位顺便抢红包……',
                 link = 'http://www.mfca.com.cn',
-                imgUrl = 'http://www.mfca.com.cn/img/dog.jpg';
+                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg';
             self.shareToTimeLine(title, link, imgUrl);
         });
     }
