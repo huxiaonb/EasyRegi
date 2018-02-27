@@ -174,14 +174,23 @@ class Positions extends React.Component{
             console.log(key);
             let nearbyPositions = this.state.nearbyPositions;
             var keyArray = key.split('_');
-            var title = '【入职易】赶紧来看看热门招聘职位顺便抢红包……',
+            var title = '【入职易】查看周边招聘信息，好工作等着你！',
                 link = '',
-                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg';
+                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg',
+                desc = '分享包含红包的职位到朋友圈，可以获得奖励';
             if(keyArray.length > 1 && keyArray[1] !== undefined){
-                let currentPosition = nearbyPositions.filter((pos) => {return pos._id === keyArray[1];});
-                console.log(currentPosition[0]);
-                if(currentPosition.length > 0)
-                    this.setState({currentPosition: currentPosition[0]});
+                let currentPositionList = nearbyPositions.filter((pos) => {return pos._id === keyArray[1];});
+                console.log(currentPositionList);
+                if(currentPositionList.length > 0) {
+                    let currentPosition = currentPositionList[0];
+                    this.setState({currentPosition: currentPosition});
+                    if(currentPosition.luckyFlag){
+                        title = '【入职易】分享招聘信息，红包抢不停！';
+                        imgUrl = 'http://www.mfca.com.cn/img/redPackLogo.jpg';
+                    } else {
+                        title = '【入职易】推荐一个靠谱的招聘信息给你…';
+                    }
+                }
                 link = 'http://www.mfca.com.cn/details/' + keyArray[1];
             } else {
                 link = 'http://www.mfca.com.cn/positions';
@@ -189,6 +198,7 @@ class Positions extends React.Component{
             console.log(title, link, imgUrl);
 
             this.shareToTimeLine(title, link, imgUrl);
+            this.shareToFriends(title, desc, link, imgUrl);
         }
     }
 
@@ -217,10 +227,31 @@ class Positions extends React.Component{
         });
 
         wx.ready(function(){
-            var title = '【入职易】赶紧来看看热门招聘职位顺便抢红包……',
+            var title = '【入职易】查看周边招聘信息，好工作等着你！',
                 link = 'http://www.mfca.com.cn',
-                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg';
+                imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg',
+                desc = '分享包含红包的职位到朋友圈，可以获得奖励';
             self.shareToTimeLine(title, link, imgUrl);
+            self.shareToFriends(title, desc, link, imgUrl);
+        });
+    }
+
+    shareToFriends = (title, desc, link, imgUrl) => {
+        wx.onMenuShareAppMessage({
+            title: title, // 分享标题
+            desc: desc, // 分享描述
+            link: link, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: imgUrl, // 分享图标
+            type: '', // 分享类型,music、video或link，不填默认为link
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+            success: function () {
+            // 用户确认分享后执行的回调函数
+                Toast.info('转发成功');
+            },
+            cancel: function () {
+            // 用户取消分享后执行的回调函数
+                Toast.info('取消转发');
+            }
         });
     }
 

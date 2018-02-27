@@ -87,7 +87,12 @@ exports.positions = function(req, res) {
   var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
     console.log('open is is empty');
-    res.json({ success: false, errmsg: '缺少open id' });
+    var originalUrl = _.get(req, ['originalUrl'], '');
+    var url = 'http://www.mfca.com.cn' + originalUrl;
+    console.log('set signature for url: ', url);
+    var signatureObj = wechatUtil.getSignature(url);
+    console.log('signature obj: ' + JSON.stringify(signatureObj));
+    res.render('server/weChat/views/positions', { openId: '', isComplete : 'false', signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
   }else{
     Applicant.find({
       wechatOpenId: openId
