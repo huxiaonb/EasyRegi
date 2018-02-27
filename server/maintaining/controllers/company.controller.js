@@ -802,7 +802,7 @@ function createPositionForCompany(req, res, next){
                     var positionItem = {
                         name: _.get(positionObj, ['name'], ''),
                         companyId: companyId,
-                        contactPerson :_.get(positionObj, ['phoneNumber'], ''),
+                        contactPerson :_.get(positionObj, ['contactPerson'], ''),
                         phoneNumber: _.get(positionObj, ['phoneNumber'], ''),
                         totalRecruiters: _.get(positionObj, ['totalRecruiters'],''),
                         salaryStart: _.get(positionObj, ['salaryStart'], ''),
