@@ -135,7 +135,7 @@ class Step1 extends React.Component{
                                     onErrorClick={() => {
                                         Toast.info(getFieldError('code').join('、'));
                                     }}
-                                placeholder="请输入手机号码">
+                                placeholder="请输入验证码">
                                 验证码       
                             </InputItem>
                         </div>

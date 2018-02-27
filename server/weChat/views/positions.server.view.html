@@ -59,7 +59,12 @@
             var openId = $('#openId').text() ===''? undefined : $('#openId').text() ;
             var isComplete = $('#isComplete').text() === ''? undefined : $('#isComplete').text();
             var signatureObj = $('#signatureObj').text() === '' ? {} : JSON.parse($('#signatureObj').text());
-            var developmentMode = $('#developmentMode').text() === 'yes' ? true : false;
+            geolocation.getLocation(function (position) {
+                Lego('#location').nearByPositions({ position: position, openId: openId, isComplete: isComplete, signatureObj: signatureObj, wx: wx });
+            }, function () {
+                Lego('#location').nearByPositions(false);
+            });
+            /*var developmentMode = $('#developmentMode').text() === 'yes' ? true : false;
             if(developmentMode) {
                 var fakePosition = {
                     lat: '22.26666',
@@ -75,7 +80,7 @@
                 },function(){
                     Lego('#location').nearByPositions(false);
                 });
-            }
+            }*/
 
         }))
     </script>

@@ -39,25 +39,31 @@ exports.commonErr = commonErr;
 exports.getCaptchaCode = getCaptchaCode;
 exports.resetPasswordByCaptcha = resetPasswordByCaptcha
 
-function updateCompBlance(companyId, fee) {
+function updateCompBlance(companyId, fee, callback) {
     Company.find({
         _id: companyId
     }).then(companies => {
         if (!_.isEmpty(companies)) {
             var company = _.get(companies, ['0'], {});
-            var balance = company.balance + fee;
-            console.log('yu e', company.balance);
-            console.log('fee',  fee);
-            console.log('final', balance);
-            Company.update({ _id: companyId }, { $set: { balance: balance } }, { upsert: true })
-                .exec(function (error, result) {
-                    if (error) {
-                        logger.info('Error in saving company in notify', error)
-                    } else {
-                        logger.info('Updating company balace success for  company id %s', companyId);
-                    }
-                });
-        } else {
+            
+            var balance = parseInt(company.balance) + parseInt(fee);
+            if (parseInt(balance)<0){
+                console.log('12313 %s', balance);
+                return callback(false)
+            }else{
+                console.log('yu e', company.balance);
+                console.log('fee',  fee);
+                console.log('final', balance);
+                Company.update({ _id: companyId }, { $set: { balance: balance } }, { upsert: true })
+                    .exec(function (error, result) {
+                        if (error) {
+                            logger.info('Error in saving company in notify', error)
+                        } else {
+                            logger.info('Updating company balace success for  company id %s', companyId);
+                            return callback(true);
+                        }
+                    });
+        }} else {
             console.log('find company err');
         }
     })
@@ -817,44 +823,85 @@ function createPositionForCompany(req, res, next){
                     }
                     
                     if (parseInt(_.get(positionObj, ['luckyFlag'], '')) === 1){
-                        console.log('calculate balance');
+                        console.log('calculate balance %s', parseInt(_.get(positionObj, ['redPackSum'], '')));
                         let compBalance = -1 * parseInt(_.get(positionObj, ['redPackSum'], ''));
-                        updateCompBlance(companyId, compBalance);
-                    }
-                    var positionEntity = new Position(positionItem);
-                    positionEntity.save(function(saveErr, persistedObj){
-                        if(saveErr) {
-                            logger.info('Error in saving position', saveErr);
-                            res.status(500).send({success: false, errmsg: 'Error in saving position', position: {}});
-                        } else {
-                            var _id = _.get(persistedObj, ['_id'], ''),
-                                positionName = _.get(persistedObj, ['name'], '');
-                            if(_.isEmpty(_id)){
-                                logger.info('Failed in saving position');
-                                res.status(500).send({success: false, errmsg: 'Failed in saving position', position: {}});
-                            } else {
-                                var companyPosition = {
-                                    positionId: _id,
-                                    positionName: positionName
-                                };
-                                var dbPositions = _.get(dbCompany, ['positions'], []);
-                                dbPositions.push(companyPosition);
-                                Company.update({_id: companyId}, {$set: {positions: dbPositions}}, {upsert: false}, function(err, result){
-                                    if(err) {
-                                        logger.info('Error in updating company', err);
-                                        res.status(500).send({success: false, errmsg: 'Error in updating company', position: {}});
+                        updateCompBlance(companyId, compBalance, function(flag){
+                            if(!flag){
+                                res.status(500).send({ success: false, errmsg: 'CHARGE' });
+                            }else{
+                                var positionEntity = new Position(positionItem);
+                                positionEntity.save(function (saveErr, persistedObj) {
+                                    if (saveErr) {
+                                        logger.info('Error in saving position', saveErr);
+                                        res.status(500).send({ success: false, errmsg: 'Error in saving position', position: {} });
                                     } else {
-                                        var updateResult = {
-                                            success: true,
-                                            errmsg: '',
-                                            position: positionObj
-                                        };
-                                        res.json(updateResult);
+                                        var _id = _.get(persistedObj, ['_id'], ''),
+                                            positionName = _.get(persistedObj, ['name'], '');
+                                        if (_.isEmpty(_id)) {
+                                            logger.info('Failed in saving position');
+                                            res.status(500).send({ success: false, errmsg: 'Failed in saving position', position: {} });
+                                        } else {
+                                            var companyPosition = {
+                                                positionId: _id,
+                                                positionName: positionName
+                                            };
+                                            var dbPositions = _.get(dbCompany, ['positions'], []);
+                                            dbPositions.push(companyPosition);
+                                            Company.update({ _id: companyId }, { $set: { positions: dbPositions } }, { upsert: false }, function (err, result) {
+                                                if (err) {
+                                                    logger.info('Error in updating company', err);
+                                                    res.status(500).send({ success: false, errmsg: 'Error in updating company', position: {} });
+                                                } else {
+                                                    var updateResult = {
+                                                        success: true,
+                                                        errmsg: '',
+                                                        position: positionObj
+                                                    };
+                                                    res.json(updateResult);
+                                                }
+                                            })
+                                        }
                                     }
-                                })
+                                });
                             }
-                        }
-                    });
+                        });
+                    
+                    }else{
+                        var positionEntity = new Position(positionItem);
+                        positionEntity.save(function (saveErr, persistedObj) {
+                            if (saveErr) {
+                                logger.info('Error in saving position', saveErr);
+                                res.status(500).send({ success: false, errmsg: 'Error in saving position', position: {} });
+                            } else {
+                                var _id = _.get(persistedObj, ['_id'], ''),
+                                    positionName = _.get(persistedObj, ['name'], '');
+                                if (_.isEmpty(_id)) {
+                                    logger.info('Failed in saving position');
+                                    res.status(500).send({ success: false, errmsg: 'Failed in saving position', position: {} });
+                                } else {
+                                    var companyPosition = {
+                                        positionId: _id,
+                                        positionName: positionName
+                                    };
+                                    var dbPositions = _.get(dbCompany, ['positions'], []);
+                                    dbPositions.push(companyPosition);
+                                    Company.update({ _id: companyId }, { $set: { positions: dbPositions } }, { upsert: false }, function (err, result) {
+                                        if (err) {
+                                            logger.info('Error in updating company', err);
+                                            res.status(500).send({ success: false, errmsg: 'Error in updating company', position: {} });
+                                        } else {
+                                            var updateResult = {
+                                                success: true,
+                                                errmsg: '',
+                                                position: positionObj
+                                            };
+                                            res.json(updateResult);
+                                        }
+                                    })
+                                }
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -985,7 +1032,7 @@ function findPositionById(id, callback){
                 if(ps.luckyFlag){
                     console.log('222');
                     console.log(ps.redPackSum);
-                    return callback(ps.redPackSum)
+                    return callback(ps.luckyFlag, parseInt(ps.redPackSum))
                 } else {return callback(false)}
             }
         })
@@ -1001,33 +1048,80 @@ function updatePosition(req, res, next){
         res.status(500).send({success: false, errmsg: 'company id and position id are required', positions: []});
     } else {
         var tasks = [];
-        findPositionById(positionId,function(flag){
-            
-            if (flag) {
-                console.log('money', positionObj.redPackSum);
-                positionObj.luckyFlag ? updateCompBlance(companyId, flag - positionObj.redPackSum) : updateCompBlance(companyId, flag);
+        //算余额
+        findPositionById(positionId,function(flag,sum){
+            if (flag==='1') {
+                var redSum = parseInt(positionObj.redPackSum);
+                console.log('red', redSum);
+                console.log('sum', sum);
+                positionObj.luckyFlag === '1' ? updateCompBlance(companyId, (sum - redSum), function(flg){
+                    if(!flg){
+                        res.status(500).send({ success: false, errmsg: 'CHARGE' });
+                    }else{
+                        tasks.push(updatePositionModel(positionObj));
+                        tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
+                        async.parallel(tasks, function (error, result) {
+                            if (error) {
+                                logger.error('Error in update company position', error);
+                                res.status(500).send({ success: false, errmsg: 'Error in update company position', positions: [] });
+                            } else {
+                                var tasksResult = {
+                                    success: true,
+                                    errmsg: '',
+                                    positions: []
+                                };
+                                res.json(tasksResult);
+                            }
+                        });
+                    }
+                }) : updateCompBlance(companyId, sum, function(flg){
+                        if (!flg) {
+                            res.status(500).send({ success: false, errmsg: 'CHARGE' });
+                        }else{
+                            tasks.push(updatePositionModel(positionObj));
+                            tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
+                            async.parallel(tasks, function (error, result) {
+                                if (error) {
+                                    logger.error('Error in update company position', error);
+                                    res.status(500).send({ success: false, errmsg: 'Error in update company position', positions: [] });
+                                } else {
+                                    var tasksResult = {
+                                        success: true,
+                                        errmsg: '',
+                                        positions: []
+                                    };
+                                    res.json(tasksResult);
+                                }
+                            });
+                        }
+                });
             } else {
-                if (positionObj.luckyFlag) {
-                    updateCompBlance(companyId, -1 * positionObj.redPackSum)
+                if (positionObj.luckyFlag==='1') {
+                    console.log('money3', -1 * redSum);
+                    updateCompBlance(companyId, -1 * redSum, function(flg){
+                        if (!flg) {
+                            res.status(500).send({ success: false, errmsg: 'CHARGE' });
+                        }else{
+                            tasks.push(updatePositionModel(positionObj));
+                            tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
+                            async.parallel(tasks, function (error, result) {
+                                if (error) {
+                                    logger.error('Error in update company position', error);
+                                    res.status(500).send({ success: false, errmsg: 'Error in update company position', positions: [] });
+                                } else {
+                                    var tasksResult = {
+                                        success: true,
+                                        errmsg: '',
+                                        positions: []
+                                    };
+                                    res.json(tasksResult);
+                                }
+                            });
+                        }
+                    })
                 }
             }
-        });
-        
-        
-        tasks.push(updatePositionModel(positionObj));
-        tasks.push(updatePositionNameByCompanyId(companyId, positionObj));
-        async.parallel(tasks, function(error, result){
-            if(error) {
-                logger.error('Error in update company position', error);
-                res.status(500).send({success: false, errmsg: 'Error in update company position', positions: []});
-            } else {
-                var tasksResult = {
-                    success: true,
-                    errmsg: '',
-                    positions: []
-                };
-                res.json(tasksResult);
-            }
+            
         });
     }
 }

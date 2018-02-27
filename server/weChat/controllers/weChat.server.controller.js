@@ -84,7 +84,7 @@ exports.maintain = function(req, res) {
 exports.positions = function(req, res) {
   //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
   var openId = _.get(req, ['session', 'openId'], '');
-  var developmentMode = _.get(req, ['query', 'dev'], '');
+  //var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
     console.log('open is is empty');
     res.json({ success: false, errmsg: '缺少open id' });
@@ -99,7 +99,7 @@ exports.positions = function(req, res) {
         var url = 'http://www.mfca.com.cn/positions';
         var signatureObj = wechatUtil.getSignature(url);
         console.log('signature obj: ' + JSON.stringify(signatureObj));
-        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
+        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj)});
       }
     })
   }
@@ -148,15 +148,18 @@ exports.checkIfNeedPay = function(req, res){
     }
 }
 
-function updateCompBlance(companyId, fee){
+function updateCompBlance(companyId, fee) {
     Company.find({
-        companyId : companyId
+        _id: companyId
     }).then(companies => {
-        if(!_.isEmpty(companies)){
+        if (!_.isEmpty(companies)) {
             var company = _.get(companies, ['0'], {});
-            var balance = company.balance + fee;
+            var balance = company.balance ? parseInt(company.balance) : 0;
+            balance = balance + parseInt(fee);
             console.log('yu e', company.balance);
-            Company.update({ companyId: companyId }, { $set: {balance:balance} }, { upsert: true })
+            console.log('fee', fee);
+            console.log('final', balance);
+            Company.update({ _id: companyId }, { $set: { balance: balance } }, { upsert: true })
                 .exec(function (error, result) {
                     if (error) {
                         logger.info('Error in saving company in notify', error)
@@ -164,11 +167,12 @@ function updateCompBlance(companyId, fee){
                         logger.info('Updating company balace success for  company id %s', companyId);
                     }
                 });
-        }else{
+        } else {
             console.log('find company err');
         }
     })
 }
+
 exports.userDefinedCharge = function(req, res){
     //到底回不回调
     console.log('jiiiinnnnn laaaaaaiiiii le')
@@ -187,14 +191,16 @@ exports.userDefinedCharge = function(req, res){
                     console.log(trade);
                     if(!trade.result){
                         Trade.update({ bid: result.out_trade_no }, { $set: { result: result.return_code, time_end: result.time_end, wechatId: result.openid, total_fee: result.total_fee} }, { upsert: true })
-                            .exec(function (error, tRes) {
+                            .exec(function (error) {
                                 if (error) {
                                     logger.info('Error in saving trade in notify', error)
                                 } else {
-                                    //问题处在这里
-                                    console.log('gengxinjieguo %s',tRes)
-                                    logger.info('Updating trade success for trade id %s', tRes.out_trade_no);
+                                    //问题处在这里,update 并不会返回更新后的实例
+                                    logger.info('Updating trade success for trade id %s', trade.bid);
                                     //var resTowx = { return_code: 'SUCCESS', return_msg: 'OK' };
+                                    console.log('id : %s', trade.companyId);
+                                    console.log('id fee : %s', result.total_fee);
+                                    updateCompBlance(trade.companyId, parseInt(result.total_fee)/100);
                                     var resTowx = { xml : {return_code: 'SUCCESS', return_msg: 'OK'} };
                                     res.end(wechatUtil.buildXML(resTowx));
                                 }
@@ -243,7 +249,7 @@ exports.orderQuery = function(req, res){
                                         logger.info('Error in saving trade in notify', error)
                                     } else {
                                         console.log('ziji cha ok');
-                                        logger.info('Updating trade success for trade id %s', result.out_trade_no);
+                                        logger.info('Updating trade success for trade id %s', result.bid);
                                         var res = { return_code: 'SUCCESS', return_msg: 'OK' };
                                         res.json(wechatUtil.buildXML(res));
                                     }
@@ -262,8 +268,8 @@ exports.orderQuery = function(req, res){
 exports.charge = function (req, res) {
     var fee = _.get(req, ['body', 'total_fee'], '');
     var companyId = _.get(req, ['body', 'companyId'], '');
-    if(_.isEmpty(fee)) {
-        console.log('xxxxx');
+    if(_.isEmpty(fee) || parseInt(fee) < 0) {
+        res.status(500).send({ success: false, errmsg: 'CHARGE' });
     }else {
         var startDateStr = Date.now().toString();
         var businessID = startDateStr + Math.random().toString().substr(2, 10);
@@ -291,10 +297,13 @@ exports.charge = function (req, res) {
                     logger.info(err);
                     res.json({ success: false, errmsg: 'wechat code is rubbish' });
                 } else if (result.return_code === 'SUCCESS') {
+                    console.log('compid %s',companyId);
                     var tradeEntity = new Trade({ companyId:companyId, bid : businessID, startDate : startDateStr, total_fee_from_client : fee * 100});
                     tradeEntity.save(function(error, data){
                             if(error) {
                                 logger.info('Error in saving trade', error)
+                            }else{
+                                console.log(JSON.stringify(data));
                             }
                     })
                     res.json({ success: true, code_url: result.code_url, bid :businessID });
@@ -876,7 +885,7 @@ exports.searchPosition = function(req, res) {
             } else {
                 var dbPositions = _.get(result, ['dbPositions'], []);
                 var stillExist = _.get(result, ['stillExist'], false);
-                res.json({success: true, position: dbPositions, existFlag: stillExist});
+                res.json({success: true, positions: dbPositions, existFlag: stillExist});
             }
         })
     }
