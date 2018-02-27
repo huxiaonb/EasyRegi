@@ -11,7 +11,7 @@ const tagStyle = {
     height : '50px',
     lineHeight : '50px'
 };
-const tagContet = ['无经验', '电子五金', '模具塑胶', '纺织玩具', '文员行政', '后勤维修', '印刷宣传', '运输装卸', '销售客服', '建筑装潢','财务出纳'];
+const tagContet = ['无经验', '电子五金', '模具塑胶', '纺织玩具', '文员行政', '后勤维修', '印刷宣传', '运输装卸', '销售客服', '建筑装潢','财务出纳', '采购跟单'];
 class Step3 extends React.Component{
     state={
         skill : ['无经验']
@@ -76,13 +76,13 @@ class Step3 extends React.Component{
                         现住址
                     </InputItem>
                     </div>
-                    <List.Item arrow="horizontal" name="skill" style={{paddingLeft:15}}>技能&经验
+                    <List.Item arrow="horizontal" name="skill" style={{paddingLeft:15}}>技能&经验(多选)
                     <br/>
-                        <Tag style={tagStyle} onChange={this.onChange.bind(this,0)} selected>无经验</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,0)} selected>暂无经验</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,1)}>电子五金</Tag>
-                        <Tag style={tagStyle}onChange={this.onChange.bind(this,2)}>模具塑胶</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,2)}>模具塑胶</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,3)}>纺织玩具</Tag>
-                    <br/>  
+                        <br/>  
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,4)}>文员行政</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,5)}>后勤维修</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,6)}>印刷宣传</Tag>
@@ -91,6 +91,7 @@ class Step3 extends React.Component{
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,8)}>销售客服</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,9)}>建筑装潢</Tag>
                         <Tag style={tagStyle} onChange={this.onChange.bind(this,10)}>财务出纳</Tag>
+                        <Tag style={tagStyle} onChange={this.onChange.bind(this,11)}>采购跟单</Tag>
                         <br/>
                     </List.Item>
                         
