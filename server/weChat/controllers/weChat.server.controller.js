@@ -86,12 +86,12 @@ exports.positions = function(req, res) {
   var openId = _.get(req, ['session', 'openId'], '');
   var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
-    console.log('open is is empty');
+    // console.log('open id is empty');
     var originalUrl = _.get(req, ['originalUrl'], '');
     var url = 'http://www.mfca.com.cn' + originalUrl;
-    console.log('set signature for url: ', url);
+    // console.log('set signature for url: ', url);
     var signatureObj = wechatUtil.getSignature(url);
-    console.log('signature obj: ' + JSON.stringify(signatureObj));
+    // console.log('signature obj: ' + JSON.stringify(signatureObj));
     res.render('server/weChat/views/positions', { openId: '', isComplete : 'false', signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
   }else{
     Applicant.find({
@@ -103,9 +103,9 @@ exports.positions = function(req, res) {
         var applicant = _.get(applicants, ['0'], {});
         var originalUrl = _.get(req, ['originalUrl'], '');
         var url = 'http://www.mfca.com.cn' + originalUrl;
-        console.log('set signature for url: ', url);
+        // console.log('set signature for url: ', url);
         var signatureObj = wechatUtil.getSignature(url);
-        console.log('signature obj: ' + JSON.stringify(signatureObj));
+        // console.log('signature obj: ' + JSON.stringify(signatureObj));
         res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
       }
     })
@@ -997,11 +997,11 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
         return b.distance - c.distance;
     });
     sortedPositions = _.concat(sortedPositions, unsortedPositions);
-    console.log('the number of positions before pagination:  ' + sortedPositions.length);
+    // console.log('the number of positions before pagination:  ' + sortedPositions.length);
     var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
     var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
     var stillExist = sortedPositions.length > displayedPositions.length;
-    console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
+    // console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
     result.dbPositions = pagingPositions;
     result.stillExist = stillExist;
     return result;
@@ -1012,7 +1012,7 @@ function constructPositionVOs(copPositions, cop, distance) {
     if(!_.isUndefined(distance) && _.isNumber(distance)){
         distanceStr = Math.floor(distance);
     }
-    console.log('distance str: ', distanceStr, 'company name: ', cop.companyName);
+    // console.log('distance str: ', distanceStr, 'company name: ', cop.companyName);
     var tempPositions = [];
     _.forEach(copPositions, function (posi) {
         let ageRangeStart = posi.ageRangeStart || '',
