@@ -320,7 +320,7 @@ class Positions extends React.Component{
                                 <Item extra={ele.phoneNumber}>联系电话</Item>
                                 <Item extra={ele.salary}>薪资</Item>
                                 <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
-                                <Item id='p_btn_grp' style={{ marginTop: '2em' , marginBotton: '1em'}}>
+                                <Item id='p_btn_grp' style={{ marginTop: '2em' , marginBottom: '1em'}}>
                                     <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即1元应聘</Button>
                                     <Button type="primary" size="small" inline onClick={this.showTipsForSharingToTimeLine.bind()}>转发给朋友</Button>
                                 </Item>
