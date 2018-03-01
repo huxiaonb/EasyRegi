@@ -296,6 +296,7 @@ class Positions extends React.Component{
     }
 
     render(){
+        
         let { geolocation, nearbyPositions, isLocationExist, locationFlag, noMoreP, sflag} = this.state;
 
             const list = nearbyPositions && nearbyPositions.length ? nearbyPositions.map((ele, idx) => {
@@ -319,8 +320,8 @@ class Positions extends React.Component{
                                 <Item extra={ele.phoneNumber}>联系电话</Item>
                                 <Item extra={ele.salary}>薪资</Item>
                                 <Item>岗位描述<Brief>{ele.positionDesc}</Brief></Item>
-                                <Item id='p_btn_grp' style={{ marginTop: '2em' }}>
-                                    <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即应聘</Button>
+                                <Item id='p_btn_grp' style={{ marginTop: '2em' , marginBottom: '1em'}}>
+                                    <Button type="primary" size="small" inline onClick={this.apply.bind(this,ele.companyId)}style={{ marginRight: '1em' }}>立即1元应聘</Button>
                                     <Button type="primary" size="small" inline onClick={this.showTipsForSharingToTimeLine.bind()}>转发给朋友</Button>
                                 </Item>
                             </List>
@@ -361,7 +362,10 @@ class Positions extends React.Component{
                     <div id='position' style={{ padding: 24, background: '#fff', minHeight: 360 ,textAlign:'left'}}>
                         <div className='curr-geo' style={{marginBottom:'15px'}}>
                             <span>当前位置：{addr.split(',').pop()}</span>
-                            <InputItem  placeholder='在这里搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
+                             <div style={{position:'relative'}}>
+                                 <span className='icon-container'><Icon type='search'/></span>
+                                 <InputItem  style={{paddingLeft : '40px'}}placeholder='在这里输入城市或职位进行搜索' maxLength={40} onChange={this.onSearch.bind(this)}/>
+                             </div>
                         </div>
 
 
@@ -375,7 +379,7 @@ class Positions extends React.Component{
                     </div>
                 </div>
                 <div className='ant-layout-footer' style={{ textAlign: 'center',fontSize: '34px' }}>
-                    Copyright ©2017 深圳云轻微创科技有限公司 粤ICP备12044479号
+                    Copyright ©2017 深圳云轻微创科技有限公司 <br/>粤ICP备12044479号
                 </div>
             </div>
         )
