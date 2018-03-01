@@ -84,10 +84,15 @@ exports.maintain = function(req, res) {
 exports.positions = function(req, res) {
   //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
   var openId = _.get(req, ['session', 'openId'], '');
-  //var developmentMode = _.get(req, ['query', 'dev'], '');
+  var developmentMode = _.get(req, ['query', 'dev'], '');
   if (_.isEmpty(openId)){
-    console.log('open is is empty');
-    res.json({ success: false, errmsg: '缺少open id' });
+    // console.log('open id is empty');
+    var originalUrl = _.get(req, ['originalUrl'], '');
+    var url = 'http://www.mfca.com.cn' + originalUrl;
+    // console.log('set signature for url: ', url);
+    var signatureObj = wechatUtil.getSignature(url);
+    // console.log('signature obj: ' + JSON.stringify(signatureObj));
+    res.render('server/weChat/views/positions', { openId: '', isComplete : 'false', signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
   }else{
     Applicant.find({
       wechatOpenId: openId
@@ -96,10 +101,12 @@ exports.positions = function(req, res) {
         res.status(500).send({ success: false, errmsg: '查找用户出错' });
       }else{
         var applicant = _.get(applicants, ['0'], {});
-        var url = 'http://www.mfca.com.cn/positions';
+        var originalUrl = _.get(req, ['originalUrl'], '');
+        var url = 'http://www.mfca.com.cn' + originalUrl;
+        // console.log('set signature for url: ', url);
         var signatureObj = wechatUtil.getSignature(url);
-        console.log('signature obj: ' + JSON.stringify(signatureObj));
-        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj)});
+        // console.log('signature obj: ' + JSON.stringify(signatureObj));
+        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
       }
     })
   }
@@ -990,11 +997,11 @@ function sortPositionsWithPagination(dbPositions, dbCompanies, locationInfo, off
         return b.distance - c.distance;
     });
     sortedPositions = _.concat(sortedPositions, unsortedPositions);
-    console.log('the number of positions before pagination:  ' + sortedPositions.length);
+    // console.log('the number of positions before pagination:  ' + sortedPositions.length);
     var pagingPositions = _.slice(sortedPositions, offset, offset + limit);
     var displayedPositions = _.slice(sortedPositions, 0, offset + limit);
     var stillExist = sortedPositions.length > displayedPositions.length;
-    console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
+    // console.log('the number of positions after pagination:  ' + (sortedPositions.length - displayedPositions.length));
     result.dbPositions = pagingPositions;
     result.stillExist = stillExist;
     return result;
@@ -1005,7 +1012,7 @@ function constructPositionVOs(copPositions, cop, distance) {
     if(!_.isUndefined(distance) && _.isNumber(distance)){
         distanceStr = Math.floor(distance);
     }
-    console.log('distance str: ', distanceStr, 'company name: ', cop.companyName);
+    // console.log('distance str: ', distanceStr, 'company name: ', cop.companyName);
     var tempPositions = [];
     _.forEach(copPositions, function (posi) {
         let ageRangeStart = posi.ageRangeStart || '',
@@ -1020,6 +1027,14 @@ function constructPositionVOs(copPositions, cop, distance) {
         if (!_.isEmpty(salaryStart) && !_.isEmpty(salaryEnd)) {
             salaryRange = salaryStart + '~' + salaryEnd;
         }
+        var luckyFlag = _.isUndefined(posi.luckyFlag) ? false : posi.luckyFlag,
+            redPackSendList = _.get(posi, ['redPackSendList'], []),
+            redPackCount = _.get(posi, ['redPackCount'], 0);
+        if(luckyFlag) {
+            if(redPackCount <= 0 || redPackSendList.length >= redPackCount) {
+                luckyFlag = false;
+            }
+        }
         let clonePosi = {
             name: posi.name,
             ageRange: ageRange,
@@ -1031,7 +1046,7 @@ function constructPositionVOs(copPositions, cop, distance) {
             _id: posi._id,
             companyId: posi.companyId,
             phoneNumber: posi.phoneNumber,
-            luckyFlag: _.isUndefined(posi.luckyFlag) ? false : posi.luckyFlag,
+            luckyFlag: luckyFlag,
             companyName: cop.companyName,
             alias: cop.alias,
             distance: distanceStr
@@ -1045,7 +1060,10 @@ function constructPositionVOs(copPositions, cop, distance) {
 }
 
 exports.testWechatApi = function(req, res){
-    var url = 'http://www.mfca.com.cn/testWechatApi';
+    console.log('path: ', req.path);
+    console.log('original url: ', req.originalUrl);
+    console.log('route: ', req.route);
+    var url = 'http://www.mfca.com.cn' + req.originalUrl;
     var signatureObj = wechatUtil.getSignature(url);
     console.log('signature obj: ' + JSON.stringify(signatureObj));
     res.render('server/weChat/views/wechatApiTest', {openId: 'wechat1234567', signatureObj: JSON.stringify(signatureObj)});

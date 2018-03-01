@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 
 import {Flex, Accordion, List, InputItem, Button, Icon, TextareaItem, Toast, Result, Tag} from 'antd-mobile';
+import { Link } from 'react-router';
 import lapi from './registerProfile/lapi'
 import './less/detail.less'
 
@@ -40,8 +41,8 @@ class Detail extends React.Component{
                 <Item extra={data.phoneNumber}>联系电话</Item>
             </List>
             <div className='btn-grp'>
-                <Button type='primary'>关注入职易查看更多职位</Button>
-                <Button className='grp-mg'  type='primary'>立即转发职位抢红包</Button>
+                    <a role="button" className="am-button am-button-primary"  href='https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAwODA1NDM5OQ==&scene=124#wechat_redirect'>关注入职易查看更多职位</a>
+                    
             </div>
         </div>)
     }
