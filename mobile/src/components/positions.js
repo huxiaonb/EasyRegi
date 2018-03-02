@@ -29,6 +29,7 @@ class Positions extends React.Component{
     async onSearch(kw){
         console.log(kw);
         if(kw===''){
+            this.setState({kw});
             this.load();
         }else{
             let info = this.state.geolocation;
