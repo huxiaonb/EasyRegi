@@ -100,7 +100,8 @@ export default class ApplicantManage extends React.Component{
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
         let applicantName = rec.name;
-        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName});
+        let openId = rec.wechatOpenId;
+        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送补充简历通知！');
@@ -113,7 +114,8 @@ export default class ApplicantManage extends React.Component{
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
         let applicantName = rec.name;
-        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName});
+        let openId = rec.wechatOpenId;
+        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送面试邀请！');

@@ -311,7 +311,7 @@ class Positions extends React.Component{
                                 </div>
                             </div>
                         } 
-                         key={`position_${ele._id}_${ele.name}`}
+                         key={`position_${ele._id}_${ele.name}_` +  Math.random().toString(36)}
                          >
                             <List>
                                 <Item extra={ele.companyName}>公司</Item>
