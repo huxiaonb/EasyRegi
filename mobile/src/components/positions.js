@@ -168,7 +168,9 @@ class Positions extends React.Component{
             });
         }else{
             Toast.info('请完善个人简历！');
+            Toast.hide();
         }
+        Toast.hide();
     }
     onPositionChange = (key) => {
         if(key !== undefined) {
