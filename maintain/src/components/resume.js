@@ -98,7 +98,7 @@ export default class ApplicantManage extends React.Component{
         e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
-        let companyName = this.context.comp.companyName;
+        let companyName = this.props.companyInfo._id;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
         let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
@@ -112,7 +112,7 @@ export default class ApplicantManage extends React.Component{
         e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
-        let companyName = this.context.comp.companyName;
+        let companyName = this.props.companyInfo._id;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
         let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});

@@ -9,6 +9,7 @@ import './less/detail.less'
 
 const Item = List.Item;
 const Brief = Item.Brief;
+const Tc = ['#f50','#2db7f5','#87d068','#108ee9']
 class Detail extends React.Component{
     state={
         data : null
@@ -25,7 +26,10 @@ class Detail extends React.Component{
         let {data} = this.state;
         const welfs = (data.welfares.map((w,idx)=>{
             return(
-                <Tag selected disabled>{w}</Tag>
+                <span>
+                    <Tag key={idx} style={{marginRight : 5,height : 60, 'line-height' : '60px', color:'#fff', fontSize:40, backgroundColor: Tc[idx%4]}}>{w}</Tag>
+                    {(!!idx && (idx+1)%4===0) && <div style={{marginBottom : 10}}/>}
+                </span>
             )
         }));
         return(

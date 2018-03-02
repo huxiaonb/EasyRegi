@@ -205,7 +205,6 @@ class PositionManage extends React.Component{
                     
                     let res = await api.updatePosition({companyId : this.context.comp._id, position:newP});
                     let data = await res.json();
-                    debugger;
                     if(data.success){
                         message.success('操作成功！');
                         this.searchPosi();
