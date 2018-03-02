@@ -27,16 +27,35 @@ exports.basicInfo = function(req, res) {
 exports.detailPosition = function(req, res) {
   var positionid = _.get(req, ['params', 'positionid'], '') ;
   //positionid = mongoose.Types.ObjectId.isValid(positionid);
-  logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
+  // logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
   Position.find({_id: positionid}).then(positions => {
             if(_.isEmpty(positions)){
               res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify({err : 'no data',id:positionid})});
             } else {
-              res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(_.get(positions, ['0']))});
+                var dbPosition = _.get(positions, ['0'], {});
+                var positionObj = {
+                    companyName: '',
+                    name: dbPosition.name,
+                    totalRecruiters: dbPosition.totalRecruiters,
+                    salaryStart: dbPosition.salaryStart,
+                    salaryEnd: dbPosition.salaryEnd,
+                    welfares: dbPosition.welfares,
+                    positionDesc: dbPosition.positionDesc,
+                    contactPerson: dbPosition.contactPerson,
+                    phoneNumber: dbPosition.phoneNumber
+                };
+                var companyId = _.get(dbPosition, ['companyId'], '');
+                Company.findOne({_id: companyId}).then(dbCompany => {
+                    positionObj.companyName = _.get(dbCompany, ['companyName'], '');
+                    res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(positionObj)});
+                }).catch(e => {
+                    logger.info('Error in finding company', e);
+                    res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(positionObj)});
+                });
             }
         }).catch(e => {
-            console.log(e);
-            logger.info('Error in finding postions');
+            logger.info('Error in finding postions', e);
+            res.json({success: false, errMsg: '找不到这个职位'});
         });
 }
 
@@ -83,33 +102,40 @@ exports.maintain = function(req, res) {
 
 exports.positions = function(req, res) {
   //req.session.openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-  var openId = _.get(req, ['session', 'openId'], '');
-  var developmentMode = _.get(req, ['query', 'dev'], '');
-  if (_.isEmpty(openId)){
-    // console.log('open id is empty');
+    var openId = _.get(req, ['session', 'openId'], '');
+    var developmentMode = _.get(req, ['query', 'dev'], '');
     var originalUrl = _.get(req, ['originalUrl'], '');
     var url = 'http://www.mfca.com.cn' + originalUrl;
-    // console.log('set signature for url: ', url);
     var signatureObj = wechatUtil.getSignature(url);
-    // console.log('signature obj: ' + JSON.stringify(signatureObj));
-    res.render('server/weChat/views/positions', { openId: '', isComplete : 'false', signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
-  }else{
-    Applicant.find({
-      wechatOpenId: openId
-    }).then(applicants=>{
-      if (_.isEmpty(applicants)) {
-        res.status(500).send({ success: false, errmsg: '查找用户出错' });
-      }else{
-        var applicant = _.get(applicants, ['0'], {});
-        var originalUrl = _.get(req, ['originalUrl'], '');
-        var url = 'http://www.mfca.com.cn' + originalUrl;
-        // console.log('set signature for url: ', url);
-        var signatureObj = wechatUtil.getSignature(url);
-        // console.log('signature obj: ' + JSON.stringify(signatureObj));
-        res.render('server/weChat/views/positions', { openId: openId, isComplete : applicant.isComplete, signatureObj: JSON.stringify(signatureObj), developmentMode: developmentMode});
-      }
-    })
-  }
+    if (_.isEmpty(openId)) {
+        res.render('server/weChat/views/positions', {
+            openId: '',
+            isComplete: 'false',
+            signatureObj: JSON.stringify(signatureObj),
+            developmentMode: developmentMode
+        });
+    } else {
+        Applicant.find({
+            wechatOpenId: openId
+        }).then(applicants => {
+            if (_.isEmpty(applicants)) {
+                res.render('server/weChat/views/positions', {
+                    openId: openId,
+                    isComplete: 'false',
+                    signatureObj: JSON.stringify(signatureObj),
+                    developmentMode: developmentMode
+                });
+            } else {
+                var applicant = _.get(applicants, ['0'], {});
+                res.render('server/weChat/views/positions', {
+                    openId: openId,
+                    isComplete: applicant.isComplete,
+                    signatureObj: JSON.stringify(signatureObj),
+                    developmentMode: developmentMode
+                });
+            }
+        })
+    }
 }
 
 exports.checkIfNeedPay = function(req, res){
