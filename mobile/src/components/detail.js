@@ -31,7 +31,7 @@ class Detail extends React.Component{
         return(
         <div>
             <List>
-                <Item extra={data.companyId}>公司名称</Item>
+                <Item extra={data.companyName} wrap>公司名称</Item>
                 <Item extra={data.name}>招聘职位</Item>
                 <Item extra={data.totalRecruiters}>招聘人数</Item>
                 <Item extra={data.salaryStart + '~' + data.salaryEnd}>薪资待遇</Item>

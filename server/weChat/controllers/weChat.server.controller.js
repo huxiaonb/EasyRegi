@@ -27,16 +27,35 @@ exports.basicInfo = function(req, res) {
 exports.detailPosition = function(req, res) {
   var positionid = _.get(req, ['params', 'positionid'], '') ;
   //positionid = mongoose.Types.ObjectId.isValid(positionid);
-  logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
+  // logger.info('render position detail info page with open id', _.get(req, ['session', 'openId'], ''));
   Position.find({_id: positionid}).then(positions => {
             if(_.isEmpty(positions)){
               res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify({err : 'no data',id:positionid})});
             } else {
-              res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(_.get(positions, ['0']))});
+                var dbPosition = _.get(positions, ['0'], {});
+                var positionObj = {
+                    companyName: '',
+                    name: dbPosition.name,
+                    totalRecruiters: dbPosition.totalRecruiters,
+                    salaryStart: dbPosition.salaryStart,
+                    salaryEnd: dbPosition.salaryEnd,
+                    welfares: dbPosition.welfares,
+                    positionDesc: dbPosition.positionDesc,
+                    contactPerson: dbPosition.contactPerson,
+                    phoneNumber: dbPosition.phoneNumber
+                };
+                var companyId = _.get(dbPosition, ['companyId'], '');
+                Company.findOne({_id: companyId}).then(dbCompany => {
+                    positionObj.companyName = _.get(dbCompany, ['companyName'], '');
+                    res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(positionObj)});
+                }).catch(e => {
+                    logger.info('Error in finding company', e);
+                    res.render('server/weChat/views/detail', {openId: _.get(req, ['session', 'openId'], ''), postion : JSON.stringify(positionObj)});
+                });
             }
         }).catch(e => {
-            console.log(e);
-            logger.info('Error in finding postions');
+            logger.info('Error in finding postions', e);
+            res.json({success: false, errMsg: '找不到这个职位'});
         });
 }
 
