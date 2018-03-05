@@ -231,7 +231,7 @@ class Positions extends React.Component{
 
         wx.ready(function(){
             var title = '【入职易】查看周边招聘信息，好工作等着你！',
-                link = 'http://www.mfca.com.cn',
+                link = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAwODA1NDM5OQ==&scene=124#wechat_redirect',
                 imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg',
                 desc = '分享包含红包的职位到朋友圈，可以获得奖励';
             self.shareToTimeLine(title, link, imgUrl);
