@@ -98,7 +98,7 @@ export default class ApplicantManage extends React.Component{
         e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
-        let companyName = this.props.companyInfo._id;
+        let companyName = this.props.companyInfo.companyName;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
         let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
@@ -112,10 +112,10 @@ export default class ApplicantManage extends React.Component{
         e.target.setAttribute('disabled','disabled');
         e.stopPropagation();
         let {results} = this.state;
-        let companyName = this.props.companyInfo._id;
+        let companyName = this.props.companyInfo.companyName;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
-        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendInterviewMessage({companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送面试邀请！');
