@@ -43,13 +43,14 @@ export default class ApplicantManage extends React.Component{
     async invite(rec, e){
         //需控制频率
         e.stopPropagation();
-        let companyName = this.context.comp.companyName;
-        let applicantName = rec.name;
+        //let applicantName = rec.name;
+        let companyId = this.props.companyInfo._id;
+        let positionIds =  rec.appliedPositionSchema.filter(a=>a.companyId != companyId );
         let openId = rec.wechatOpenId;
-        let r = await api.sendResumeFeedbackMessage({companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendResumeFeedbackMessage(positionIds && positionIds.length ? {positionId:positionIds[0], openId : openId}:{openId : openId});
         let res = await r.json();
         if(res.success){
-            message.success('已发送面试邀请！');
+            message.success('已发送入职邀请！');
         }
     }
     onSearch(){
