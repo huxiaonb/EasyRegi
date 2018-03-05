@@ -44,9 +44,10 @@ export default class ApplicantManage extends React.Component{
         //需控制频率
         e.stopPropagation();
         let companyName = this.context.comp.companyName;
+        let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
-        let r = await api.sendResumeFeedbackMessage({companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendResumeFeedbackMessage({companyId:companyId, companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送面试邀请！');
@@ -128,7 +129,7 @@ export default class ApplicantManage extends React.Component{
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>录用</a>
+                    {!record.feedbackNotificationList.includes(this.props.companyInfo._id) && <a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请面试</a>}{record.feedbackNotificationList.includes(this.props.companyInfo._id) && <span>已发出面试邀请</span>}
 				</span>
 			)
         }];

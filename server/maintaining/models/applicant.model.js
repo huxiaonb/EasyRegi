@@ -120,7 +120,10 @@ var applicantSchema = new Schema({
     emergencyContactPhoneNumber: String,
     emergencyContactAddress: String,
     emergencycontactrelation : String,
-    threeCategoryRelations: [threeCategorySchema]
+    threeCategoryRelations: [threeCategorySchema],
+    completeResumeInvitationList: [String],
+    interviewInvitationList: [String],
+    feedbackNotificationList: [String]
 },{
     collection: 'applicants',
     timestamps: true

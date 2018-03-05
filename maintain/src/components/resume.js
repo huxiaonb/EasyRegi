@@ -99,9 +99,10 @@ export default class ApplicantManage extends React.Component{
         e.stopPropagation();
         let {results} = this.state;
         let companyName = this.context.comp.companyName;
+        let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
-        let r = await api.sendResumeHasBeenCheckedMessage({companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendResumeHasBeenCheckedMessage({companyId: companyId, companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送补充简历通知！');
@@ -174,7 +175,7 @@ export default class ApplicantManage extends React.Component{
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					{!record.isComplete&& <a className=''  href="javascript:;" onClick={this.toCopmleteDetail.bind(this,record)}>完善简历</a>}&nbsp;{!!record.isComplete && <a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>}
+                    {!record.isComplete && !record.completeResumeInvitationList.includes(this.props.companyInfo._id) && <a className=''  href="javascript:;" onClick={this.toCopmleteDetail.bind(this,record)}>完善简历</a>}{!record.isComplete && record.completeResumeInvitationList.includes(this.props.companyInfo._id) && <span>已邀请完善简历</span>}{!!record.isComplete && !record.interviewInvitationList.includes(this.props.companyInfo._id) && <a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请入职</a>}{!!record.isComplete && record.interviewInvitationList.includes(this.props.companyInfo._id) && <span>已发出入职邀请</span>}
 				</span>
 			)
         }];
