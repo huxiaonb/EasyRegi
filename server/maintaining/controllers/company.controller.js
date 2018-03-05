@@ -46,7 +46,7 @@ function updateCompBlance(companyId, fee, callback) {
         if (!_.isEmpty(companies)) {
             var company = _.get(companies, ['0'], {});
             
-            var balance = parseInt(company.balance) + parseInt(fee);
+            var balance = parseInt(company.balance? company.balance : 0) + parseInt(fee);
             if (parseInt(balance)<0){
                 console.log('12313 %s', balance);
                 return callback(false)

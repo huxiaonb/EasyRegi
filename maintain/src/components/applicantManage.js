@@ -46,11 +46,14 @@ export default class ApplicantManage extends React.Component{
         let companyName = this.context.comp.companyName;
         let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
+        //let applicantName = rec.name;
+        let positionIds =  rec.appliedPositionSchema.filter(a=>a.companyId != companyId );
         let openId = rec.wechatOpenId;
         let r = await api.sendResumeFeedbackMessage({companyId:companyId, companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendResumeFeedbackMessage(positionIds && positionIds.length ? {positionId:positionIds[0], openId : openId, companyId:companyId}:{openId : openId, companyId: companyId});
         let res = await r.json();
         if(res.success){
-            message.success('已发送面试邀请！');
+            message.success('已发送入职邀请！');
         }
     }
     onSearch(){

@@ -501,8 +501,8 @@ function constructEmergencyContactSheet(app, conf){
 }
 
 function sendResumeFeedbackMessage(req, res){
-    var openId = !_.isEmpty(_.get(req, ['query', 'openId'], '')) ? _.get(req, ['query', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-    var positionId = !_.isEmpty(_.get(req, ['query', 'positionId'], '')) ? _.get(req, ['query', 'positionId'], '') : "59ede2e6c969da2b48238fe6"
+    var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+    var positionId = !_.isEmpty(_.get(req, ['body', 'positionId'], '')) ? _.get(req, ['body', 'positionId'], '') : "59ede2e6c969da2b48238fe6"
     var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : ""
     console.log(openId, positionId);
     var findApplicantInfoTask = [];

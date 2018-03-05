@@ -172,6 +172,10 @@ class PositionManage extends React.Component{
              if (!!err){
                 return;
              }
+             if(form.getFieldValue('luckyflag') === '1' && (!form.getFieldValue('red_sum') || !form.getFieldValue('red_count'))){
+                 message.error('请设置红包金额和数量');
+                 return;
+             }
              this.setState({
                 loading : true,
             });
@@ -201,7 +205,6 @@ class PositionManage extends React.Component{
                     
                     let res = await api.updatePosition({companyId : this.context.comp._id, position:newP});
                     let data = await res.json();
-                    debugger;
                     if(data.success){
                         message.success('操作成功！');
                         this.searchPosi();
@@ -580,7 +583,7 @@ class PositionManage extends React.Component{
                         <FormItem name='luckyflag' label='红包职位' labelCol={{ span: 5 }}
                             wrapperCol={{ span: 16, offset: 1 }}>
                             {getFieldDecorator('luckyflag', {
-                                initialValue : '1'
+                                initialValue : '0'
                             })(
                                 <RadioGroup style={{ marginBottom: 15 }}  onChange={this.changePacket.bind(this)}>
                                 <Radio value="1">是</Radio>
