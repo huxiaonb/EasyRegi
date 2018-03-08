@@ -15,9 +15,10 @@ class Detail extends React.Component{
         data : null
     }
     async componentWillMount(){
+        // Toast.info('请上传身份证正反面照片！',0);
         let data = this.props.args;
         if(data.err){
-            Toast.error('职位不存在！')
+            Toast.fail('职位不存在！')
         }else{
             this.setState({data : data})
         }
@@ -39,8 +40,8 @@ class Detail extends React.Component{
                 <Item extra={data.name}>招聘职位</Item>
                 <Item extra={data.totalRecruiters}>招聘人数</Item>
                 <Item extra={data.salaryStart + '~' + data.salaryEnd}>薪资待遇</Item>
-                <Item>相关福利<Brief>{welfs}</Brief></Item>
-                <Item>岗位描述<Brief><p>{data.positionDesc}</p></Brief></Item>
+                <Item>相关福利<Brief style={{marginBottom : 10}}>{welfs}</Brief></Item>
+                <Item wrap>岗位描述<Brief><p style={{'white-space' : 'pre-wrap'}}>{data.positionDesc}</p></Brief></Item>
                 <Item extra={data.contactPerson}>联系人</Item>
                 <Item extra={data.phoneNumber}>联系电话</Item>
             </List>
