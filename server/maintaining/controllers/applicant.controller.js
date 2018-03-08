@@ -503,6 +503,7 @@ function constructEmergencyContactSheet(app, conf){
 function sendResumeFeedbackMessage(req, res){
     var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var positionId = !_.isEmpty(_.get(req, ['body', 'positionId'], '')) ? _.get(req, ['body', 'positionId'], '') : "59ede2e6c969da2b48238fe6"
+    var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : ""
     console.log(openId, positionId);
     var findApplicantInfoTask = [];
     findApplicantInfoTask.push(startSearchApplicantInfoTask(openId, positionId));
@@ -561,6 +562,7 @@ function sendResumeHasBeenCheckedMessage(req, res){
     var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
     var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+    var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : '小米科技';
     var now = moment().format('YYYY-MM-DD');
     var welcomeMessage = '尊敬的' + applicantName + '，很荣幸地通知您，有企业关注到您的简历';
     var remark = companyName + '请您补充【详细个人简历】，以便为您安排合适的职位';
@@ -593,8 +595,32 @@ function sendResumeHasBeenCheckedMessage(req, res){
             res.status(500).send({success: false, errmsg: '发送消息失败'});
         } else {
             logger.info('call send template message api with feedback: ', returnedBody);
-            res.json({success: true});
+            addCompanyIdIntoMessageSentList(openId, 'completeResumeInvitationList', companyId, function(updateErr){
+                res.json({success: true});
+            });
         }
+    });
+}
+
+function addCompanyIdIntoMessageSentList(openId, messageSentListType, companyId, callback){
+    Applicant.findOne({wechatOpenId: openId}, function(error, dbApplicant){
+       if(error || _.isEmpty(dbApplicant)){
+           logger.error('Error in find applicant when add company id into message sent list', error);
+           return callback(null, null);
+       } else {
+           var messageSentList = _.get(dbApplicant, [messageSentListType], []);
+           if(_.indexOf(messageSentList, companyId) < 0){
+               messageSentList.push(companyId);
+               Applicant.update({wechatOpenId: openId}, {$set: {messageSentListType: messageSentList}}, {upsert: false})
+                   .exec(function (updateError, result) {
+                       if(updateError) logger.error('Error in update message list', updateError);
+                       return callback(null, null);
+                   });
+           } else {
+               logger.info('company %s already sent message to user %s', companyId, openId);
+               return callback(null, null);
+           }
+       }
     });
 }
 
