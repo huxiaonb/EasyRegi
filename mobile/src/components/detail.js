@@ -15,9 +15,10 @@ class Detail extends React.Component{
         data : null
     }
     async componentWillMount(){
+        // Toast.info('请上传身份证正反面照片！',0);
         let data = this.props.args;
         if(data.err){
-            Toast.error('职位不存在！')
+            Toast.fail('职位不存在！')
         }else{
             this.setState({data : data})
         }

@@ -162,7 +162,7 @@ class Positions extends React.Component{
                         stitle: type==='sum'? '提交成功' : '支付成功'
                     })
                 } else {
-                    Toast.error('error');
+                    Toast.fail('error');
                     Toast.hide();
                 }
             });
@@ -288,7 +288,7 @@ class Positions extends React.Component{
         if(r && r.success){
             Toast.info('发送红包成功');
         } else {
-            Toast.error('发送红包失败');
+            Toast.fail('发送红包失败');
             Toast.hide();
         }
     }
