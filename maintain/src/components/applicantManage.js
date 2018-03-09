@@ -43,11 +43,12 @@ export default class ApplicantManage extends React.Component{
     async invite(rec, e){
         //需控制频率
         e.stopPropagation();
+        e.target.setAttribute('disabled','disabled');
         let companyName = this.context.comp.companyName;
         let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
         //let applicantName = rec.name;
-        let positionIds =  rec.appliedPositionSchema.filter(a=>a.companyId != companyId );
+        let positionIds =  rec.appliedPositionSchema.filter(a=>a.companyId === companyId );
         let openId = rec.wechatOpenId;
         
         let r = await api.sendResumeFeedbackMessage(positionIds && positionIds.length ? {positionId:positionIds[0], openId : openId, companyId:companyId}:{openId : openId, companyId: companyId});
