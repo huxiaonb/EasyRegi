@@ -43,6 +43,7 @@ export default class ApplicantManage extends React.Component{
     async invite(rec, e){
         //需控制频率
         e.stopPropagation();
+        e.target.setAttribute('disabled','disabled');
         let companyName = this.context.comp.companyName;
         let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
