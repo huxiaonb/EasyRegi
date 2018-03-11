@@ -123,7 +123,7 @@ class Index extends React.Component {
           <Layout style={{position:'relative'}}>
             <Menu mode="horizontal">
               <SubMenu className='user-right' title={<span className='user-right'><Icon type="user" />{companyInfo.alias}</span>}>
-                <Menu.Item key="setting:1" onClick={this.logout.bind(this)}>退出</Menu.Item>
+                  <Menu.Item key="setting:1"><span onClick={this.logout.bind(this)}>退出</span></Menu.Item>
                 <Menu.Item key="setting:2"><Link to='/charge'>充值</Link></Menu.Item>
                   <Menu.Item key="setting:3"><Link style={{ marginLeft: 0}} to='/charge'>余额：{companyInfo.balance}元</Link></Menu.Item>
               </SubMenu>
