@@ -33,14 +33,14 @@ export async function wepay(data, callback){
                                 
                             } else {
                                 return callback(false);
-                                Toast.error('error');
+                                Toast.fail('error');
                             } 
                         }
                     );
                 }
             } else {
                 Toast.hide();
-                Toast.error('error');
+                Toast.fail('error');
             }
         } else {
             let sr = await lapi.submitSelectComp(data);
@@ -50,7 +50,7 @@ export async function wepay(data, callback){
                 return callback(true, 'sum');
             }else{
                 Toast.hide();
-                Toast.error('error');
+                Toast.fail('error');
                 return callback(false);
             }
             
@@ -58,7 +58,7 @@ export async function wepay(data, callback){
         }
     } else {
         Toast.hide();
-        Toast.error('error');
+        Toast.fail('error');
     }
     
 }

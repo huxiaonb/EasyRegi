@@ -35,7 +35,7 @@ class Company extends React.Component{
   
     async subm(){
         let that = this;
-        Toast.loading('Loading...', 0);
+        Toast.loading('Loading...');
         let data = {
             openId: openId,
             selectCompanyId: this.state.selectCompId

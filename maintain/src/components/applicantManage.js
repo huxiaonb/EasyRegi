@@ -43,12 +43,18 @@ export default class ApplicantManage extends React.Component{
     async invite(rec, e){
         //需控制频率
         e.stopPropagation();
+        e.target.setAttribute('disabled','disabled');
         let companyName = this.context.comp.companyName;
+        let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
-        let r = await api.sendResumeFeedbackMessage({companyName:companyName, applicantName : applicantName});
+        //let applicantName = rec.name;
+        let positionIds =  rec.appliedPositionSchema.filter(a=>a.companyId === companyId );
+        let openId = rec.wechatOpenId;
+        
+        let r = await api.sendResumeFeedbackMessage(positionIds && positionIds.length ? {positionId:positionIds[0], openId : openId, companyId:companyId}:{openId : openId, companyId: companyId});
         let res = await r.json();
         if(res.success){
-            message.success('已发送面试邀请！');
+            message.success('已发送入职邀请！');
         }
     }
     onSearch(){
@@ -127,7 +133,7 @@ export default class ApplicantManage extends React.Component{
             className: 'log-result-noWrap',
             render: (text, record) => (
 				<span>
-					<a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>录用</a>
+                    {!record.feedbackNotificationList.includes(this.props.companyInfo._id) && <a className='' href="javascript:;" onClick={this.invite.bind(this,record)}>邀请面试</a>}{record.feedbackNotificationList.includes(this.props.companyInfo._id) && <span>已发出面试邀请</span>}
 				</span>
 			)
         }];

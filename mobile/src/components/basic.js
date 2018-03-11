@@ -44,7 +44,7 @@ class Basic extends React.Component{
                     flag : true
                 })
             }else{
-                Toast.err('api error!')
+                Toast.fail('api error!')
             }
         }
 

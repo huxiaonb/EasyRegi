@@ -162,13 +162,15 @@ class Positions extends React.Component{
                         stitle: type==='sum'? '提交成功' : '支付成功'
                     })
                 } else {
-                    Toast.error('error');
+                    Toast.fail('error');
                     Toast.hide();
                 }
             });
         }else{
             Toast.info('请完善个人简历！');
+            Toast.hide();
         }
+        Toast.hide();
     }
     onPositionChange = (key) => {
         if(key !== undefined) {
@@ -229,7 +231,7 @@ class Positions extends React.Component{
 
         wx.ready(function(){
             var title = '【入职易】查看周边招聘信息，好工作等着你！',
-                link = 'http://www.mfca.com.cn',
+                link = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAwODA1NDM5OQ==&scene=124#wechat_redirect',
                 imgUrl = 'http://www.mfca.com.cn/img/easyRegisterLogo.jpg',
                 desc = '分享包含红包的职位到朋友圈，可以获得奖励';
             self.shareToTimeLine(title, link, imgUrl);
@@ -286,7 +288,7 @@ class Positions extends React.Component{
         if(r && r.success){
             Toast.info('发送红包成功');
         } else {
-            Toast.error('发送红包失败');
+            Toast.fail('发送红包失败');
             Toast.hide();
         }
     }
@@ -311,7 +313,7 @@ class Positions extends React.Component{
                                 </div>
                             </div>
                         } 
-                         key={`position_${ele._id}_${ele.name}`}
+                         key={`position_${ele._id}_${ele.name}_`}
                          >
                             <List>
                                 <Item extra={ele.companyName}>公司</Item>
