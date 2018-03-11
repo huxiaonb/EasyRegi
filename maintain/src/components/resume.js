@@ -155,6 +155,7 @@ export default class ApplicantManage extends React.Component{
             dataIndex: 'birthDate',
             key: 'birthDate',
             className: 'log-result-noWrap',
+            render: text => (<span>{text.slice(0, 10)}</span>)
         }, {
             title: '电话',
             dataIndex: 'mobile',
