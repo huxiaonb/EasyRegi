@@ -28,9 +28,17 @@ const step_data=[{
     ]
 class Basic extends React.Component{
     state={
-        step : 1,
+        step : 3,
         flag : false,
-        basic : {}
+        basic : {},
+        info : {
+            name : '',
+            mobile : '',
+            idCardNumber : '',
+            currentAddress : '',
+            degree :'',
+            skill : [],
+        }
     }
 
     async updateBasicInfo(){
@@ -48,6 +56,16 @@ class Basic extends React.Component{
             }
         }
 
+    }
+    async componentWillMount(){
+        let openId = 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
+        let r = await lapi.getApplicant(openId);
+        console.log('rrrr',r);
+        if(r && r.length){
+            this.setState({
+                info : r[0]
+            })
+        }
     }
     
     nextStep(n,data){
@@ -78,7 +96,7 @@ class Basic extends React.Component{
     }
     
     render(){
-        let {step, flag} = this.state;
+        let {step, flag, info} = this.state;
         if(flag){
             return(
                 <div className="result-example">
@@ -93,9 +111,9 @@ class Basic extends React.Component{
             <div>
                 <Steps style={{ 'marginBottom': '2rem',display:'flex'}} items={step_data}></Steps>
             <div>
-                {step===1 && <Step1 nextStep={::this.nextStep} />}
-                {step===2 && <Step2 nextStep={::this.nextStep} />}
-                {step===3 && <Step3 nextStep={::this.nextStep} />}
+                {step===1 && <Step1 info={info} nextStep={::this.nextStep} />}
+                {step===2 && <Step2 info={info} nextStep={::this.nextStep} />}
+                {step===3 && <Step3 info={info} nextStep={::this.nextStep} />}
             </div>
             </div>
         );
