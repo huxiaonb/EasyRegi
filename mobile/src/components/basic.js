@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import lapi from './registerProfile/lapi'
 import './less/basic.less'
 import BasicForm from './basicform';
-import BasicView from './basicview';
+import BasicView from './basicView';
 import {Toast} from 'antd-mobile';
 
 const openId = $('#openId').text();
