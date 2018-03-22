@@ -30,7 +30,7 @@ export default class BasicView extends React.Component{
             })
         }
         return(
-            <div style={{margin : '20px 20px', background : '#fff',position :'fixed', height : '100%'}}>
+            <div style={{margin : '20px 20px', background : '#fff',position :'fixed', height : '100%',width:'100%'}}>
                 <h2 className='basic-h2'>微简历预览</h2>
                 <div style={{margin : '60px 30px'}}>
                 <div className='ant-row ant-form-item item-padd'>
@@ -41,6 +41,14 @@ export default class BasicView extends React.Component{
                         <span>{info.name}</span>
                     </div>
                 </div>
+                    <div className='ant-row ant-form-item item-padd'>
+                        <div className='ant-col-8 ant-form-item-label'>
+                            <label className='am-input-label'>电话</label>
+                        </div>
+                        <div className='ant-col-14 ant-form-item-control-wrapper'>
+                            <span>{info.mobile}</span>
+                        </div>
+                    </div>
                 <div className='ant-row ant-form-item item-padd'>
                     <div className='ant-col-8 ant-form-item-label'>
                         <label>身份证号</label>
