@@ -24,7 +24,7 @@ export default class BasicView extends React.Component{
     render(){
         let {info, onEdit} = this.props;
         let tagOptions = [];
-        if(info.skill.length){
+        if(info.skill && info.skill.length){
             info.skill.map(s=>{
                 tagOptions.push(tagContet[s] + ',');
             })
