@@ -49,7 +49,8 @@ export default class BasicForm extends React.Component{
             if(re.success){
                 this.setState({
                     flag : true
-                })
+                });
+                Toast.hide();
             }else{
                 Toast.fail('api error!')
             }

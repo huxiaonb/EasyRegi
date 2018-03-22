@@ -17,8 +17,8 @@ class Step1 extends React.Component{
         let code = form.getFieldValue('code');
         let mobile = form.getFieldValue('mobile');
         let name = form.getFieldValue('name');
+        //this.props.nextStep(1, { name, mobile });
         const reg = new RegExp("^[0-9]{4,6}$")
-        this.props.nextStep();
         if(reg.test(code)){
             let re = await lapi.verifyCaptcha(code);
             if(re.success){

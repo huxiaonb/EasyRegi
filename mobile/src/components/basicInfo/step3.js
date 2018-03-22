@@ -14,7 +14,7 @@ const tagStyle = {
 const tagContet = ['无经验', '电子五金', '模具塑胶', '纺织玩具', '文员行政', '后勤维修', '印刷宣传', '运输装卸', '销售客服', '建筑装潢','财务出纳', '采购跟单'];
 class Step3 extends React.Component{
     state={
-        skill : ['无经验']
+        skill : [0]
     }
     next(){
         let { form } = this.props;
@@ -33,14 +33,19 @@ class Step3 extends React.Component{
         let {skill} = this.state;
         if(e){
             this.setState({
-                skill : [...skill, tagContet[count]]
+                skill : [...skill, count]
             })
         }else{
-            let s = skill.filter(s=>s!=tagContet[count]);
+            let s = skill.filter(s=>s!=count);
             this.setState({
                 skill:s
             })
         }
+    }
+    componentWillMount(){
+        this.setState({
+            skill : this.props.info.skill
+        })
     }
     render(){
         // console.log(this.state.skill);

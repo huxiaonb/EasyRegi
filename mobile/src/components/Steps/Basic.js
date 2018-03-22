@@ -23,7 +23,7 @@ export default class Basic extends React.Component {
             return (
                 <div key={idx} className='item' style={{ background: item.activeItem ? '#108ee9' : '#ddd', 'border-radius' : '2em' }}>
                     <span className='number' style={{ color: item.activeItem ? '#fff' : 'initial'}}>{idx + 1}</span>
-                    <Arrow width={34} height={60} />
+                    <Arrow width={30} height={60} />
                     <span className='text' style={{ color: item.activeItem ? '#fff' : 'initial' }}>{item.text}</span>
                 </div>
             );
