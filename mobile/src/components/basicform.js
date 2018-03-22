@@ -97,7 +97,7 @@ export default class BasicForm extends React.Component{
     
     render(){
         let {step, flag} = this.state;
-        let {info} = this.props;
+        let info = !!this.props.info? this.props.info : this.state.info;
         if(flag){
             return(
                 <div className="result-example">
@@ -109,7 +109,7 @@ export default class BasicForm extends React.Component{
             )
         }
         return(
-            <div style={{position:'fixed', height:'100%', background:'#fff'}}>
+            <div style={{position:'fixed', height:'100%', background:'#fff',width : '100%'}}>
                 <Steps style={{ 'marginBottom': '2rem',display:'flex'}} items={step_data}></Steps>
             <div>
                 {step===1 && <Step1 info={info} nextStep={::this.nextStep} />}
