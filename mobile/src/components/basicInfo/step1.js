@@ -73,6 +73,7 @@ class Step1 extends React.Component{
     }
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
+        let {info} = this.props;
         let {disable,verCode} = this.state;
         const bt = (<Button type="primary" disabled = {disable} onClick={this.getVerCode.bind(this)}>{verCode}</Button>)
         return(
@@ -86,7 +87,7 @@ class Step1 extends React.Component{
                                 type:'string', pattern:/^[\u4e00-\u9fa5]{1,5}$/, message:'请输入有效的姓名！'
                             },{
                                 required:true, message:'请输入有效的姓名！'
-                            }]
+                            }],initialValue : info.name
                         })}
                         clear
                         error={!!getFieldError('name')}
@@ -105,7 +106,7 @@ class Step1 extends React.Component{
                                         required : true, pattern: /^[0-9]{11,13}$/,  message: '请输入有效的手机号码！'
                                     }, {
                                         whitespace: true,  message: '请输入有效的手机号码！'
-                                    }],
+                                    }],initialValue : info.mobile
                                 })}
                                 clear
                                 error={!!getFieldError('mobile')}

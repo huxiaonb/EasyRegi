@@ -38,7 +38,8 @@ class Step3 extends React.Component{
         }
     }
     render(){
-        console.log(this.state.skill);
+        // console.log(this.state.skill);
+        let {info} = this.props;
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
         return(
             <form key='step3' style={{}}>
@@ -49,9 +50,9 @@ class Step3 extends React.Component{
                             {...getFieldProps('degree', {
                             rules:[{
                                 required:true, message:'请选择最高学历！'
-                            }],
+                            }],initialValue:[info.highestDegree]
                             })}
-                            data={[{label:'小学',value:'小学'},{label:'初中',value:'初中'},{label:'高中',value:'高中'},{label:'大专',value:'大专'},{label:'本科',value:'本科'},{label:'硕士',value:'硕士'},{label:'博士',value:'博士'}]}
+                            data={[{ label: '小学', value: '小学' }, { label:'初中',value:'初中'},{label:'高中',value:'高中'},{label:'大专',value:'大专'},{label:'本科',value:'本科'},{label:'硕士',value:'硕士'},{label:'博士',value:'博士'}]}
                             >
                             <List.Item arrow="horizontal" name="degree" style={{padding : 0}}>最高学历</List.Item>
                         </Picker>
@@ -60,7 +61,7 @@ class Step3 extends React.Component{
                     <InputItem
                         name="currentAddress"
                         {...getFieldProps('currentAddress', {
-                            rules:[{required : true,type:'string',message : '请输入有效的现住址！'}],
+                            rules:[{required : true,type:'string',message : '请输入有效的现住址！'}],initialValue:info.currentAddress
                         })}
                         clear
                         error={!!getFieldError('currentAddress')}

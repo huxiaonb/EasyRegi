@@ -70,6 +70,7 @@ class Step2 extends React.Component{
     }
     render(){
         const {getFieldDecorator,getFieldProps, getFieldError } = this.props.form;
+        let {info} = this.props;
         return(
             <form key='step2' style={{}}>
                 <List >
@@ -81,7 +82,7 @@ class Step2 extends React.Component{
                                     required : true, pattern:/^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/,  message: '请输入有效的身份证号码！'
                                 }, {
                                     whitespace: true,  message: '请输入有效的身份证号码！'
-                                }],
+                                }],initialValue : info.idCardNumber
                             })}
                             clear
                             error={!!getFieldError('idCardNumber')}
