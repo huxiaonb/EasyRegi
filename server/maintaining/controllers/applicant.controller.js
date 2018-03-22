@@ -502,8 +502,8 @@ function constructEmergencyContactSheet(app, conf){
 
 function sendResumeFeedbackMessage(req, res){
     var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
-    var positionId = !_.isEmpty(_.get(req, ['body', 'positionId'], '')) ? _.get(req, ['body', 'positionId'], '') : "59ede2e6c969da2b48238fe6"
-    var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : ""
+    var positionId = !_.isEmpty(_.get(req, ['body', 'positionId'], '')) ? _.get(req, ['body', 'positionId'], '') : "59ede2e6c969da2b48238fe6";
+    var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : "小米科技";
     console.log(openId, positionId);
     var findApplicantInfoTask = [];
     findApplicantInfoTask.push(startSearchApplicantInfoTask(openId, positionId));
@@ -518,6 +518,7 @@ function sendResumeFeedbackMessage(req, res){
             var remark = '邀请您面试并办理入职手续，请尽快带齐您的相关证件前往办理，联系人：' + _.get(result, ['dbPosition', 'contactPerson'], '') + '，联系电话：' + _.get(result, ['dbPosition', 'phoneNumber'], '');
             var companyId = _.get(result, ['dbPosition', 'companyId'], '');
             var registeredCompany = _.find(_.get(result, ['dbApplicant', 'registeredCompanies'], {}), {'companyId': companyId});
+            var registeredDate = moment(_.get(registeredCompany, ['registerDate'], '')).format('YYYY-MM-DD');
             var templateMessageOpt = {
                 "touser": openId,
                 "template_id": "x5dSWR4FZHkrYo8AMSKHZbByK0tXBXvvni0lLTi6CE4",
@@ -536,7 +537,7 @@ function sendResumeFeedbackMessage(req, res){
                         "color": "#000000"
                     },
                     "time": {
-                        "value": "2018年01月22日",
+                        "value": registeredDate,
                         "color": "#000000"
                     },
                     "remark":{
@@ -550,8 +551,10 @@ function sendResumeFeedbackMessage(req, res){
                     logger.error('Error in send template message', sendErr);
                     res.status(500).send({success: false, errmsg: '发送消息失败'});
                 } else {
-                    logger.info('call send template message api with feedback: ', returnedBody);
-                    res.json({success: true});
+                    logger.info('call send template message api with feedback: ', JSON.stringify(returnedBody));
+                    addCompanyIdIntoMessageSentList(openId, 'feedbackNotificationList', companyId, function(updateErr){
+                        res.json({success: true});
+                    });
                 }
             });
         }
@@ -594,7 +597,7 @@ function sendResumeHasBeenCheckedMessage(req, res){
             logger.error('Error in send template message', sendErr);
             res.status(500).send({success: false, errmsg: '发送消息失败'});
         } else {
-            logger.info('call send template message api with feedback: ', returnedBody);
+            logger.info('call send template message api with feedback: ', JSON.stringify(returnedBody));
             addCompanyIdIntoMessageSentList(openId, 'completeResumeInvitationList', companyId, function(updateErr){
                 res.json({success: true});
             });
@@ -611,8 +614,9 @@ function addCompanyIdIntoMessageSentList(openId, messageSentListType, companyId,
            var messageSentList = _.get(dbApplicant, [messageSentListType], []);
            if(_.indexOf(messageSentList, companyId) < 0){
                messageSentList.push(companyId);
-               Applicant.update({wechatOpenId: openId}, {$set: {messageSentListType: messageSentList}}, {upsert: false})
-                   .exec(function (updateError, result) {
+               var setValue = {};
+               setValue[messageSentListType] = messageSentList;
+               Applicant.update({wechatOpenId: openId}, {$set: setValue}, {upsert: false}, function (updateError, result) {
                        if(updateError) logger.error('Error in update message list', updateError);
                        return callback(null, null);
                    });
@@ -628,6 +632,7 @@ function sendInterviewMessage(req, res){
     var openId = !_.isEmpty(_.get(req, ['body', 'openId'], '')) ? _.get(req, ['body', 'openId'], '') : 'of0RLszGA9FJ7AtV0bmpQ8REs_Fc';
     var applicantName = !_.isEmpty(_.get(req, ['body', 'applicantName'], '')) ? _.get(req, ['body', 'applicantName'], '') : '张生';
     var companyName = !_.isEmpty(_.get(req, ['body', 'companyName'], '')) ? _.get(req, ['body', 'companyName'], '') : '小米科技';
+    var companyId = !_.isEmpty(_.get(req, ['body', 'companyId'], '')) ? _.get(req, ['body', 'companyId'], '') : '小米科技';
     var interviewDate = !_.isEmpty(_.get(req, ['body', 'interviewDate'], '')) ? _.get(req, ['body', 'interviewDate'], '') : '待定';
     var welcomeMessage = '尊敬的' + applicantName + '，很荣幸地通知您，有企业邀请您投递简历参加面试';
     var remark = companyName + '邀请您面试并办理入职手续，请您在【周边招聘】中向该企业投递您的简历，若您的个人简历不完整，请维护【详细个人简历】';
@@ -659,8 +664,10 @@ function sendInterviewMessage(req, res){
             logger.error('Error in send template message', sendErr);
             res.status(500).send({success: false, errmsg: '发送消息失败'});
         } else {
-            logger.info('call send template message api with feedback: ', returnedBody);
-            res.json({success: true});
+            logger.info('call send template message api with feedback: ', JSON.stringify(returnedBody));
+            addCompanyIdIntoMessageSentList(openId, 'interviewInvitationList', companyId, function(updateErr){
+                res.json({success: true});
+            });
         }
     });
 }

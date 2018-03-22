@@ -114,9 +114,10 @@ export default class ApplicantManage extends React.Component{
         e.stopPropagation();
         let {results} = this.state;
         let companyName = this.props.companyInfo.companyName;
+        let companyId = this.props.companyInfo._id;
         let applicantName = rec.name;
         let openId = rec.wechatOpenId;
-        let r = await api.sendInterviewMessage({companyName:companyName, applicantName : applicantName, openId : openId});
+        let r = await api.sendInterviewMessage({companyId: companyId, companyName:companyName, applicantName : applicantName, openId : openId});
         let res = await r.json();
         if(res.success){
             message.success('已发送面试邀请！');
