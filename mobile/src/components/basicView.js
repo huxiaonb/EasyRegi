@@ -26,7 +26,7 @@ export default class BasicView extends React.Component{
         let tagOptions = [];
         if(info.skill && info.skill.length){
             info.skill.map(s=>{
-                tagOptions.push(tagContet[s] + ',');
+                 !!!isNaN(s)?tagOptions.push(tagContet[s] + ','):false;
             })
         }
         return(
