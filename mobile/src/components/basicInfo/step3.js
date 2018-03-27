@@ -38,9 +38,12 @@ class Step3 extends React.Component{
         }
     }
     componentWillMount(){
+        //console.log(this.props.info.skill);
+        let sk = this.props.info.skill.filter(s => (isNaN(s) ? false : s))
         this.setState({
-            skill : this.props.info.skill
-        })
+            skill : sk
+        });
+        //console.log(sk);
     }
     render(){
         // console.log(this.state.skill);
@@ -79,20 +82,20 @@ class Step3 extends React.Component{
                     </div>
                     <List.Item arrow="horizontal" name="skill" style={{paddingLeft:15}}>技能&经验(多选)
                     <br/>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,0)} selected>暂无经验</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,1)}>电子五金</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,2)}>模具塑胶</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,3)}>纺织玩具</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(0)} onChange={this.onChange.bind(this,0)} selected>暂无经验</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(1)} onChange={this.onChange.bind(this,1)}>电子五金</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(2)} onChange={this.onChange.bind(this,2)}>模具塑胶</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(3)} onChange={this.onChange.bind(this,3)}>纺织玩具</Tag>
                         <br/>  
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,4)}>文员行政</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,5)}>后勤维修</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,6)}>印刷宣传</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,7)}>运输装卸</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(4)} onChange={this.onChange.bind(this,4)}>文员行政</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(5)} onChange={this.onChange.bind(this,5)}>后勤维修</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(6)} onChange={this.onChange.bind(this,6)}>印刷宣传</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(7)} onChange={this.onChange.bind(this,7)}>运输装卸</Tag>
                         <br/>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,8)}>销售客服</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,9)}>建筑装潢</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,10)}>财务出纳</Tag>
-                        <Tag className='tag-style' onChange={this.onChange.bind(this,11)}>采购跟单</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(8)} onChange={this.onChange.bind(this,8)}>销售客服</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(9)} onChange={this.onChange.bind(this,9)}>建筑装潢</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(10)} onChange={this.onChange.bind(this,10)}>财务出纳</Tag>
+                        <Tag className='tag-style' selected={info.skill.includes(11)} onChange={this.onChange.bind(this,11)}>采购跟单</Tag>
                         <br/>
                     </List.Item>
                         
