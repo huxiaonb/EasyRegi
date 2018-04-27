@@ -9,6 +9,7 @@ web:
    # DB_1_PORT_27017_TCP_ADDR: db
     PORT: '80'
   tty: true
+  restart: always
   image: easyregister:5.0
   ports: 
   - 80:80
