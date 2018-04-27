@@ -151,13 +151,14 @@ class Positions extends React.Component{
         }
     }
     apply(companyId){
+        let that = this;
         let currentPosition = this.state.currentPosition;
-        console.log(companyId, currentPosition._id);
+        //console.log(companyId, currentPosition._id);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
             wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: currentPosition._id } ,function(flag, type){
                 if (flag) {
-                    this.setState({
+                    that.setState({
                         sflag: true,
                         stitle: type==='sum'? '提交成功' : '支付成功'
                     })
