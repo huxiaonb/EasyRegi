@@ -189,10 +189,10 @@ class Positions extends React.Component{
                     let currentPosition = currentPositionList[0];
                     this.setState({currentPosition: currentPosition});
                     if(currentPosition.luckyFlag){
-                        title = '【入职易】分享招聘信息，红包抢不停！';
+                        title = '【入职易】分享招聘信息，红包抢不停！' + currentPosition.alias + '公司招聘' + currentPosition.name + '......';
                         imgUrl = 'http://www.mfca.com.cn/img/redPackLogo.jpg';
                     } else {
-                        title = '【入职易】推荐一个靠谱的招聘信息给你…';
+                        title = '【入职易】推荐一个靠谱的职位给你！' + currentPosition.alias + '公司招聘' + currentPosition.name + '......';
                     }
                 }
                 link = 'http://www.mfca.com.cn/details/' + keyArray[1];
