@@ -156,7 +156,7 @@ class Positions extends React.Component{
         //console.log(companyId, currentPosition._id);
         var completeFlag = this.props.args.isComplete === 'true' ? true: false;
         if (completeFlag){
-            wepay({ openId: this.props.args.openId, selectCompanyId: companyId, positionId: currentPosition._id } ,function(flag, type){
+            wepay({ openId: this.props.args.openId, companyId: companyId, positionId: currentPosition._id } ,function(flag, type){
                 if (flag) {
                     that.setState({
                         sflag: true,
@@ -356,7 +356,6 @@ class Positions extends React.Component{
                         title={this.state.stitle}
                         message="简历已提交"
                     />
-                    <Button type='primary' style={{ width: 'auto' }} onClick={this.bindTimelineData.bind(this)}>转发到朋友圈</Button>
                 </div>
             );
         }
