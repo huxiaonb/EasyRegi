@@ -76,6 +76,7 @@ function companyUserLogin(req, res, next){
         logger.info('login id and pwd are required');
         res.status(500).send({success: false, errmsg: 'login id and pwd are required'});
     } else {
+        email = email.toLowerCase();
         login(email, pwd, function(error, companyItem){
             if(error){
                 logger.info('Error in finding an account', email, error);
@@ -398,6 +399,7 @@ function registerCompany(req, res, next){
     if(_.isEmpty(email) || _.isEmpty(pwd)){
         res.status(500).send({success: false, errmsg: '邮箱及密码是必填的'});
     } else {
+        email = email.toLowerCase();
         var queryCriteria = {$or: []};
         queryCriteria.$or.push({email: email});
         var companyName = _.get(req, ['body', 'companyName'], '');
