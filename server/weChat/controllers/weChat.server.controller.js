@@ -614,7 +614,7 @@ exports.submitRegisterCompany = function(req, res){
             }
 
             logger.info(JSON.stringify(dbApplicant.registeredCompanies));
-            Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies}}, {upsert: true})
+            Applicant.update({wechatOpenId : openId}, {$set: {registeredCompanies: dbApplicant.registeredCompanies, appliedPositions: dbApplicant.appliedPositions}}, {upsert: true})
             .exec(function(error, persistedObj){
               if(error) {
                 logger.info('Error in updating applicant', error);
