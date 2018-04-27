@@ -140,7 +140,7 @@ exports.positions = function(req, res) {
 
 exports.checkIfNeedPay = function(req, res){
     var openId = _.get(req, ['body', 'openId'], ''),
-        selectCompanyId = _.get(req, ['body', 'companyId', '0']);
+        selectCompanyId = _.get(req, ['body', 'companyId']);
     logger.info('check if need pay', openId, selectCompanyId);
     if(_.isEmpty(openId) || _.isEmpty(selectCompanyId)){
         console.log('open id is empty or company id is empty');
