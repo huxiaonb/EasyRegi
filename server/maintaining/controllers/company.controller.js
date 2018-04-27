@@ -461,7 +461,7 @@ function registerCompany(req, res, next){
                                     emailOpt.html = verificationEmailContent;
                                     sendVerificationEmail(emailOpt, function(err4, emailResult){
                                         if(err4) {
-                                            logger.info('Error in sending verification email', err4);
+                                            logger.info('Error in sending verification email', JSON.stringify(err4));
                                             res.status(500).send({success: false, errmsg: '未知错误请联系管理员！'});
                                         } else {
                                             Company.update({email: email}, {$set: verificationInfo}, {upsert: false}, function(err5, updResult2){
@@ -1257,7 +1257,7 @@ function testSendEmail(req, res, next){
 function sendVerificationEmail(email, callback){
     EmailUtil.sendEmail(email, function(error, info){
         if(error) {
-            logger.info(error);
+            logger.info(JSON.stringify(error));
             return callback(error, null);
         }
         else {
