@@ -400,6 +400,7 @@ function registerCompany(req, res, next){
         res.status(500).send({success: false, errmsg: '邮箱及密码是必填的'});
     } else {
         email = email.toLowerCase();
+        companyItem.email = email;
         var queryCriteria = {$or: []};
         queryCriteria.$or.push({email: email});
         var companyName = _.get(req, ['body', 'companyName'], '');
