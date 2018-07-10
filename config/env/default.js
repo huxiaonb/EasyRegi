@@ -79,8 +79,8 @@ module.exports = {
     },
     qqmapKey: 'HAWBZ-D6RWD-K4Y4X-PQFW3-5L6WZ-LMFHQ',
     qqapi: {
-        geocoderApi: 'http://apis.map.qq.com/ws/geocoder/v1/',
-        distanceApi: 'http://apis.map.qq.com/ws/distance/v1/'
+        geocoderApi: 'https://apis.map.qq.com/ws/geocoder/v1/',
+        distanceApi: 'https://apis.map.qq.com/ws/distance/v1/'
     },
     aliCloud: {
         SMS: {
